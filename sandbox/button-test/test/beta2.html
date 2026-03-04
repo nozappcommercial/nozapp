@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="it">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Effetto Bobina Pellicola</title>
+    <style>
+        body {
+            background-color: #fcfbf7;
+            /* Colore di sfondo app */
+            font-family: 'Helvetica Neue', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            overflow: hidden;
+            /* Previene scrollbar durante l'animazione */
+        }
+
+        /* --- CONTENITORE DEL BOTTONE --- */
+        /* Necessario per gestire l'overflow della pellicola che esce */
+        .button-container {
+            position: relative;
+            width: 100%;
+            max-width: 400px;
+            height: 60px;
+            /* Altezza fissa per contenere l'effetto */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* --- IL BOTTONE ORIGINALE --- */
+        .base-btn {
+            position: absolute;
+            background-color: #5e2129;
+            /* Bordeaux scuro */
+            color: #fcfbf7;
+            border: none;
+            border-radius: 8px;
+            width: 100%;
+            height: 100%;
+            font-size: 14px;
+            font-weight: 600;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            cursor: pointer;
+            z-index: 10;
+            /* Sta sopra l'SVG a riposo */
+            transition: all 0.3s ease;
+            outline: none;
+        }
+
+        .base-btn span {
+            transition: opacity 0.2s;
+        }
+
+        /* --- STATO ATTIVO (CLICK) --- */
+        /* Quando si clicca, il bottone base svanisce e parte l'SVG */
+        .button-container.active .base-btn {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        /* Rende visibile l'SVG */
+        .button-container.active .film-svg-container {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        /* --- CONTENITORE SVG --- */
+        /* È molto più largo del bottone per permettere alla pellicola di "uscire" */
+        .film-svg-container {
+            position: absolute;
+            left: 0;
+            /* Larghezza doppia per far uscire la pellicola dallo schermo a destra */
+            width: 200%;
+            height: 120%;
+            /* Un po' più alto per margine */
+            top: -10%;
+            z-index: 5;
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+            /* L'origine della trasformazione è a sinistra, dove c'è il rotolo */
+            transform-origin: left center;
+        }
+
+        /* --- ANIMAZIONI SVG (Attivate dalla classe .active nel container padre) --- */
+
+        /* 1. Il rotolo che si consuma (si stringe orizzontalmente) */
+        .button-container.active #source-roll-rect {
+            animation: shrinkRoll 1.5s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+        }
+
+        /* 2. La pellicola piatta che si estende */
+        .button-container.active #deployed-film-group {
+            animation: extendFilm 1.5s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+        }
+
+        /* 3. I fori della pellicola che scorrono mentre si srotola */
+        .button-container.active #film-pattern-rect {
+            animation: moveTexture 0.5s linear infinite;
+        }
+
+
+        /* --- KEYFRAMES --- */
+
+        /* Il rotolo si stringe dall'8% di larghezza quasi a zero */
+        @keyframes shrinkRoll {
+            0% {
+                width: 8%;
+                x: 0;
+            }
+
+            100% {
+                width: 1%;
+                x: 7%;
+                /* Si sposta leggermente a destra mentre si consuma */
+            }
+        }
+
+        /* La striscia si allarga da zero fino a coprire tutto */
+        @keyframes extendFilm {
+            0% {
+                width: 0;
+            }
+
+            100% {
+                width: 92%;
+            }
+        }
+
+        /* Fa scorrere la texture dei buchi per dare senso di movimento */
+        @keyframes moveTexture {
+            to {
+                transform: translateX(-40px);
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="button-container" id="loginBtnContainer">
+
+        <svg class="film-svg-container" viewBox="0 0 1000 120" xmlns="http://www.w3.org/2000/svg"
+            preserveAspectRatio="xMidYMid slice">
+            <defs>
+                <linearGradient id="rollGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                    <stop offset="0%" style="stop-color:#3d151a;stop-opacity:1" />
+                    <stop offset="50%" style="stop-color:#7a2e38;stop-opacity:1" />
+                    <stop offset="100%" style="stop-color:#3d151a;stop-opacity:1" />
+                </linearGradient>
+
+                <pattern id="sprocketHoles" x="0" y="0" width="40" height="120" patternUnits="userSpaceOnUse">
+                    <rect x="10" y="10" width="20" height="15" rx="4" fill="#fcfbf7" />
+                    <rect x="10" y="95" width="20" height="15" rx="4" fill="#fcfbf7" />
+                </pattern>
+
+                <mask id="holesMask">
+                    <rect x="0" y="0" width="100%" height="100%" fill="white" />
+                    <rect id="film-pattern-rect" x="0" y="0" width="150%" height="100%" fill="url(#sprocketHoles)" />
+                </mask>
+            </defs>
+
+            <g id="deployed-film-group" transform="translate(80, 0)" width="0">
+                <rect x="0" y="10" width="100%" height="100" rx="5" fill="#6e2630" mask="url(#holesMask)" />
+                <rect x="0" y="10" width="100%" height="2" fill="#8a3a45" />
+            </g>
+
+            <rect id="source-roll-rect" x="0" y="0" width="8%" height="120" rx="10" fill="url(#rollGradient)" />
+            <ellipse cx="0" cy="60" rx="5" ry="58" fill="#4a1a20" />
+
+        </svg>
+
+        <button class="base-btn" onclick="triggerFilmEffect()">
+            <span>Accedi</span>
+        </button>
+    </div>
+
+    <script>
+        function triggerFilmEffect() {
+            const container = document.getElementById('loginBtnContainer');
+
+            // Attiva la classe che fa partire le animazioni CSS
+            container.classList.add('active');
+
+            // OPZIONALE: Reset dopo 3 secondi per testare nuovamente
+            setTimeout(() => {
+                // container.classList.remove('active'); // Togli il commento per il reset automatico
+                // Qui di solito reindirizzeresti l'utente dopo il login
+                console.log("Animazione completata, reindirizzamento...");
+            }, 1500); // Durata pari all'animazione CSS
+        }
+    </script>
+
+</body>
+
+</html>

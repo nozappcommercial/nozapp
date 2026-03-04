@@ -1,566 +1,20 @@
-<!DOCTYPE html>
-<html lang="it">
-
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sfera Semantica v3</title>
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Fragment+Mono:ital@0;1&display=swap');
-
-        *,
-        *::before,
-        *::after {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0
-        }
-
-        :root {
-            --ember: #ff6b3d;
-            --ember-dim: #7a2e18;
-            --gold: #e4b84a;
-            --gold-dim: #6b5020;
-            --cold: #5ecde8;
-            --cold-dim: #1a4d5a;
-            --bg: #04050b;
-            --surface: rgba(8, 10, 18, 0.92);
-            --text: #e2d9cc;
-            --dim: #4a4540;
-        }
-
-        html,
-        body {
-            width: 100%;
-            height: 100%;
-            overflow: hidden;
-            background: var(--bg)
-        }
-
-        body.dragging {
-            cursor: grabbing !important
-        }
-
-        canvas {
-            position: fixed;
-            inset: 0;
-            display: block;
-            cursor: grab
-        }
-
-        /* Vignette */
-        .vignette {
-            position: fixed;
-            inset: 0;
-            pointer-events: none;
-            z-index: 1;
-            background: radial-gradient(ellipse 75% 75% at 50% 50%, transparent 30%, rgba(4, 5, 11, .85) 100%)
-        }
-
-        /* Labels */
-        #labels {
-            position: fixed;
-            inset: 0;
-            pointer-events: none;
-            z-index: 5
-        }
-
-        .node-label {
-            position: absolute;
-            transform: translate(-50%, -50%);
-            pointer-events: none;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 3px;
-            transition: opacity .2s ease
-        }
-
-        .label-title {
-            font-family: 'Fragment Mono', monospace;
-            font-size: 9px;
-            letter-spacing: .1em;
-            text-transform: uppercase;
-            padding: 2px 7px;
-            white-space: nowrap;
-            line-height: 1.2;
-            transition: all .2s
-        }
-
-        .label-pillar .label-title {
-            color: var(--ember);
-            background: rgba(255, 107, 61, .12);
-            border: 1px solid rgba(255, 107, 61, .35)
-        }
-
-        .label-primary .label-title {
-            color: var(--gold);
-            background: rgba(228, 184, 74, .08);
-            border: 1px solid rgba(228, 184, 74, .25)
-        }
-
-        .label-secondary .label-title {
-            color: var(--cold);
-            background: rgba(94, 205, 232, .06);
-            border: 1px solid rgba(94, 205, 232, .18)
-        }
-
-        .label-title.active {
-            padding: 3px 9px;
-            font-size: 10px
-        }
-
-        .label-pillar .label-title.active {
-            color: #fff;
-            background: rgba(255, 107, 61, .3);
-            border-color: var(--ember)
-        }
-
-        .label-primary .label-title.active {
-            color: #fff;
-            background: rgba(228, 184, 74, .25);
-            border-color: var(--gold)
-        }
-
-        .label-secondary .label-title.active {
-            color: #fff;
-            background: rgba(94, 205, 232, .2);
-            border-color: var(--cold)
-        }
-
-        /* Header */
-        header {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            z-index: 10;
-            padding: 24px 32px;
-            display: flex;
-            align-items: flex-start;
-            justify-content: space-between;
-            pointer-events: none
-        }
-
-        .brand {
-            font-family: 'Fragment Mono', monospace;
-            font-size: 8px;
-            letter-spacing: .35em;
-            text-transform: uppercase;
-            color: var(--ember);
-            opacity: .7;
-            margin-bottom: 5px
-        }
-
-        .title {
-            font-family: 'Cormorant Garamond', serif;
-            font-size: 26px;
-            font-weight: 300;
-            color: var(--text)
-        }
-
-        .title em {
-            font-style: italic;
-            color: var(--gold)
-        }
-
-        .hints {
-            font-family: 'Fragment Mono', monospace;
-            font-size: 9px;
-            color: var(--dim);
-            letter-spacing: .08em;
-            line-height: 2;
-            text-align: right
-        }
-
-        /* Shell legend */
-        .shells-legend {
-            position: fixed;
-            bottom: 28px;
-            left: 28px;
-            z-index: 10;
-            pointer-events: none;
-            display: flex;
-            flex-direction: column;
-            gap: 9px
-        }
-
-        .shell-item {
-            display: flex;
-            align-items: center;
-            gap: 9px;
-            font-family: 'Fragment Mono', monospace;
-            font-size: 9px;
-            color: var(--dim);
-            letter-spacing: .08em
-        }
-
-        .shell-dot {
-            width: 7px;
-            height: 7px;
-            border-radius: 50%;
-            flex-shrink: 0
-        }
-
-        /* ─── NAVIGATION CONTROLS ─── */
-        #nav-controls {
-            position: fixed;
-            left: 50%;
-            bottom: 32px;
-            transform: translateX(-50%);
-            z-index: 20;
-            pointer-events: auto;
-            display: none;
-            flex-direction: column;
-            align-items: center;
-            gap: 6px;
-        }
-
-        #nav-controls.visible {
-            display: flex
-        }
-
-        .nav-row {
-            display: flex;
-            gap: 6px
-        }
-
-        .nav-btn {
-            width: 40px;
-            height: 40px;
-            border-radius: 2px;
-            border: 1px solid rgba(228, 184, 74, .3);
-            background: rgba(8, 10, 18, .9);
-            backdrop-filter: blur(12px);
-            color: var(--gold);
-            font-size: 16px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all .18s ease;
-            font-family: 'Fragment Mono', monospace;
-            flex-shrink: 0;
-        }
-
-        .nav-btn:hover:not(:disabled) {
-            background: rgba(228, 184, 74, .15);
-            border-color: var(--gold);
-            color: #fff
-        }
-
-        .nav-btn:disabled {
-            opacity: .18;
-            cursor: default;
-            border-color: rgba(228, 184, 74, .1)
-        }
-
-        .nav-label {
-            font-family: 'Fragment Mono', monospace;
-            font-size: 8px;
-            letter-spacing: .2em;
-            color: rgba(228, 184, 74, .4);
-            text-transform: uppercase;
-            text-align: center
-        }
-
-        .nav-counter {
-            font-family: 'Fragment Mono', monospace;
-            font-size: 8px;
-            letter-spacing: .1em;
-            color: rgba(228, 184, 74, .5);
-            text-align: center;
-            margin-top: 2px
-        }
-
-        /* ─── INFO PANEL ─── */
-        #panel {
-            position: fixed;
-            right: 28px;
-            bottom: 28px;
-            z-index: 10;
-            width: 320px;
-            background: var(--surface);
-            border: 1px solid rgba(228, 184, 74, .2);
-            backdrop-filter: blur(20px);
-            opacity: 0;
-            transform: translateY(12px) scale(.97);
-            transition: opacity .3s ease, transform .3s ease;
-            pointer-events: none;
-        }
-
-        #panel.visible {
-            opacity: 1;
-            transform: none;
-            pointer-events: auto
-        }
-
-        #panel-close {
-            position: absolute;
-            top: 12px;
-            right: 14px;
-            background: none;
-            border: none;
-            cursor: pointer;
-            color: var(--dim);
-            font-size: 15px;
-            font-family: 'Fragment Mono', monospace;
-            transition: color .2s;
-            z-index: 1
-        }
-
-        #panel-close:hover {
-            color: var(--gold)
-        }
-
-        /* Poster */
-        #panel-poster {
-            width: 100%;
-            height: 160px;
-            position: relative;
-            overflow: hidden;
-            display: flex;
-            align-items: flex-end;
-        }
-
-        .poster-bg {
-            position: absolute;
-            inset: 0;
-            display: flex;
-            align-items: center;
-            justify-content: center
-        }
-
-        .poster-overlay {
-            position: absolute;
-            inset: 0;
-            background: linear-gradient(to top, rgba(8, 10, 18, 1) 0%, rgba(8, 10, 18, .2) 60%, transparent 100%)
-        }
-
-        .poster-content {
-            position: relative;
-            z-index: 1;
-            padding: 16px 18px 14px
-        }
-
-        .poster-eyebrow {
-            font-family: 'Fragment Mono', monospace;
-            font-size: 8px;
-            letter-spacing: .3em;
-            text-transform: uppercase;
-            opacity: .5;
-            margin-bottom: 3px
-        }
-
-        .poster-film-title {
-            font-family: 'Cormorant Garamond', serif;
-            font-size: 22px;
-            font-weight: 400;
-            color: #fff;
-            line-height: 1.1;
-            margin-bottom: 2px
-        }
-
-        .poster-film-meta {
-            font-family: 'Fragment Mono', monospace;
-            font-size: 9px;
-            color: rgba(255, 255, 255, .45);
-            letter-spacing: .08em
-        }
-
-        /* Panel body */
-        .panel-body {
-            padding: 14px 18px 18px
-        }
-
-        .p-badge {
-            display: inline-block;
-            margin-bottom: 10px;
-            font-family: 'Fragment Mono', monospace;
-            font-size: 8px;
-            letter-spacing: .2em;
-            text-transform: uppercase;
-            padding: 2px 8px
-        }
-
-        .p-badge-pillar {
-            background: rgba(255, 107, 61, .12);
-            border: 1px solid rgba(255, 107, 61, .35);
-            color: var(--ember)
-        }
-
-        .p-badge-primary {
-            background: rgba(228, 184, 74, .1);
-            border: 1px solid rgba(228, 184, 74, .3);
-            color: var(--gold)
-        }
-
-        .p-badge-secondary {
-            background: rgba(94, 205, 232, .06);
-            border: 1px solid rgba(94, 205, 232, .2);
-            color: var(--cold)
-        }
-
-        .p-section {
-            font-family: 'Fragment Mono', monospace;
-            font-size: 8px;
-            letter-spacing: .2em;
-            color: rgba(226, 217, 204, .2);
-            text-transform: uppercase;
-            margin-bottom: 6px
-        }
-
-        .p-tags {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 4px;
-            margin-bottom: 14px
-        }
-
-        .p-tag {
-            font-family: 'Fragment Mono', monospace;
-            font-size: 8px;
-            letter-spacing: .08em;
-            padding: 2px 7px;
-            border: 1px solid rgba(228, 184, 74, .18);
-            color: var(--gold);
-            background: rgba(228, 184, 74, .05)
-        }
-
-        .p-conns {
-            display: flex;
-            flex-direction: column;
-            gap: 5px
-        }
-
-        .p-conn {
-            font-family: 'Fragment Mono', monospace;
-            font-size: 9px;
-            color: rgba(226, 217, 204, .6);
-            letter-spacing: .05em;
-            display: flex;
-            align-items: center;
-            gap: 7px;
-            line-height: 1.3
-        }
-
-        .p-conn-dot {
-            width: 5px;
-            height: 5px;
-            border-radius: 50%;
-            flex-shrink: 0
-        }
-
-        .p-conn-type {
-            font-size: 8px;
-            opacity: .4;
-            font-style: italic;
-            white-space: nowrap
-        }
-
-        /* Path breadcrumb */
-        #breadcrumb {
-            position: fixed;
-            top: 90px;
-            left: 50%;
-            transform: translateX(-50%);
-            z-index: 10;
-            pointer-events: none;
-            display: none;
-            align-items: center;
-            gap: 6px;
-            font-family: 'Fragment Mono', monospace;
-            font-size: 9px;
-            letter-spacing: .1em;
-            color: var(--dim);
-        }
-
-        #breadcrumb.visible {
-            display: flex
-        }
-
-        .bc-item {
-            color: var(--gold);
-            opacity: .7
-        }
-
-        .bc-sep {
-            opacity: .3
-        }
-
-        .bc-current {
-            color: var(--text);
-            opacity: .9
-        }
-    </style>
-</head>
-
-<body>
-    <canvas id="c"></canvas>
-    <div class="vignette"></div>
-    <div id="labels"></div>
-
-    <header>
-        <div>
-            <div class="brand">Editorial Graph</div>
-            <div class="title">La <em>Sfera</em> Semantica</div>
-        </div>
-        <div class="hints">
-            TRASCINA · ruota &nbsp;·&nbsp; SCROLL · zoom<br>
-            CLICK · seleziona nodo<br>
-            ↑↓ · cambia livello &nbsp;·&nbsp; ←→ · stesso livello
-        </div>
-    </header>
-
-    <div class="shells-legend">
-        <div class="shell-item">
-            <div class="shell-dot" style="background:var(--ember)"></div>Shell I — Pilastri
-        </div>
-        <div class="shell-item">
-            <div class="shell-dot" style="background:var(--gold)"></div>Shell II — Affinità
-        </div>
-        <div class="shell-item">
-            <div class="shell-dot" style="background:var(--cold)"></div>Shell III — Scoperta
-        </div>
-    </div>
-
-    <!-- Breadcrumb -->
-    <div id="breadcrumb"></div>
-
-    <!-- Navigation -->
-    <div id="nav-controls">
-        <button class="nav-btn" id="btn-up" disabled title="Esplora verso l'esterno">↑</button>
-        <div class="nav-row">
-            <button class="nav-btn" id="btn-left" disabled title="Film precedente">←</button>
-            <button class="nav-btn" id="btn-down" disabled title="Torna verso il centro">↓</button>
-            <button class="nav-btn" id="btn-right" disabled title="Film successivo">→</button>
-        </div>
-        <div class="nav-counter" id="nav-counter"></div>
-    </div>
-
-    <!-- Info Panel -->
-    <div id="panel">
-        <button id="panel-close">×</button>
-        <div id="panel-poster">
-            <div class="poster-bg" id="poster-bg"></div>
-            <div class="poster-overlay"></div>
-            <div class="poster-content">
-                <div class="poster-eyebrow" id="poster-eyebrow"></div>
-                <div class="poster-film-title" id="poster-title"></div>
-                <div class="poster-film-meta" id="poster-meta"></div>
-            </div>
-        </div>
-        <div class="panel-body">
-            <div id="p-badge"></div>
-            <div class="p-section">Temi editoriali</div>
-            <div class="p-tags" id="p-tags"></div>
-            <div class="p-section" id="conn-section-label"></div>
-            <div class="p-conns" id="p-conns"></div>
-        </div>
-    </div>
-
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-    <script>
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-nocheck
+/* eslint-disable */
+"use client";
+import React, { useEffect, useRef } from 'react';
+import * as THREE from 'three';
+import './sphere.css';
+
+export default function SemanticSphere() {
+    const containerRef = useRef<HTMLDivElement>(null);
+    const mounted = useRef(false);
+
+    useEffect(() => {
+        if (mounted.current) return;
+        mounted.current = true;
+
+        // Wrap the original script inside this effect
         // ═══════════════════════════════════════════════════════════
         // DATA
         // ═══════════════════════════════════════════════════════════
@@ -585,6 +39,27 @@
             { id: 17, title: "Memoria", year: 2021, dir: "Weerasethakul", shell: 2, tags: ["suono", "amnesia"], poster: ["#050d10", "#0d1e22", "#152e35"] },
             { id: 18, title: "A Ghost Story", year: 2017, dir: "Lowery", shell: 2, tags: ["lutto", "tempo", "casa"], poster: ["#0d0808", "#1e1010", "#2e1818"] },
             { id: 19, title: "Seconds", year: 1966, dir: "Frankenheimer", shell: 2, tags: ["identità nuova", "orrore borghese"], poster: ["#080d08", "#101810", "#182518"] },
+            // Extra test data
+            { id: 20, title: "The Tree of Life", year: 2011, dir: "Malick", shell: 0, tags: ["grazia", "natura", "cosmo"], poster: ["#1e251a", "#324029", "#4b603d"] },
+            { id: 21, title: "Synecdoche, New York", year: 2008, dir: "Kaufman", shell: 0, tags: ["morte", "rappresentazione", "tempo"], poster: ["#1f1b24", "#302a3a", "#4a415a"] },
+            { id: 22, title: "The Truman Show", year: 1998, dir: "Weir", shell: 1, tags: ["falsa realtà", "libero arbitrio"], poster: ["#0d1a26", "#173048", "#244b70"] },
+            { id: 23, title: "Paprika", year: 2006, dir: "Kon", shell: 1, tags: ["sogno lucido", "inconscio", "tecnologia"], poster: ["#331414", "#5a2222", "#873232"] },
+            { id: 24, title: "Midsommar", year: 2019, dir: "Aster", shell: 1, tags: ["luce", "setta", "liberazione"], poster: ["#2d2b1f", "#4a4732", "#736e4f"] },
+            { id: 25, title: "Perfect Blue", year: 1997, dir: "Kon", shell: 1, tags: ["doppio", "ossessione", "internet"], poster: ["#141624", "#202640", "#2e3a63"] },
+            { id: 26, title: "Brazil", year: 1985, dir: "Gilliam", shell: 2, tags: ["burocrazia", "fuga", "distopia"], poster: ["#212121", "#383838", "#595959"] },
+            { id: 27, title: "The Matrix", year: 1999, dir: "Wachowski", shell: 2, tags: ["simulazione", "risveglio", "scelta"], poster: ["#0f2613", "#17401d", "#22632b"] },
+            { id: 28, title: "Donnie Darko", year: 2001, dir: "Kelly", shell: 2, tags: ["viaggio nel tempo", "adolescenza", "destino"], poster: ["#1a1d26", "#2a3245", "#3c4866"] },
+            { id: 29, title: "A Clockwork Orange", year: 1971, dir: "Kubrick", shell: 2, tags: ["libera scelta", "condizionamento", "violenza"], poster: ["#331b14", "#5c3022", "#8c4832"] },
+            { id: 30, title: "The Master", year: 2012, dir: "Anderson", shell: 2, tags: ["trauma", "culto", "dipendenza"], poster: ["#263333", "#3a5050", "#547575"] },
+            { id: 31, title: "Beau Is Afraid", year: 2023, dir: "Aster", shell: 2, tags: ["ansia", "senso di colpa", "odissea"], poster: ["#33252a", "#523740", "#78505e"] },
+            { id: 32, title: "Her", year: 2013, dir: "Jonze", shell: 2, tags: ["amore virtuale", "solitudine", "evoluzione"], poster: ["#331f24", "#5c333a", "#8c4e58"] },
+            { id: 33, title: "Fight Club", year: 1999, dir: "Fincher", shell: 2, tags: ["doppio", "alienazione", "distruzione"], poster: ["#262621", "#424237", "#636353"] },
+            { id: 34, title: "Black Swan", year: 2010, dir: "Aronofsky", shell: 2, tags: ["perfezione", "paranoia", "doppio"], poster: ["#1a1a1a", "#2e2e2e", "#454545"] },
+            { id: 35, title: "Ex Machina", year: 2014, dir: "Garland", shell: 2, tags: ["coscienza", "macchina", "inganno"], poster: ["#1a2a33", "#294452", "#3b6378"] },
+            { id: 36, title: "Interstellar", year: 2014, dir: "Nolan", shell: 2, tags: ["spazio", "tempo", "amore"], poster: ["#0f141a", "#1b2530", "#2b3b4d"] },
+            { id: 37, title: "Arrival", year: 2016, dir: "Villeneuve", shell: 2, tags: ["linguaggio", "tempo ciclico", "memoria"], poster: ["#212826", "#364541", "#526b64"] },
+            { id: 38, title: "Vortex", year: 2021, dir: "Noé", shell: 2, tags: ["morte", "decadimento", "frammentazione"], poster: ["#2e2424", "#4a3838", "#6b5050"] },
+            { id: 39, title: "High Life", year: 2018, dir: "Denis", shell: 2, tags: ["buco nero", "riproduzione", "isolamento"], poster: ["#141a2e", "#24325c", "#384f94"] },
         ];
 
         const EDGES = [
@@ -617,14 +92,14 @@
         ];
 
         const ECFG = {
-            thematic: { from: 0xff6b3d, to: 0xe4b84a, base: .6 },
-            stylistic: { from: 0xe4b84a, to: 0x5ecde8, base: .5 },
-            contrast: { from: 0x5ecde8, to: 0x1a4d5a, base: .3 },
+            thematic: { from: 0x78272e, to: 0xb58c2a, base: .6 },
+            stylistic: { from: 0xb58c2a, to: 0x3b8b9e, base: .5 },
+            contrast: { from: 0x3b8b9e, to: 0x225560, base: .3 },
         };
         const NCFG = [
-            { color: 0xff6b3d, size: .15, glow: .22 }, // shell 0
-            { color: 0xe4b84a, size: .11, glow: .12 }, // shell 1
-            { color: 0x5ecde8, size: .08, glow: .08 }, // shell 2
+            { color: 0x78272e, size: .15, glow: .22 }, // shell 0
+            { color: 0xb58c2a, size: .11, glow: .12 }, // shell 1
+            { color: 0x3b8b9e, size: .08, glow: .08 }, // shell 2
         ];
 
         // ═══════════════════════════════════════════════════════════
@@ -635,25 +110,27 @@
         const renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
         renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
         renderer.setSize(W(), H());
-        renderer.setClearColor(0x04050b, 1);
+        renderer.setClearColor(0xf8f8ee, 1);
 
         const scene = new THREE.Scene();
-        scene.fog = new THREE.FogExp2(0x04050b, .032);
+        scene.fog = new THREE.FogExp2(0xf8f8ee, .032);
         const camera = new THREE.PerspectiveCamera(48, W() / H(), .1, 500);
         camera.position.set(0, 0, 11);
 
         const RADII = [1.35, 2.8, 4.4];
 
-        // Shell wireframes (no raycast)
+        // Shell wireframes (disabled per request)
+        /*
         const shellAlpha = [.10, .07, .05];
         RADII.forEach((r, i) => {
             const m = new THREE.Mesh(
                 new THREE.SphereGeometry(r, 26, 16),
-                new THREE.MeshBasicMaterial({ color: 0x0d1525, wireframe: true, transparent: true, opacity: shellAlpha[i] })
+                new THREE.MeshBasicMaterial({ color: 0x160a0c, wireframe: true, transparent: true, opacity: shellAlpha[i] * 0.4 })
             );
             m.raycast = () => { };
             scene.add(m);
         });
+        */
 
         const group = new THREE.Group();
         scene.add(group);
@@ -687,7 +164,7 @@
 
             const gl = new THREE.Mesh(
                 new THREE.SphereGeometry(cfg.size * 3.5, 16, 12),
-                new THREE.MeshBasicMaterial({ color: cfg.color, transparent: true, opacity: cfg.glow, blending: THREE.AdditiveBlending })
+                new THREE.MeshBasicMaterial({ color: cfg.color, transparent: true, opacity: cfg.glow, blending: THREE.NormalBlending })
             );
             gl.position.copy(pos); gl.raycast = () => { };
             group.add(gl); glowMeshes.push(gl);
@@ -711,7 +188,7 @@
             geo.setAttribute('position', new THREE.Float32BufferAttribute(pos3, 3));
             geo.setAttribute('color', new THREE.Float32BufferAttribute(cols, 3));
             return new THREE.Line(geo, new THREE.LineBasicMaterial({
-                vertexColors: true, transparent: true, opacity: cfg.base, blending: THREE.AdditiveBlending
+                vertexColors: true, transparent: true, opacity: cfg.base, blending: THREE.NormalBlending
             }));
         }
         EDGES.forEach((e, i) => {
@@ -727,7 +204,7 @@
         }
         const sGeo = new THREE.BufferGeometry();
         sGeo.setAttribute('position', new THREE.Float32BufferAttribute(spts, 3));
-        scene.add(new THREE.Points(sGeo, new THREE.PointsMaterial({ color: 0x6677aa, size: .014, transparent: true, opacity: .25 })));
+        scene.add(new THREE.Points(sGeo, new THREE.PointsMaterial({ color: 0x160a0c, size: .014, transparent: true, opacity: .25 })));
 
         // ═══════════════════════════════════════════════════════════
         // LABELS
@@ -845,7 +322,7 @@
             // Dim everything not in visible
             FILMS.forEach((f, i) => {
                 if (!visible.has(i)) {
-                    nodeMeshes[i].material.color.setHex(0x0d1020);
+                    nodeMeshes[i].material.color.setHex(0xe0ddd5);
                     glowMeshes[i].material.opacity = .01;
                 }
             });
@@ -859,7 +336,7 @@
             // Highlight current
             const cfg = NCFG[FILMS[current].shell];
             const c = new THREE.Color(cfg.color);
-            nodeMeshes[current].material.color.copy(c.clone().multiplyScalar(2.2));
+            nodeMeshes[current].material.color.copy(c.clone().multiplyScalar(0.7));
             glowMeshes[current].material.opacity = .45;
 
             updateNavButtons(ctx);
@@ -977,11 +454,27 @@
             const panel = document.getElementById('panel');
 
             // Poster
-            const colors = film.poster;
-            document.getElementById('poster-bg').style.background =
-                `radial-gradient(ellipse at 30% 40%,${colors[2]} 0%,${colors[1]} 40%,${colors[0]} 100%)`;
-            document.getElementById('poster-eyebrow').textContent = ['★ PILASTRO', '◆ AFFINITÀ', '· SCOPERTA'][film.shell];
-            document.getElementById('poster-title').textContent = film.title;
+            const posterImg = document.getElementById('poster-img');
+            const posterBg = document.getElementById('poster-bg');
+            if (film.posterUrl) {
+                if (posterImg) {
+                    posterImg.setAttribute('src', film.posterUrl);
+                    posterImg.style.display = 'block';
+                }
+                if (posterBg) posterBg.style.display = 'none';
+            } else {
+                if (posterImg) posterImg.style.display = 'none';
+                if (posterBg) {
+                    posterBg.style.display = 'block';
+                    const colors = film.poster;
+                    posterBg.style.background = `radial-gradient(ellipse at 30% 40%,${colors[2]} 0%,${colors[1]} 40%,${colors[0]} 100%)`;
+                }
+            }
+
+            if (document.getElementById('poster-eyebrow')) {
+                document.getElementById('poster-eyebrow')!.textContent = ['★ PILASTRO', '◆ AFFINITÀ', '· SCOPERTA'][film.shell];
+            }
+            document.getElementById('poster-title')!.textContent = film.title;
             document.getElementById('poster-meta').textContent = `${film.year}  ·  ${film.dir}`;
 
             // Badge
@@ -1061,10 +554,10 @@
                         FILMS.forEach((f, i) => {
                             if (conn.has(i)) {
                                 nodeMeshes[i].material.color.setHex(NCFG[f.shell].color);
-                                nodeMeshes[i].material.color.multiplyScalar(i === hit ? 2.0 : 1.4);
+                                nodeMeshes[i].material.color.multiplyScalar(i === hit ? 0.8 : 0.9);
                                 glowMeshes[i].material.opacity = NCFG[f.shell].glow * (i === hit ? 3 : 1.8);
                             } else {
-                                nodeMeshes[i].material.color.setHex(0x0d1020);
+                                nodeMeshes[i].material.color.setHex(0xe0ddd5);
                                 glowMeshes[i].material.opacity = .008;
                             }
                         });
@@ -1130,8 +623,9 @@
         });
 
         window.addEventListener('wheel', e => {
+            e.preventDefault();
             camera.position.z = Math.max(5, Math.min(18, camera.position.z + e.deltaY * .012));
-        }, { passive: true });
+        }, { passive: false });
 
         // Keyboard navigation — mirrors button logic (↑=outward, ↓=inward)
         window.addEventListener('keydown', e => {
@@ -1184,7 +678,89 @@
             camera.aspect = W() / H(); camera.updateProjectionMatrix();
             renderer.setSize(W(), H());
         });
-    </script>
-</body>
 
-</html>
+        // Auto cleanup on unmount
+        return () => {
+            window.removeEventListener('resize', () => { });
+            window.removeEventListener('mousemove', () => { });
+            window.removeEventListener('mousedown', () => { });
+            window.removeEventListener('mouseup', () => { });
+            window.removeEventListener('wheel', () => { });
+            window.removeEventListener('keydown', () => { });
+            if (document.getElementById('canvas-container')) {
+                document.getElementById('canvas-container').innerHTML = '';
+            }
+            mounted.current = false;
+        };
+    }, []);
+
+    return (
+        <div ref={containerRef} className="sphere-wrapper w-full h-full relative" style={{ background: 'var(--bg)', color: 'var(--text)', overflow: 'hidden', height: '100vh', width: '100vw' }}>
+            <canvas id="c"></canvas>
+            <div className="vignette"></div>
+            <div id="labels"></div>
+
+            <header>
+                <div>
+                    <div className="brand">Editorial Graph</div>
+                    <div className="title">La <em>Sfera</em> Semantica</div>
+                </div>
+                <div className="hints">
+                    TRASCINA · ruota &nbsp;·&nbsp; SCROLL · zoom<br />
+                    CLICK · seleziona nodo<br />
+                    ↑↓ · cambia livello &nbsp;·&nbsp; ←→ · stesso livello
+                </div>
+            </header>
+
+            <div className="shells-legend">
+                <div className="shell-item">
+                    <div className="shell-dot" style={{ background: "var(--ember)", }}></div>Shell I — Pilastri
+                </div>
+                <div className="shell-item">
+                    <div className="shell-dot" style={{ background: "var(--gold)", }}></div>Shell II — Affinità
+                </div>
+                <div className="shell-item">
+                    <div className="shell-dot" style={{ background: "var(--cold)", }}></div>Shell III — Scoperta
+                </div>
+            </div>
+
+            {/* Breadcrumb */}
+            <div id="breadcrumb"></div>
+
+            {/* Navigation */}
+            <div id="nav-controls">
+                <button className="nav-btn" id="btn-up" disabled title="Esplora verso l'esterno">↑</button>
+                <div className="nav-row">
+                    <button className="nav-btn" id="btn-left" disabled title="Film precedente">←</button>
+                    <button className="nav-btn" id="btn-down" disabled title="Torna verso il centro">↓</button>
+                    <button className="nav-btn" id="btn-right" disabled title="Film successivo">→</button>
+                </div>
+                <div className="nav-counter" id="nav-counter"></div>
+            </div>
+
+            {/* Info Panel */}
+            <div id="panel">
+                <button id="panel-close">×</button>
+                <div id="panel-poster">
+                    <img id="poster-img" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', zIndex: 0, display: 'none' }} alt="" />
+                    <div className="poster-bg" id="poster-bg"></div>
+                    <div className="poster-overlay"></div>
+                    <div className="poster-content">
+                        <div className="poster-eyebrow" id="poster-eyebrow"></div>
+                        <div className="poster-film-title" id="poster-title"></div>
+                        <div className="poster-film-meta" id="poster-meta"></div>
+                    </div>
+                </div>
+                <div className="panel-body">
+                    <div id="p-badge"></div>
+                    <div className="p-section">Temi editoriali</div>
+                    <div className="p-tags" id="p-tags"></div>
+                    <div className="p-section" id="conn-section-label"></div>
+                    <div className="p-conns" id="p-conns"></div>
+                </div>
+            </div>
+
+
+        </div>
+    );
+}

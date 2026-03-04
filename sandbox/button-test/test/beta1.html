@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="it">
+
+<head>
+    <meta charset="UTF-8">
+    <style>
+        body {
+            background-color: #fcfbf7;
+            /* Colore di sfondo della tua app */
+            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        /* Stile base del bottone */
+        .film-btn {
+            position: relative;
+            background-color: #5e2129;
+            /* Il bordeaux del tuo screenshot */
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            /* Arrotondamento leggero come nel design */
+            padding: 18px 0;
+            width: 100%;
+            max-width: 400px;
+            font-size: 14px;
+            font-weight: 600;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            cursor: pointer;
+            overflow: hidden;
+            /* Fondamentale per mascherare l'animazione */
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(94, 33, 41, 0.2);
+        }
+
+        .film-btn:hover {
+            background-color: #4a1a20;
+            transform: translateY(-1px);
+        }
+
+        /* Testo del bottone */
+        .btn-text {
+            position: relative;
+            z-index: 2;
+            transition: opacity 0.3s;
+        }
+
+        /* L'elemento SVG della pellicola (nascosto inizialmente) */
+        .film-strip {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 200%;
+            /* Doppio della larghezza per il loop fluido */
+            height: 100%;
+            background-image: url("data:image/svg+xml,%3Csvg width='40' height='60' viewBox='0 0 40 60' xmlns='http://www.w3.org/2000/svg'%3E%3Crect x='0' y='5' width='20' height='12' rx='2' ry='2' fill='%23fcfbf7' fill-opacity='0.8'/%3E%3Crect x='0' y='43' width='20' height='12' rx='2' ry='2' fill='%23fcfbf7' fill-opacity='0.8'/%3E%3C/svg%3E");
+            background-repeat: repeat-x;
+            background-size: 30px 100%;
+            /* Dimensione dei fori */
+            opacity: 0;
+            z-index: 1;
+            pointer-events: none;
+        }
+
+        /* --- STATO DI CARICAMENTO (Click) --- */
+
+        .film-btn.rolling {
+            cursor: default;
+        }
+
+        /* Nasconde il testo */
+        .film-btn.rolling .btn-text {
+            opacity: 0;
+        }
+
+        /* Mostra e anima la pellicola */
+        .film-btn.rolling .film-strip {
+            opacity: 1;
+            animation: rollFilm 0.8s linear infinite;
+        }
+
+        /* L'animazione di scorrimento */
+        @keyframes rollFilm {
+            0% {
+                transform: translateX(0);
+            }
+
+            100% {
+                transform: translateX(-30px);
+                /* Deve corrispondere alla larghezza del pattern SVG */
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <button class="film-btn" id="loginBtn" onclick="startRolling()">
+        <span class="btn-text">Crea Account</span>
+        <div class="film-strip"></div>
+    </button>
+
+    <script>
+        function startRolling() {
+            const btn = document.getElementById('loginBtn');
+
+            // Aggiunge la classe che attiva l'animazione
+            btn.classList.add('rolling');
+
+            // Simulazione: Rimuove l'effetto dopo 3 secondi (o quando il login è finito)
+            setTimeout(() => {
+                btn.classList.remove('rolling');
+            }, 3000);
+        }
+    </script>
+
+</body>
+
+</html>

@@ -13,13 +13,13 @@
 ### Setup & Infrastruttura
 | # | Task | Agente | Stato |
 |---|---|---|---|
-| 1 | Inizializzare progetto Next.js 14 con App Router e TypeScript strict | Frontend | 🔲 |
-| 2 | Configurare Tailwind CSS + shadcn/ui | Frontend | 🔲 |
-| 3 | Setup Supabase project + connessione Next.js (con `@supabase/ssr`) | Backend | 🔲 |
-| 4 | Creare schema DB: `films`, `editorial_edges`, `users`, `user_pillars` | Backend | 🔲 |
-| 5 | Attivare RLS e scrivere policies per ogni tabella | Backend | 🔲 |
-| 6 | Generare tipi TypeScript da Supabase CLI → `src/types/supabase.ts` | Backend | 🔲 |
-| 7 | Configurare middleware per protezione route autenticate | Backend | 🔲 |
+| 1 | Inizializzare progetto Next.js 14 con App Router e TypeScript strict | Frontend | ✅ |
+| 2 | Configurare Tailwind CSS + shadcn/ui | Frontend | ✅ |
+| 3 | Setup Supabase project + connessione Next.js (con `@supabase/ssr`) | Backend | ✅ |
+| 4 | Creare schema DB: `films`, `editorial_edges`, `users`, `user_pillars` | Backend | ✅ |
+| 5 | Attivare RLS e scrivere policies per ogni tabella | Backend | ✅ |
+| 6 | Generare tipi TypeScript da Supabase CLI → `src/types/supabase.ts` | Backend | ✅ |
+| 7 | Configurare middleware per protezione route autenticate | Backend | ✅ |
 
 ### Seed Dati Editoriali
 | # | Task | Agente | Stato |
@@ -34,7 +34,7 @@
 ### Auth & Onboarding
 | # | Task | Agente | Stato |
 |---|---|---|---|
-| 10 | Implementare route `/login` con Supabase magic link | Frontend | 🔲 |
+| 10 | Implementare route `/login` con Supabase (Email/Password, Signup, Reset) | Frontend | ✅ |
 | 11 | Progettare e implementare form psicografico `/onboarding` | Frontend | 🔲 |
 | 12 | Implementare Server Action `savePillars()` | Backend | 🔲 |
 | 13 | Logica redirect onboarding → sphere dopo completamento | Backend | 🔲 |
@@ -42,7 +42,7 @@
 ### Sfera Semantica
 | # | Task | Agente | Stato |
 |---|---|---|---|
-| 14 | Convertire prototipo HTML Three.js in componente `SemanticSphere.tsx` | Frontend | 🔄 |
+| 14 | Convertire prototipo HTML Three.js in componente `SemanticSphere.tsx` | Frontend | ✅ |
 | 15 | Estrarre logica Three.js in `SphereScene.ts` (puro JS, no React) | Frontend | 🔲 |
 | 16 | Implementare Server Action `getEditorialGraph()` | Backend | 🔲 |
 | 17 | Connettere `SpherePage` a dati reali Supabase | Backend | 🔲 |
