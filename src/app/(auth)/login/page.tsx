@@ -460,7 +460,7 @@ function Logo({ src, light = false }: { src?: string; light?: boolean }) {
     );
 }
 
-export default function AuthPage({ logoSrc }: { logoSrc?: string }) {
+export default function AuthPage() {
     const [view, setView] = useState<'login' | 'register' | 'reset'>('login');
 
     const [email, setEmail] = useState('');
@@ -572,7 +572,7 @@ export default function AuthPage({ logoSrc }: { logoSrc?: string }) {
                     </div>
 
                     <div className="auth-left-content">
-                        <Logo src={logoSrc} light />
+                        <Logo light />
                         <h2 className="brand-tagline">&quot;Il cinema non si cerca, si scopre.&quot;</h2>
                         <div className="brand-separator" />
                         <p className="brand-desc">Una sfera semantica che connette i film attraverso fili editoriali invisibili.</p>
@@ -586,7 +586,7 @@ export default function AuthPage({ logoSrc }: { logoSrc?: string }) {
                     <div className="auth-form-wrapper">
 
                         <div className="mobile-brand">
-                            <Logo src={logoSrc} />
+                            <Logo />
                             <div style={{ fontFamily: "'Playfair Display', serif", fontStyle: 'italic', color: 'var(--ink)' }}>NoZapp</div>
                         </div>
 
