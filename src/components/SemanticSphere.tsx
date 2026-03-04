@@ -210,6 +210,7 @@ export default function SemanticSphere() {
         // LABELS
         // ═══════════════════════════════════════════════════════════
         const labelsDiv = document.getElementById('labels');
+        if (labelsDiv) labelsDiv.innerHTML = ''; // Ensure no ghost labels from React Strict Mode double-invocations
         const labelEls = [];
         FILMS.forEach(f => {
             const d = document.createElement('div');
@@ -623,8 +624,22 @@ export default function SemanticSphere() {
         });
 
         window.addEventListener('wheel', e => {
-            e.preventDefault();
-            camera.position.z = Math.max(5, Math.min(18, camera.position.z + e.deltaY * .012));
+            const rect = canvas.getBoundingClientRect();
+
+            // Calculate distance from the actual center of the 3D canvas on the screen
+            const cx = rect.left + rect.width / 2;
+            const cy = rect.top + rect.height / 2;
+            const dist = Math.sqrt(Math.pow(e.clientX - cx, 2) + Math.pow(e.clientY - cy, 2));
+
+            // Circular active area: 45% of the canvas smallest dimension
+            const activeRadius = Math.min(rect.width, rect.height) * 0.45;
+
+            // Only zoom and prevent scrolling if the mouse is hovering over the actual sphere
+            // And if the sphere is still somewhat visible on the screen
+            if (dist < activeRadius && rect.bottom > 0) {
+                e.preventDefault();
+                camera.position.z = Math.max(5, Math.min(18, camera.position.z + e.deltaY * .012));
+            }
         }, { passive: false });
 
         // Keyboard navigation — mirrors button logic (↑=outward, ↓=inward)
@@ -687,9 +702,8 @@ export default function SemanticSphere() {
             window.removeEventListener('mouseup', () => { });
             window.removeEventListener('wheel', () => { });
             window.removeEventListener('keydown', () => { });
-            if (document.getElementById('canvas-container')) {
-                document.getElementById('canvas-container').innerHTML = '';
-            }
+            const labelsDiv = document.getElementById('labels');
+            if (labelsDiv) labelsDiv.innerHTML = '';
             mounted.current = false;
         };
     }, []);

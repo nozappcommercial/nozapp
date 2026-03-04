@@ -21,15 +21,12 @@
     --dim: rgba(22, 10, 12, 0.5);
 }
 
-html,
-
-
 body.dragging {
     cursor: grabbing !important
 }
 
-canvas {
-    position: fixed;
+.sphere-wrapper canvas {
+    position: absolute;
     inset: 0;
     display: block;
     cursor: grab;
@@ -39,7 +36,7 @@ canvas {
 
 /* Vignette */
 .vignette {
-    position: fixed;
+    position: absolute;
     inset: 0;
     pointer-events: none;
     z-index: 1;
@@ -48,7 +45,7 @@ canvas {
 
 /* Labels */
 #labels {
-    position: fixed;
+    position: absolute;
     inset: 0;
     pointer-events: none;
     z-index: 5
@@ -124,8 +121,8 @@ canvas {
 }
 
 /* Header */
-header {
-    position: fixed;
+.sphere-wrapper>header {
+    position: absolute;
     top: 0;
     left: 0;
     right: 0;
@@ -170,7 +167,7 @@ header {
 
 /* Shell legend */
 .shells-legend {
-    position: fixed;
+    position: absolute;
     bottom: 28px;
     left: 28px;
     z-index: 10;
@@ -199,7 +196,7 @@ header {
 
 /* ─── NAVIGATION CONTROLS ─── */
 #nav-controls {
-    position: fixed;
+    position: absolute;
     left: 50%;
     bottom: 32px;
     transform: translateX(-50%);
@@ -271,7 +268,7 @@ header {
 
 /* ─── INFO PANEL ─── */
 #panel {
-    position: fixed;
+    position: absolute;
     right: 28px;
     bottom: 28px;
     z-index: 10;
@@ -456,7 +453,7 @@ header {
 
 /* Path breadcrumb */
 #breadcrumb {
-    position: fixed;
+    position: absolute;
     top: 90px;
     left: 50%;
     transform: translateX(-50%);
