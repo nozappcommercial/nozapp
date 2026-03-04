@@ -1,0 +1,911 @@
+<!DOCTYPE html>
+<html lang="it">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sfera Semantica — Editorial Graph v2</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Fragment+Mono:ital@0;1&display=swap');
+
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        :root {
+            --ember: #e8613a;
+            --gold: #c9a84c;
+            --cold: #5ab4d6;
+            --bg: #060810;
+            --text: #cdc4b5;
+            --dim: rgba(205, 196, 181, 0.35);
+            --surface: rgba(10, 13, 22, 0.88);
+        }
+
+        html,
+        body {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background: var(--bg);
+            cursor: grab;
+        }
+
+        body.dragging {
+            cursor: grabbing;
+        }
+
+        canvas {
+            position: fixed;
+            inset: 0;
+            display: block;
+        }
+
+        /* ── vignette ── */
+        .vignette {
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            z-index: 1;
+            background: radial-gradient(ellipse 80% 80% at 50% 50%, transparent 35%, rgba(6, 8, 16, .8) 100%);
+        }
+
+        .grain {
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            z-index: 2;
+            opacity: .04;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+            background-size: 200px;
+        }
+
+        /* ── NODE LABELS ── */
+        #labels {
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            z-index: 5;
+        }
+
+        .node-label {
+            position: absolute;
+            transform: translate(-50%, -50%);
+            white-space: nowrap;
+            pointer-events: none;
+            transition: opacity 0.25s ease;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 3px;
+        }
+
+        .label-title {
+            font-family: 'Fragment Mono', monospace;
+            font-size: 9px;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            padding: 2px 6px;
+            border-radius: 1px;
+            white-space: nowrap;
+            line-height: 1;
+        }
+
+        .label-dot {
+            width: 3px;
+            height: 3px;
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+
+        /* Per tipo nodo */
+        .label-pillar .label-title {
+            color: var(--ember);
+            background: rgba(232, 97, 58, .10);
+            border: 1px solid rgba(232, 97, 58, .25);
+        }
+
+        .label-pillar .label-dot {
+            background: var(--ember);
+        }
+
+        .label-primary .label-title {
+            color: var(--gold);
+            background: rgba(201, 168, 76, .08);
+            border: 1px solid rgba(201, 168, 76, .20);
+        }
+
+        .label-primary .label-dot {
+            background: var(--gold);
+        }
+
+        .label-secondary .label-title {
+            color: var(--cold);
+            background: rgba(90, 180, 214, .06);
+            border: 1px solid rgba(90, 180, 214, .15);
+        }
+
+        .label-secondary .label-dot {
+            background: var(--cold);
+        }
+
+        /* ── HEADER ── */
+        header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 10;
+            padding: 28px 36px;
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            pointer-events: none;
+        }
+
+        .brand {
+            font-family: 'Fragment Mono', monospace;
+            font-size: 9px;
+            letter-spacing: .35em;
+            text-transform: uppercase;
+            color: var(--ember);
+            opacity: .75;
+            margin-bottom: 6px;
+        }
+
+        .title {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 28px;
+            font-weight: 300;
+            color: var(--text);
+            line-height: 1;
+        }
+
+        .title em {
+            font-style: italic;
+            color: var(--gold);
+        }
+
+        .hints {
+            font-family: 'Fragment Mono', monospace;
+            font-size: 9px;
+            color: var(--dim);
+            letter-spacing: .1em;
+            line-height: 2;
+            text-align: right;
+        }
+
+        /* ── SHELL LEGEND ── */
+        .shells-legend {
+            position: fixed;
+            bottom: 32px;
+            left: 36px;
+            z-index: 10;
+            pointer-events: none;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .shell-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-family: 'Fragment Mono', monospace;
+            font-size: 9px;
+            color: var(--dim);
+            letter-spacing: .1em;
+        }
+
+        .shell-ring {
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .shell-ring span {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+        }
+
+        /* ── INFO PANEL ── */
+        #panel {
+            position: fixed;
+            right: 32px;
+            bottom: 32px;
+            z-index: 10;
+            width: 300px;
+            background: var(--surface);
+            border: 1px solid rgba(201, 168, 76, .18);
+            padding: 22px 24px;
+            backdrop-filter: blur(16px);
+            opacity: 0;
+            transform: translateY(10px) scale(.98);
+            transition: opacity .3s ease, transform .3s ease;
+            pointer-events: none;
+        }
+
+        #panel.visible {
+            opacity: 1;
+            transform: none;
+            pointer-events: auto;
+        }
+
+        .p-eyebrow {
+            font-family: 'Fragment Mono', monospace;
+            font-size: 8px;
+            letter-spacing: .3em;
+            text-transform: uppercase;
+            color: rgba(201, 168, 76, .5);
+            margin-bottom: 4px;
+        }
+
+        .p-badge {
+            display: inline-block;
+            margin-bottom: 10px;
+            font-family: 'Fragment Mono', monospace;
+            font-size: 8px;
+            letter-spacing: .2em;
+            text-transform: uppercase;
+            padding: 2px 8px;
+            background: rgba(232, 97, 58, .12);
+            border: 1px solid rgba(232, 97, 58, .35);
+            color: var(--ember);
+        }
+
+        .p-title {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 22px;
+            font-weight: 400;
+            color: var(--text);
+            margin-bottom: 2px;
+        }
+
+        .p-meta {
+            font-family: 'Fragment Mono', monospace;
+            font-size: 9px;
+            color: var(--dim);
+            letter-spacing: .08em;
+            margin-bottom: 14px;
+        }
+
+        .p-section-label {
+            font-family: 'Fragment Mono', monospace;
+            font-size: 8px;
+            letter-spacing: .2em;
+            color: rgba(205, 196, 181, .3);
+            text-transform: uppercase;
+            margin-bottom: 6px;
+        }
+
+        .p-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 4px;
+            margin-bottom: 14px;
+        }
+
+        .p-tag {
+            font-family: 'Fragment Mono', monospace;
+            font-size: 8px;
+            letter-spacing: .1em;
+            padding: 2px 7px;
+            border: 1px solid rgba(201, 168, 76, .2);
+            color: var(--gold);
+            background: rgba(201, 168, 76, .05);
+        }
+
+        .p-connections {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .p-conn {
+            font-family: 'Fragment Mono', monospace;
+            font-size: 9px;
+            color: var(--dim);
+            letter-spacing: .06em;
+            display: flex;
+            align-items: center;
+            gap: 7px;
+        }
+
+        .p-conn-dot {
+            width: 5px;
+            height: 5px;
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+
+        .p-conn-label {
+            font-size: 8px;
+            opacity: .5;
+            font-style: italic;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        #panel-close {
+            position: absolute;
+            top: 14px;
+            right: 16px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-family: 'Fragment Mono', monospace;
+            font-size: 14px;
+            color: var(--dim);
+            pointer-events: auto;
+            transition: color .2s;
+        }
+
+        #panel-close:hover {
+            color: var(--gold);
+        }
+
+        /* ── PATH LABEL ── */
+        #path-label {
+            position: fixed;
+            top: 50%;
+            left: 30px;
+            z-index: 10;
+            transform: translateY(-50%);
+            writing-mode: vertical-rl;
+            text-orientation: mixed;
+            font-family: 'Fragment Mono', monospace;
+            font-size: 8px;
+            letter-spacing: .25em;
+            text-transform: uppercase;
+            color: var(--ember);
+            opacity: 0;
+            transition: opacity .4s;
+            pointer-events: none;
+        }
+
+        #path-label.visible {
+            opacity: .6;
+        }
+    </style>
+</head>
+
+<body>
+    <canvas id="c"></canvas>
+    <div class="vignette"></div>
+    <div class="grain"></div>
+    <div id="labels"></div>
+
+    <header>
+        <div>
+            <div class="brand">Editorial Graph</div>
+            <div class="title">La <em>Sfera</em> Semantica</div>
+        </div>
+        <div class="hints">
+            TRASCINA · ruota<br>
+            HOVER · esplora il path<br>
+            CLICK · blocca il nodo<br>
+            SCROLL · zoom
+        </div>
+    </header>
+
+    <div class="shells-legend">
+        <div class="shell-item">
+            <div class="shell-ring" style="border:1.5px solid rgba(232,97,58,.4)"><span
+                    style="background:var(--ember)"></span></div>
+            Shell I — Pilastri del gusto
+        </div>
+        <div class="shell-item">
+            <div class="shell-ring" style="border:1.5px solid rgba(201,168,76,.3)"><span
+                    style="background:var(--gold)"></span></div>
+            Shell II — Affinità diretta
+        </div>
+        <div class="shell-item">
+            <div class="shell-ring" style="border:1.5px solid rgba(90,180,214,.25)"><span
+                    style="background:var(--cold)"></span></div>
+            Shell III — Scoperta laterale
+        </div>
+    </div>
+
+    <div id="path-label">PERCORSO ATTIVO</div>
+
+    <div id="panel">
+        <button id="panel-close">×</button>
+        <div class="p-eyebrow">Nodo selezionato</div>
+        <div id="p-badge"></div>
+        <div class="p-title" id="p-title">—</div>
+        <div class="p-meta" id="p-meta"></div>
+        <div class="p-section-label">Temi editoriali</div>
+        <div class="p-tags" id="p-tags"></div>
+        <div class="p-section-label" id="p-conn-label"></div>
+        <div class="p-connections" id="p-connections"></div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script>
+        // ═══════════════════════════════════════════════════════════
+        // DATA
+        // ═══════════════════════════════════════════════════════════
+        const FILMS = [
+            // SHELL 0 — Pillar (user taste anchors)
+            { id: 0, title: "Solaris", year: 1972, dir: "Tarkovsky", shell: 0, tags: ["contemplazione", "spazio-tempo", "identità"] },
+            { id: 1, title: "Mulholland Drive", year: 2001, dir: "Lynch", shell: 0, tags: ["sogno", "doppio", "noir psichico"] },
+            { id: 2, title: "Stalker", year: 1979, dir: "Tarkovsky", shell: 0, tags: ["zona", "fede", "vuoto"] },
+
+            // SHELL 1 — Primary recommendations
+            { id: 3, title: "Annihilation", year: 2018, dir: "Garland", shell: 1, tags: ["confine realtà", "corpo", "area X"] },
+            { id: 4, title: "Lost Highway", year: 1997, dir: "Lynch", shell: 1, tags: ["identità fluida", "colpa", "mistero"] },
+            { id: 5, title: "2001: Odissea nello spazio", year: 1968, dir: "Kubrick", shell: 1, tags: ["evoluzione", "silenzio", "monolito"] },
+            { id: 6, title: "Inland Empire", year: 2006, dir: "Lynch", shell: 1, tags: ["meta-narrazione", "dissociazione"] },
+            { id: 7, title: "The Mirror", year: 1975, dir: "Tarkovsky", shell: 1, tags: ["memoria", "sogno", "madre"] },
+
+            // SHELL 2 — Secondary / lateral discovery
+            { id: 8, title: "Blade Runner 2049", year: 2017, dir: "Villeneuve", shell: 2, tags: ["post-umano", "solitudine"] },
+            { id: 9, title: "Persona", year: 1966, dir: "Bergman", shell: 2, tags: ["doppio", "silenzio", "maschera"] },
+            { id: 10, title: "Holy Motors", year: 2012, dir: "Carax", shell: 2, tags: ["metamorfosi", "recitazione"] },
+            { id: 11, title: "Under the Skin", year: 2013, dir: "Glazer", shell: 2, tags: ["alieno", "corpo", "predazione"] },
+            { id: 12, title: "Eraserhead", year: 1977, dir: "Lynch", shell: 2, tags: ["angoscia", "industriale"] },
+            { id: 13, title: "The Lighthouse", year: 2019, dir: "Eggers", shell: 2, tags: ["follia", "isolamento"] },
+            { id: 14, title: "Picnic at Hanging Rock", year: 1975, dir: "Weir", shell: 2, tags: ["mistero", "natura", "scomparsa"] },
+            { id: 15, title: "Enter the Void", year: 2009, dir: "Noé", shell: 2, tags: ["morte", "bardo", "coscienza"] },
+            { id: 16, title: "Sátántangó", year: 1994, dir: "Tarr", shell: 2, tags: ["tempo", "desolazione"] },
+            { id: 17, title: "Memoria", year: 2021, dir: "Weerasethakul", shell: 2, tags: ["suono", "amnesia"] },
+            { id: 18, title: "A Ghost Story", year: 2017, dir: "Lowery", shell: 2, tags: ["lutto", "tempo", "casa"] },
+            { id: 19, title: "Seconds", year: 1966, dir: "Frankenheimer", shell: 2, tags: ["identità nuova", "orrore borghese"] },
+        ];
+
+        const EDGES = [
+            { from: 0, to: 3, type: "thematic", label: "Affinità tematica" },
+            { from: 0, to: 5, type: "thematic", label: "Affinità tematica" },
+            { from: 0, to: 2, type: "stylistic", label: "Evoluzione stilistica" },
+            { from: 0, to: 7, type: "stylistic", label: "Evoluzione stilistica" },
+            { from: 0, to: 17, type: "contrast", label: "Contrasto narrativo" },
+            { from: 1, to: 4, type: "stylistic", label: "Evoluzione stilistica" },
+            { from: 1, to: 6, type: "stylistic", label: "Evoluzione stilistica" },
+            { from: 1, to: 12, type: "thematic", label: "Affinità tematica" },
+            { from: 1, to: 9, type: "thematic", label: "Affinità tematica" },
+            { from: 1, to: 19, type: "thematic", label: "Affinità tematica" },
+            { from: 2, to: 16, type: "thematic", label: "Affinità tematica" },
+            { from: 2, to: 13, type: "contrast", label: "Contrasto narrativo" },
+            { from: 2, to: 14, type: "contrast", label: "Contrasto narrativo" },
+            { from: 3, to: 11, type: "thematic", label: "Affinità tematica" },
+            { from: 3, to: 8, type: "stylistic", label: "Evoluzione stilistica" },
+            { from: 4, to: 12, type: "stylistic", label: "Evoluzione stilistica" },
+            { from: 5, to: 8, type: "stylistic", label: "Evoluzione stilistica" },
+            { from: 5, to: 15, type: "thematic", label: "Affinità tematica" },
+            { from: 6, to: 10, type: "thematic", label: "Affinità tematica" },
+            { from: 7, to: 18, type: "thematic", label: "Affinità tematica" },
+            { from: 9, to: 10, type: "contrast", label: "Contrasto narrativo" },
+            { from: 11, to: 15, type: "thematic", label: "Affinità tematica" },
+            { from: 13, to: 16, type: "contrast", label: "Contrasto narrativo" },
+        ];
+
+        const EDGE_CFG = {
+            thematic: { from: 0xe8613a, to: 0xc9a84c, baseOp: 0.55 },
+            stylistic: { from: 0xc9a84c, to: 0x5ab4d6, baseOp: 0.45 },
+            contrast: { from: 0x5ab4d6, to: 0x2a3d52, baseOp: 0.28 },
+        };
+        const NODE_CFG = {
+            0: { color: 0xe8613a, size: 0.14, glowOp: 0.18 },
+            1: { color: 0xc9a84c, size: 0.10, glowOp: 0.10 },
+            2: { color: 0x5ab4d6, size: 0.07, glowOp: 0.07 },
+        };
+
+        // ═══════════════════════════════════════════════════════════
+        // THREE SETUP
+        // ═══════════════════════════════════════════════════════════
+        const canvas = document.getElementById('c');
+        const W = () => window.innerWidth, H = () => window.innerHeight;
+
+        const renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
+        renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+        renderer.setSize(W(), H());
+        renderer.setClearColor(0x060810, 1);
+
+        const scene = new THREE.Scene();
+        scene.fog = new THREE.FogExp2(0x060810, 0.035);
+
+        const camera = new THREE.PerspectiveCamera(48, W() / H(), 0.1, 500);
+        camera.position.set(0, 0, 10);
+
+        // ─── Shell wireframes ───────────────────────────────────
+        const RADII = [1.3, 2.7, 4.2];
+        const shellColors = [0x3a1a10, 0x2a2010, 0x0e2030];
+        RADII.forEach((r, i) => {
+            const geo = new THREE.SphereGeometry(r, 28, 18);
+            const mat = new THREE.MeshBasicMaterial({
+                color: shellColors[i], wireframe: true,
+                transparent: true, opacity: 0.08 - i * 0.01
+            });
+            const mesh = new THREE.Mesh(geo, mat);
+            mesh.raycast = () => { }; // ← non intercetta il raycast!
+            scene.add(mesh);
+        });
+
+        // ─── Node positions on their shells ─────────────────────
+        const group = new THREE.Group();
+        scene.add(group);
+
+        function fibSphere(index, total, radius) {
+            const phi = Math.PI * (3 - Math.sqrt(5));
+            const y = 1 - (index / Math.max(total - 1, 1)) * 2;
+            const r = Math.sqrt(Math.max(0, 1 - y * y));
+            const theta = phi * index;
+            return new THREE.Vector3(Math.cos(theta) * r * radius, y * radius, Math.sin(theta) * r * radius);
+        }
+
+        // Group films by shell
+        const byShell = [[], [], []];
+        FILMS.forEach(f => byShell[f.shell].push(f));
+
+        const positions = new Array(FILMS.length);
+        byShell.forEach((films, shell) => {
+            films.forEach((film, idx) => {
+                positions[film.id] = fibSphere(idx, films.length, RADII[shell]);
+            });
+        });
+
+        // ─── Nodes ──────────────────────────────────────────────
+        const nodeMeshes = [];
+        const glowMeshes = [];
+
+        FILMS.forEach(film => {
+            const cfg = NODE_CFG[film.shell];
+            const pos = positions[film.id];
+
+            const core = new THREE.Mesh(
+                new THREE.SphereGeometry(cfg.size, 20, 14),
+                new THREE.MeshBasicMaterial({ color: cfg.color })
+            );
+            core.position.copy(pos);
+            core.userData.filmId = film.id;
+            group.add(core);
+            nodeMeshes.push(core);
+
+            const glow = new THREE.Mesh(
+                new THREE.SphereGeometry(cfg.size * 3.2, 16, 12),
+                new THREE.MeshBasicMaterial({ color: cfg.color, transparent: true, opacity: cfg.glowOp, blending: THREE.AdditiveBlending })
+            );
+            glow.position.copy(pos);
+            glow.raycast = () => { };
+            group.add(glow);
+            glowMeshes.push(glow);
+        });
+
+        // ─── Edges ──────────────────────────────────────────────
+        const edgeLines = [];
+
+        function buildEdge(posA, posB, cfg) {
+            const mid = posA.clone().add(posB).multiplyScalar(0.5);
+            const dir = mid.clone().normalize();
+            mid.add(dir.multiplyScalar(posA.distanceTo(posB) * 0.28));
+            const curve = new THREE.QuadraticBezierCurve3(posA, mid, posB);
+            const pts = curve.getPoints(48);
+            const pos3 = [], cols = [];
+            const cA = new THREE.Color(cfg.from), cB = new THREE.Color(cfg.to), tmp = new THREE.Color();
+            pts.forEach((p, i) => {
+                pos3.push(p.x, p.y, p.z);
+                tmp.lerpColors(cA, cB, i / (pts.length - 1));
+                cols.push(tmp.r, tmp.g, tmp.b);
+            });
+            const geo = new THREE.BufferGeometry();
+            geo.setAttribute('position', new THREE.Float32BufferAttribute(pos3, 3));
+            geo.setAttribute('color', new THREE.Float32BufferAttribute(cols, 3));
+            return new THREE.Line(geo, new THREE.LineBasicMaterial({
+                vertexColors: true, transparent: true,
+                opacity: cfg.baseOp, blending: THREE.AdditiveBlending
+            }));
+        }
+
+        EDGES.forEach((e, i) => {
+            const line = buildEdge(positions[e.from], positions[e.to], EDGE_CFG[e.type]);
+            line.userData = { edgeIdx: i };
+            group.add(line);
+            edgeLines.push(line);
+        });
+
+        // ─── Stars ─────────────────────────────────────────────
+        const starPts = [];
+        for (let i = 0; i < 500; i++) {
+            const th = Math.random() * Math.PI * 2, ph = Math.acos(2 * Math.random() - 1);
+            const r = 5 + Math.random() * 8;
+            starPts.push(Math.sin(ph) * Math.cos(th) * r, Math.sin(ph) * Math.sin(th) * r, Math.cos(ph) * r);
+        }
+        const starGeo = new THREE.BufferGeometry();
+        starGeo.setAttribute('position', new THREE.Float32BufferAttribute(starPts, 3));
+        scene.add(new THREE.Points(starGeo, new THREE.PointsMaterial({ color: 0x8898bb, size: 0.015, transparent: true, opacity: .3 })));
+
+        // ═══════════════════════════════════════════════════════════
+        // HTML LABELS
+        // ═══════════════════════════════════════════════════════════
+        const labelsContainer = document.getElementById('labels');
+        const labelEls = [];
+
+        FILMS.forEach(film => {
+            const div = document.createElement('div');
+            div.className = `node-label label-${['pillar', 'primary', 'secondary'][film.shell]}`;
+            div.innerHTML = `<div class="label-dot"></div><div class="label-title">${film.title}</div>`;
+            div.dataset.id = film.id;
+            labelsContainer.appendChild(div);
+            labelEls.push(div);
+        });
+
+        function updateLabels(hoverId, selectedId) {
+            const tmp = new THREE.Vector3();
+            FILMS.forEach(film => {
+                const el = labelEls[film.id];
+                const pos = positions[film.id].clone();
+
+                // Transform through group rotation, then project
+                pos.applyEuler(group.rotation);
+                tmp.copy(pos);
+                tmp.project(camera);
+
+                const x = (tmp.x * .5 + .5) * W();
+                const y = (-tmp.y * .5 + .5) * H();
+                el.style.left = x + 'px';
+                el.style.top = y + 'px';
+
+                // Visibility logic
+                let opacity = 0;
+                if (selectedId !== null) {
+                    // Show only connected nodes' labels
+                    const isConn = connectedTo(selectedId).has(film.id);
+                    opacity = isConn ? (film.id === selectedId ? 1 : 0.8) : 0;
+                } else if (hoverId !== null) {
+                    const isConn = connectedTo(hoverId).has(film.id);
+                    opacity = isConn ? (film.id === hoverId ? 1 : 0.75) : 0;
+                } else {
+                    // Default: all labels at low opacity
+                    opacity = 0.25;
+                }
+
+                // Hide nodes behind the sphere (z > 0 in clip space = in front)
+                const behindCamera = tmp.z > 1;
+                el.style.opacity = behindCamera ? 0 : opacity;
+
+                // Offset label above the dot
+                el.style.transform = `translate(-50%, calc(-50% - ${NODE_CFG[film.shell].size * 80 + 12}px))`;
+            });
+        }
+
+        // ═══════════════════════════════════════════════════════════
+        // GRAPH HELPERS
+        // ═══════════════════════════════════════════════════════════
+        function connectedTo(id) {
+            const s = new Set([id]);
+            EDGES.forEach(e => {
+                if (e.from === id) s.add(e.to);
+                if (e.to === id) s.add(e.from);
+            });
+            return s;
+        }
+        function edgesOf(id) {
+            return EDGES.reduce((acc, e, i) => { if (e.from === id || e.to === id) acc.push(i); return acc; }, []);
+        }
+
+        // ═══════════════════════════════════════════════════════════
+        // STATE
+        // ═══════════════════════════════════════════════════════════
+        let hoveredId = null;
+        let selectedId = null;
+
+        function resetVisuals() {
+            FILMS.forEach((f, i) => {
+                nodeMeshes[i].material.color.setHex(NODE_CFG[f.shell].color);
+                glowMeshes[i].material.opacity = NODE_CFG[f.shell].glowOp;
+            });
+            edgeLines.forEach((l, i) => { l.material.opacity = EDGE_CFG[EDGES[i].type].baseOp; });
+        }
+
+        function applyHighlight(focusId, strength = 1.5) {
+            const conn = connectedTo(focusId);
+            const eids = edgesOf(focusId);
+            FILMS.forEach((f, i) => {
+                if (conn.has(i)) {
+                    const mult = i === focusId ? 2.5 : strength;
+                    nodeMeshes[i].material.color.setHex(NODE_CFG[f.shell].color);
+                    nodeMeshes[i].material.color.multiplyScalar(mult > 2 ? 1.7 : 1.2);
+                    glowMeshes[i].material.opacity = NODE_CFG[f.shell].glowOp * mult;
+                } else {
+                    nodeMeshes[i].material.color.setHex(0x111825);
+                    glowMeshes[i].material.opacity = 0.01;
+                }
+            });
+            edgeLines.forEach((l, i) => {
+                l.material.opacity = eids.includes(i)
+                    ? EDGE_CFG[EDGES[i].type].baseOp * 2.4
+                    : 0.02;
+            });
+        }
+
+        // ═══════════════════════════════════════════════════════════
+        // PANEL
+        // ═══════════════════════════════════════════════════════════
+        function showPanel(id) {
+            const film = FILMS[id];
+            const panel = document.getElementById('panel');
+
+            document.getElementById('p-title').textContent = film.title;
+            document.getElementById('p-meta').textContent = `${film.year} · ${film.dir}`;
+
+            const badge = document.getElementById('p-badge');
+            badge.innerHTML = film.shell === 0
+                ? '<div class="p-badge">★ Pilastro del gusto</div>'
+                : film.shell === 1 ? '<div class="p-badge" style="background:rgba(201,168,76,.1);border-color:rgba(201,168,76,.3);color:#c9a84c">◆ Affinità diretta</div>'
+                    : '';
+
+            document.getElementById('p-tags').innerHTML = film.tags.map(t => `<div class="p-tag">${t}</div>`).join('');
+
+            const connEdges = EDGES.filter(e => e.from === id || e.to === id);
+            const connEl = document.getElementById('p-connections');
+            const connLabel = document.getElementById('p-conn-label');
+            if (connEdges.length) {
+                connLabel.textContent = 'Connessioni editoriali';
+                connEl.innerHTML = connEdges.map(e => {
+                    const otherId = e.from === id ? e.to : e.from;
+                    const other = FILMS[otherId];
+                    const dotColor = ['#e8613a', '#c9a84c', '#5ab4d6'][other.shell];
+                    return `<div class="p-conn">
+        <div class="p-conn-dot" style="background:${dotColor}"></div>
+        <span>${other.title}</span>
+        <span class="p-conn-label">· ${e.label}</span>
+      </div>`;
+                }).join('');
+            } else {
+                connLabel.textContent = '';
+                connEl.innerHTML = '';
+            }
+
+            panel.classList.add('visible');
+            document.getElementById('path-label').classList.add('visible');
+        }
+
+        function hidePanel() {
+            document.getElementById('panel').classList.remove('visible');
+            document.getElementById('path-label').classList.remove('visible');
+        }
+
+        document.getElementById('panel-close').addEventListener('click', () => {
+            selectedId = null;
+            resetVisuals();
+            hidePanel();
+        });
+
+        // ═══════════════════════════════════════════════════════════
+        // MOUSE / DRAG
+        // ═══════════════════════════════════════════════════════════
+        const raycaster = new THREE.Raycaster();
+        const mouse = new THREE.Vector2();
+
+        let isDown = false, isDragging = false;
+        let lastXY = { x: 0, y: 0 };
+        let vel = { x: 0, y: 0 };
+
+        function getHit(x, y) {
+            mouse.x = (x / W()) * 2 - 1;
+            mouse.y = -(y / H()) * 2 + 1;
+            raycaster.setFromCamera(mouse, camera);
+            const hits = raycaster.intersectObjects(nodeMeshes);
+            return hits.length ? hits[0].object.userData.filmId : null;
+        }
+
+        window.addEventListener('mousemove', e => {
+            if (isDown) {
+                const dx = e.clientX - lastXY.x;
+                const dy = e.clientY - lastXY.y;
+                if (Math.abs(dx) + Math.abs(dy) > 2) isDragging = true;
+                vel.x = dy * 0.006;
+                vel.y = dx * 0.006;
+                group.rotation.x += vel.x;
+                group.rotation.y += vel.y;
+            } else if (selectedId === null) {
+                // Hover detection (only when not selected)
+                const hit = getHit(e.clientX, e.clientY);
+                if (hit !== hoveredId) {
+                    hoveredId = hit;
+                    if (hit !== null) {
+                        applyHighlight(hit, 1.4);
+                        canvas.style.cursor = 'pointer';
+                    } else {
+                        resetVisuals();
+                        canvas.style.cursor = 'grab';
+                    }
+                }
+            }
+            lastXY = { x: e.clientX, y: e.clientY };
+        });
+
+        window.addEventListener('mousedown', e => {
+            isDown = true; isDragging = false;
+            lastXY = { x: e.clientX, y: e.clientY };
+            vel = { x: 0, y: 0 };
+            document.body.classList.add('dragging');
+        });
+
+        window.addEventListener('mouseup', e => {
+            isDown = false;
+            document.body.classList.remove('dragging');
+            if (!isDragging) {
+                const hit = getHit(e.clientX, e.clientY);
+                if (hit !== null) {
+                    if (selectedId === hit) {
+                        selectedId = null; resetVisuals(); hidePanel();
+                    } else {
+                        selectedId = hit;
+                        hoveredId = null;
+                        applyHighlight(hit, 1.6);
+                        showPanel(hit);
+                    }
+                } else if (selectedId !== null) {
+                    selectedId = null; resetVisuals(); hidePanel();
+                }
+            }
+        });
+
+        window.addEventListener('wheel', e => {
+            camera.position.z = Math.max(5, Math.min(18, camera.position.z + e.deltaY * 0.012));
+        }, { passive: true });
+
+        // ═══════════════════════════════════════════════════════════
+        // ANIMATE
+        // ═══════════════════════════════════════════════════════════
+        let t = 0;
+        function animate() {
+            requestAnimationFrame(animate);
+            t += 0.01;
+
+            // Auto-rotate
+            if (!isDown && selectedId === null) {
+                group.rotation.y += 0.0015;
+                group.rotation.x += 0.0003;
+            }
+            // Inertia
+            if (!isDown) {
+                vel.x *= 0.93; vel.y *= 0.93;
+                if (selectedId === null && !hoveredId) {
+                    group.rotation.x += vel.x;
+                    group.rotation.y += vel.y;
+                }
+            }
+
+            // Pillar pulse
+            FILMS.forEach((f, i) => {
+                if (f.shell === 0 && selectedId === null && hoveredId === null) {
+                    const p = 1 + Math.sin(t * 2 + i * 1.3) * 0.3;
+                    glowMeshes[i].material.opacity = NODE_CFG[0].glowOp * p;
+                }
+            });
+
+            // Active edge shimmer
+            if (selectedId !== null) {
+                edgesOf(selectedId).forEach(i => {
+                    const base = EDGE_CFG[EDGES[i].type].baseOp;
+                    edgeLines[i].material.opacity = base * (2.2 + Math.sin(t * 4 + i) * 0.3);
+                });
+            }
+
+            updateLabels(hoveredId, selectedId);
+            renderer.render(scene, camera);
+        }
+
+        animate();
+
+        window.addEventListener('resize', () => {
+            camera.aspect = W() / H();
+            camera.updateProjectionMatrix();
+            renderer.setSize(W(), H());
+        });
+    </script>
+</body>
+
+</html>
