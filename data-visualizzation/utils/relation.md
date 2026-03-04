@@ -4,5 +4,7 @@ Questo documento contiene link utili e documentazioni relative all'implementazio
 
 ---
 
-## Sfera di Fibonacci
+## Argomenti Utili
+
+### Sfera di Fibonacci
 1.: https://xprimiendo.com/en/fibonacci-sphere-using-css3-transformations/
