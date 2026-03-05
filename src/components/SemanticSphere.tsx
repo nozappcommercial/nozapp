@@ -6,90 +6,44 @@ import React, { useEffect, useRef } from 'react';
 import * as THREE from 'three';
 import './sphere.css';
 
-export default function SemanticSphere() {
+export interface FilmNode {
+    id: number;
+    title: string;
+    year: number;
+    dir: string;
+    shell: number;
+    tags: string[];
+    poster?: string[];
+    poster_url?: string | null;
+}
+
+export interface FilmEdge {
+    from: number;
+    to: number;
+    type: string;
+    label: string;
+}
+
+interface SemanticSphereProps {
+    files?: FilmNode[];
+    edges?: FilmEdge[];
+}
+
+export default function SemanticSphere({ files = [], edges = [] }: SemanticSphereProps) {
     const containerRef = useRef<HTMLDivElement>(null);
     const mounted = useRef(false);
 
     useEffect(() => {
         if (mounted.current) return;
+        if (files.length === 0) return; // wait for data or skip if empty
         mounted.current = true;
 
         // Wrap the original script inside this effect
         // ═══════════════════════════════════════════════════════════
         // DATA
         // ═══════════════════════════════════════════════════════════
-        const FILMS = [
-            { id: 0, title: "Solaris", year: 1972, dir: "Tarkovsky", shell: 0, tags: ["contemplazione", "spazio-tempo", "identità"], poster: ["#0d1b35", "#1a3a6b", "#2d5a8e"] },
-            { id: 1, title: "Mulholland Drive", year: 2001, dir: "Lynch", shell: 0, tags: ["sogno", "doppio", "noir psichico"], poster: ["#1a0a20", "#4a1060", "#7a2090"] },
-            { id: 2, title: "Stalker", year: 1979, dir: "Tarkovsky", shell: 0, tags: ["zona", "fede", "vuoto"], poster: ["#0a1a10", "#1a3a20", "#2a5a30"] },
-            { id: 3, title: "Annihilation", year: 2018, dir: "Garland", shell: 1, tags: ["confine realtà", "corpo", "area X"], poster: ["#051a15", "#0d3a28", "#1a5a3a"] },
-            { id: 4, title: "Lost Highway", year: 1997, dir: "Lynch", shell: 1, tags: ["identità fluida", "colpa", "mistero"], poster: ["#100508", "#2a0d15", "#4a1525"] },
-            { id: 5, title: "2001: Odissea", year: 1968, dir: "Kubrick", shell: 1, tags: ["evoluzione", "silenzio", "monolito"], poster: ["#030308", "#08081a", "#10102a"] },
-            { id: 6, title: "Inland Empire", year: 2006, dir: "Lynch", shell: 1, tags: ["meta-narrazione", "dissociazione"], poster: ["#150515", "#2a0a2a", "#3a1040"] },
-            { id: 7, title: "The Mirror", year: 1975, dir: "Tarkovsky", shell: 1, tags: ["memoria", "sogno", "madre"], poster: ["#1a1208", "#3a2810", "#5a3e18"] },
-            { id: 8, title: "Blade Runner 2049", year: 2017, dir: "Villeneuve", shell: 2, tags: ["post-umano", "solitudine"], poster: ["#0a0d18", "#1a2035", "#2a3050"] },
-            { id: 9, title: "Persona", year: 1966, dir: "Bergman", shell: 2, tags: ["doppio", "silenzio", "maschera"], poster: ["#121212", "#252525", "#383838"] },
-            { id: 10, title: "Holy Motors", year: 2012, dir: "Carax", shell: 2, tags: ["metamorfosi", "recitazione"], poster: ["#0d0a18", "#1e1530", "#2e2045"] },
-            { id: 11, title: "Under the Skin", year: 2013, dir: "Glazer", shell: 2, tags: ["alieno", "corpo", "predazione"], poster: ["#050a10", "#0a1825", "#103035"] },
-            { id: 12, title: "Eraserhead", year: 1977, dir: "Lynch", shell: 2, tags: ["angoscia", "industriale"], poster: ["#080808", "#141414", "#202020"] },
-            { id: 13, title: "The Lighthouse", year: 2019, dir: "Eggers", shell: 2, tags: ["follia", "isolamento"], poster: ["#0a0a08", "#181810", "#252518"] },
-            { id: 14, title: "Picnic at Hanging Rock", year: 1975, dir: "Weir", shell: 2, tags: ["mistero", "natura", "scomparsa"], poster: ["#0d1808", "#1a2e10", "#28421a"] },
-            { id: 15, title: "Enter the Void", year: 2009, dir: "Noé", shell: 2, tags: ["morte", "bardo", "coscienza"], poster: ["#08050d", "#150d20", "#201030"] },
-            { id: 16, title: "Sátántangó", year: 1994, dir: "Tarr", shell: 2, tags: ["tempo", "desolazione"], poster: ["#0a0a08", "#151510", "#201e18"] },
-            { id: 17, title: "Memoria", year: 2021, dir: "Weerasethakul", shell: 2, tags: ["suono", "amnesia"], poster: ["#050d10", "#0d1e22", "#152e35"] },
-            { id: 18, title: "A Ghost Story", year: 2017, dir: "Lowery", shell: 2, tags: ["lutto", "tempo", "casa"], poster: ["#0d0808", "#1e1010", "#2e1818"] },
-            { id: 19, title: "Seconds", year: 1966, dir: "Frankenheimer", shell: 2, tags: ["identità nuova", "orrore borghese"], poster: ["#080d08", "#101810", "#182518"] },
-            // Extra test data
-            { id: 20, title: "The Tree of Life", year: 2011, dir: "Malick", shell: 0, tags: ["grazia", "natura", "cosmo"], poster: ["#1e251a", "#324029", "#4b603d"] },
-            { id: 21, title: "Synecdoche, New York", year: 2008, dir: "Kaufman", shell: 0, tags: ["morte", "rappresentazione", "tempo"], poster: ["#1f1b24", "#302a3a", "#4a415a"] },
-            { id: 22, title: "The Truman Show", year: 1998, dir: "Weir", shell: 1, tags: ["falsa realtà", "libero arbitrio"], poster: ["#0d1a26", "#173048", "#244b70"] },
-            { id: 23, title: "Paprika", year: 2006, dir: "Kon", shell: 1, tags: ["sogno lucido", "inconscio", "tecnologia"], poster: ["#331414", "#5a2222", "#873232"] },
-            { id: 24, title: "Midsommar", year: 2019, dir: "Aster", shell: 1, tags: ["luce", "setta", "liberazione"], poster: ["#2d2b1f", "#4a4732", "#736e4f"] },
-            { id: 25, title: "Perfect Blue", year: 1997, dir: "Kon", shell: 1, tags: ["doppio", "ossessione", "internet"], poster: ["#141624", "#202640", "#2e3a63"] },
-            { id: 26, title: "Brazil", year: 1985, dir: "Gilliam", shell: 2, tags: ["burocrazia", "fuga", "distopia"], poster: ["#212121", "#383838", "#595959"] },
-            { id: 27, title: "The Matrix", year: 1999, dir: "Wachowski", shell: 2, tags: ["simulazione", "risveglio", "scelta"], poster: ["#0f2613", "#17401d", "#22632b"] },
-            { id: 28, title: "Donnie Darko", year: 2001, dir: "Kelly", shell: 2, tags: ["viaggio nel tempo", "adolescenza", "destino"], poster: ["#1a1d26", "#2a3245", "#3c4866"] },
-            { id: 29, title: "A Clockwork Orange", year: 1971, dir: "Kubrick", shell: 2, tags: ["libera scelta", "condizionamento", "violenza"], poster: ["#331b14", "#5c3022", "#8c4832"] },
-            { id: 30, title: "The Master", year: 2012, dir: "Anderson", shell: 2, tags: ["trauma", "culto", "dipendenza"], poster: ["#263333", "#3a5050", "#547575"] },
-            { id: 31, title: "Beau Is Afraid", year: 2023, dir: "Aster", shell: 2, tags: ["ansia", "senso di colpa", "odissea"], poster: ["#33252a", "#523740", "#78505e"] },
-            { id: 32, title: "Her", year: 2013, dir: "Jonze", shell: 2, tags: ["amore virtuale", "solitudine", "evoluzione"], poster: ["#331f24", "#5c333a", "#8c4e58"] },
-            { id: 33, title: "Fight Club", year: 1999, dir: "Fincher", shell: 2, tags: ["doppio", "alienazione", "distruzione"], poster: ["#262621", "#424237", "#636353"] },
-            { id: 34, title: "Black Swan", year: 2010, dir: "Aronofsky", shell: 2, tags: ["perfezione", "paranoia", "doppio"], poster: ["#1a1a1a", "#2e2e2e", "#454545"] },
-            { id: 35, title: "Ex Machina", year: 2014, dir: "Garland", shell: 2, tags: ["coscienza", "macchina", "inganno"], poster: ["#1a2a33", "#294452", "#3b6378"] },
-            { id: 36, title: "Interstellar", year: 2014, dir: "Nolan", shell: 2, tags: ["spazio", "tempo", "amore"], poster: ["#0f141a", "#1b2530", "#2b3b4d"] },
-            { id: 37, title: "Arrival", year: 2016, dir: "Villeneuve", shell: 2, tags: ["linguaggio", "tempo ciclico", "memoria"], poster: ["#212826", "#364541", "#526b64"] },
-            { id: 38, title: "Vortex", year: 2021, dir: "Noé", shell: 2, tags: ["morte", "decadimento", "frammentazione"], poster: ["#2e2424", "#4a3838", "#6b5050"] },
-            { id: 39, title: "High Life", year: 2018, dir: "Denis", shell: 2, tags: ["buco nero", "riproduzione", "isolamento"], poster: ["#141a2e", "#24325c", "#384f94"] },
-        ];
-
-        const EDGES = [
-            { from: 0, to: 3, type: "thematic", label: "Affinità tematica — confine realtà" },
-            { from: 0, to: 5, type: "thematic", label: "Affinità tematica — silenzio cosmico" },
-            { from: 0, to: 2, type: "stylistic", label: "Evoluzione stilistica — Tarkovsky" },
-            { from: 0, to: 7, type: "stylistic", label: "Evoluzione stilistica — tempo liquido" },
-            { from: 0, to: 17, type: "contrast", label: "Contrasto narrativo — suono vs visione" },
-            { from: 1, to: 4, type: "stylistic", label: "Evoluzione stilistica — Lynch-verse" },
-            { from: 1, to: 6, type: "stylistic", label: "Evoluzione stilistica — meta-Lynch" },
-            { from: 1, to: 12, type: "thematic", label: "Affinità tematica — inconscio industriale" },
-            { from: 1, to: 9, type: "thematic", label: "Affinità tematica — il doppio" },
-            { from: 1, to: 19, type: "thematic", label: "Affinità tematica — identità sostituita" },
-            { from: 2, to: 16, type: "thematic", label: "Affinità tematica — attesa e desolazione" },
-            { from: 2, to: 13, type: "contrast", label: "Contrasto narrativo — isolamento" },
-            { from: 2, to: 14, type: "contrast", label: "Contrasto narrativo — zona proibita" },
-            { from: 3, to: 11, type: "thematic", label: "Affinità tematica — corpo alieno" },
-            { from: 3, to: 8, type: "stylistic", label: "Evoluzione stilistica — sci-fi contemplativo" },
-            { from: 4, to: 12, type: "stylistic", label: "Evoluzione stilistica — early Lynch" },
-            { from: 5, to: 8, type: "stylistic", label: "Evoluzione stilistica — odissea visiva" },
-            { from: 5, to: 15, type: "thematic", label: "Affinità tematica — coscienza oltre la morte" },
-            { from: 6, to: 10, type: "thematic", label: "Affinità tematica — identità performativa" },
-            { from: 7, to: 18, type: "thematic", label: "Affinità tematica — lutto e tempo" },
-            { from: 9, to: 10, type: "contrast", label: "Contrasto narrativo — maschera vs metamorfosi" },
-            { from: 11, to: 15, type: "thematic", label: "Affinità tematica — corpo-coscienza" },
-            { from: 13, to: 16, type: "contrast", label: "Contrasto narrativo — ritmo del tempo" },
-            // ↓ arco diretto pillar(0)→shell-2: Solaris→Blade Runner 2049
-            //   (skip shell-1: nessun nodo intermedio su questo path)
-            { from: 0, to: 8, type: "contrast", label: "Contrasto narrativo — contemplazione vs distopia" },
-        ];
+        const FILMS = files;
+        const EDGES = edges;
 
         const ECFG = {
             thematic: { from: 0x78272e, to: 0xb58c2a, base: .6 },
@@ -144,22 +98,29 @@ export default function SemanticSphere() {
             return new THREE.Vector3(Math.cos(th) * r * R, y * R, Math.sin(th) * r * R);
         }
         const byShell = [[], [], []];
-        FILMS.forEach(f => byShell[f.shell].push(f));
+        FILMS.forEach((f, index) => {
+            // we attach the index to the film object temporarily to use it later
+            (f as any)._index = index;
+            byShell[f.shell].push(f)
+        });
         const positions = new Array(FILMS.length);
-        byShell.forEach((films, s) => films.forEach((f, i) => {
-            positions[f.id] = fibPos(i, films.length, RADII[s]);
+        byShell.forEach((films, s) => films.forEach((f: any, i) => {
+            if (f._index !== undefined) {
+                positions[f._index] = fibPos(i, films.length, RADII[s]);
+            }
         }));
 
         // Nodes
-        const nodeMeshes = [], glowMeshes = [];
-        FILMS.forEach(f => {
-            const cfg = NCFG[f.shell], pos = positions[f.id];
+        const nodeMeshes: THREE.Mesh[] = [], glowMeshes: THREE.Mesh[] = [];
+        FILMS.forEach((f: any, index) => {
+            const cfg = NCFG[f?.shell] || NCFG[2]; // Fallback to shell 2 
+            const pos = positions[index] || new THREE.Vector3(0, 0, 0);
             const core = new THREE.Mesh(
                 new THREE.SphereGeometry(cfg.size, 20, 14),
                 new THREE.MeshBasicMaterial({ color: cfg.color })
             );
             core.position.copy(pos);
-            core.userData.filmId = f.id;
+            core.userData.index = index;
             group.add(core); nodeMeshes.push(core);
 
             const gl = new THREE.Mesh(
@@ -211,20 +172,21 @@ export default function SemanticSphere() {
         // ═══════════════════════════════════════════════════════════
         const labelsDiv = document.getElementById('labels');
         if (labelsDiv) labelsDiv.innerHTML = ''; // Ensure no ghost labels from React Strict Mode double-invocations
-        const labelEls = [];
-        FILMS.forEach(f => {
+        const labelEls = new Array(FILMS.length);
+        FILMS.forEach((f, index) => {
             const d = document.createElement('div');
             d.className = `node-label label-${['pillar', 'primary', 'secondary'][f.shell]}`;
-            d.innerHTML = `<div class="label-title" id="lt-${f.id}">${f.title}</div>`;
-            labelsDiv.appendChild(d);
-            labelEls.push(d);
+            d.innerHTML = `<div class="label-title" id="lt-${index}">${f.title}</div>`;
+            labelsDiv!.appendChild(d);
+            labelEls[index] = d;
         });
 
-        function updateLabels(hov, sel) {
+        function updateLabels(hov: number | null, sel: number | null) {
             const tmp = new THREE.Vector3();
-            FILMS.forEach(f => {
-                const el = labelEls[f.id], lt = document.getElementById(`lt-${f.id}`);
-                const p = positions[f.id].clone().applyEuler(group.rotation);
+            FILMS.forEach((f, index) => {
+                const el = labelEls[index], lt = document.getElementById(`lt-${index}`);
+                if (!el || !lt) return;
+                const p = positions[index].clone().applyEuler(group.rotation);
                 tmp.copy(p).project(camera);
                 el.style.left = (tmp.x * .5 + .5) * W() + 'px';
                 el.style.top = (-.5 * tmp.y + .5) * H() + 'px';
@@ -371,7 +333,7 @@ export default function SemanticSphere() {
             const newStack = [...stack, { parent: navContext.parent, siblings: navContext.siblings, siblingIndex: navContext.siblingIndex }];
             const firstChild = children[0];
             const firstShell = FILMS[firstChild].shell;
-            const sameLevelSibs = children.filter(id => FILMS[id].shell === firstShell);
+            const sameLevelSibs = children.filter(idx => FILMS[idx].shell === firstShell); // Use idx
             animatePanel('up', () => applyNavContext(buildNavContext(firstChild, current, sameLevelSibs, 0, newStack)));
         });
 
@@ -450,52 +412,42 @@ export default function SemanticSphere() {
         }
 
         // ─── Panel & Poster ─────────────────────────────────────────
-        function showPanel(id) {
-            const film = FILMS[id];
-            const panel = document.getElementById('panel');
+        function showPanel(nodeIndex: number) {
+            const film = FILMS[nodeIndex];
+            const dStr = `
+                <span style="opacity:.6; font-family:'Fragment_Mono'; letter-spacing:1px; text-transform:uppercase; font-size:10px;">${film.dir}</span>
+                <span style="opacity:.3; margin:0 8px;">|</span>
+                <span style="opacity:.5; font-family:'Fragment_Mono'; letter-spacing:1px;">${film.year}</span>
+            `;
 
-            // Poster
-            const posterImg = document.getElementById('poster-img');
-            const posterBg = document.getElementById('poster-bg');
-            if (film.posterUrl) {
-                if (posterImg) {
-                    posterImg.setAttribute('src', film.posterUrl);
-                    posterImg.style.display = 'block';
-                }
-                if (posterBg) posterBg.style.display = 'none';
-            } else {
-                if (posterImg) posterImg.style.display = 'none';
-                if (posterBg) {
-                    posterBg.style.display = 'block';
-                    const colors = film.poster;
-                    posterBg.style.background = `radial-gradient(ellipse at 30% 40%,${colors[2]} 0%,${colors[1]} 40%,${colors[0]} 100%)`;
-                }
-            }
-
-            if (document.getElementById('poster-eyebrow')) {
-                document.getElementById('poster-eyebrow')!.textContent = ['★ PILASTRO', '◆ AFFINITÀ', '· SCOPERTA'][film.shell];
-            }
-            document.getElementById('poster-title')!.textContent = film.title;
-            document.getElementById('poster-meta').textContent = `${film.year}  ·  ${film.dir}`;
+            const posterTitle = document.getElementById('poster-title');
+            if (posterTitle) posterTitle.innerHTML = film.title;
+            const posterMeta = document.getElementById('poster-meta');
+            if (posterMeta) posterMeta.innerHTML = dStr;
 
             // Badge
             const badgeClasses = ['p-badge-pillar', 'p-badge-primary', 'p-badge-secondary'];
             const badgeLabels = ['Pilastro del gusto', 'Affinità diretta', 'Scoperta laterale'];
-            document.getElementById('p-badge').innerHTML =
-                `<div class="p-badge ${badgeClasses[film.shell]}">${badgeLabels[film.shell]}</div>`;
+            const pBadge = document.getElementById('p-badge');
+            if (pBadge) {
+                pBadge.innerHTML = `<div class="p-badge ${badgeClasses[film.shell]}">${badgeLabels[film.shell]}</div>`;
+            }
 
             // Tags
-            document.getElementById('p-tags').innerHTML = film.tags.map(t => `<div class="p-tag">${t}</div>`).join('');
+            const pTags = document.getElementById('p-tags');
+            if (pTags) {
+                pTags.innerHTML = film.tags.map(t => `<div class="p-tag">${t}</div>`).join('');
+            }
 
             // Connections
-            const connEdges = EDGES.filter(e => e.from === id || e.to === id);
+            const connEdges = EDGES.filter(e => e.from === nodeIndex || e.to === nodeIndex);
             const connLabel = document.getElementById('conn-section-label');
             const connEl = document.getElementById('p-conns');
             if (connEdges.length) {
-                connLabel.textContent = 'Connessioni editoriali';
+                connLabel!.textContent = 'Connessioni editoriali';
                 const dotColor = ['var(--ember)', 'var(--gold)', 'var(--cold)'];
-                connEl.innerHTML = connEdges.map(e => {
-                    const oid = e.from === id ? e.to : e.from;
+                connEl!.innerHTML = connEdges.map(e => {
+                    const oid = e.from === nodeIndex ? e.to : e.from;
                     const o = FILMS[oid];
                     return `<div class="p-conn">
         <div class="p-conn-dot" style="background:${dotColor[o.shell]}"></div>
@@ -504,10 +456,31 @@ export default function SemanticSphere() {
       </div>`;
                 }).join('');
             } else {
-                connLabel.textContent = ''; connEl.innerHTML = '';
+                if (connLabel) connLabel.textContent = '';
+                if (connEl) connEl.innerHTML = '';
             }
 
-            panel.classList.add('visible');
+            const p = document.getElementById('poster-img');
+            if (p) {
+                // Try setting image if available
+                if (film.poster_url) {
+                    p.style.backgroundImage = `url(${film.poster_url})`;
+                    p.style.backgroundSize = "cover";
+                    p.style.backgroundPosition = "center";
+                } else {
+                    const len = film.poster?.length || 0; // Assuming film.poster is an array of colors
+                    if (len > 0 && film.poster) {
+                        p.style.background = `linear-gradient(135deg, ${film.poster[0]}, ${film.poster[len - 1]})`;
+                    } else {
+                        p.style.background = `linear-gradient(135deg, #1a1a1a, #454545)`;
+                    }
+                }
+            }
+
+            const pnl = document.getElementById('panel');
+            if (pnl) {
+                pnl.classList.add('visible');
+            }
         }
 
         function closePanel() {
@@ -536,7 +509,7 @@ export default function SemanticSphere() {
             mouse.x = (x / W()) * 2 - 1; mouse.y = -(y / H()) * 2 + 1;
             raycaster.setFromCamera(mouse, camera);
             const hits = raycaster.intersectObjects(nodeMeshes);
-            return hits.length ? hits[0].object.userData.filmId : null;
+            return hits.length ? hits[0].object.userData.index : null; // Return index
         }
 
         window.addEventListener('mousemove', e => {
