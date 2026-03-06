@@ -36,9 +36,15 @@ export default function NowShowingCarousel({ movies = [] }: NowShowingCarouselPr
         const scrollStep = () => {
             if (!isHovering && el) {
                 scrollPos += 0.5;
-                if (scrollPos >= el.scrollWidth - el.clientWidth) {
-                    scrollPos = 0;
+
+                // Infinite loop logic: the content is duplicated 3 times.
+                // When we scroll past the first 1/3, we instantly jump back to 0.
+                const oneThirdWidth = el.scrollWidth / 3;
+
+                if (scrollPos >= oneThirdWidth) {
+                    scrollPos -= oneThirdWidth;
                 }
+
                 el.scrollLeft = scrollPos;
             }
             animationId = requestAnimationFrame(scrollStep);
@@ -153,9 +159,9 @@ export default function NowShowingCarousel({ movies = [] }: NowShowingCarouselPr
                         className="flex overflow-x-auto gap-6 pb-10 pt-4 px-8"
                         style={{ msOverflowStyle: 'none', scrollbarWidth: 'none' }}
                     >
-                        {movies.map((movie, idx) => (
+                        {[...movies, ...movies, ...movies].map((movie, idx) => (
                             <div
-                                key={movie.id}
+                                key={`${movie.id}-${idx}`}
                                 ref={(el) => setCardRef(el, idx)}
                                 className="flex-shrink-0 w-[140px] md:w-[170px] group cursor-pointer"
                                 style={{
