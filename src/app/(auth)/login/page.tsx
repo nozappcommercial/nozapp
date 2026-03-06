@@ -23,10 +23,11 @@ const styles = `
 
 .auth-container {
   display: flex;
+  justify-content: center;
+  align-items: center;
   min-height: 100vh;
   width: 100%;
-  background-color: var(--bg);
-  background-image: repeating-linear-gradient(0deg, transparent, transparent 27px, rgba(22,10,12,0.03) 27px, rgba(22,10,12,0.03) 28px);
+  background-color: rgb(247, 245, 234);
   font-family: 'DM Sans', sans-serif;
   color: var(--ink);
 }
@@ -129,14 +130,15 @@ const styles = `
 }
 
 .auth-right {
-  width: 480px;
+  width: 100%;
+  max-width: 480px;
   min-height: 100vh;
   background-color: var(--paper);
   display: flex;
   flex-direction: column;
+  justify-content: center;
   position: relative;
   z-index: 20;
-  box-shadow: -10px 0 40px rgba(0,0,0,0.05);
 }
 
 .auth-form-wrapper {
@@ -429,16 +431,6 @@ const styles = `
   line-height: 1.5;
 }
 
-@media (min-width: 1200px) {
-  .auth-right { width: 520px; }
-}
-
-@media (max-width: 899px) {
-  .auth-left { display: none; }
-  .auth-right { width: 100%; box-shadow: none; }
-  .mobile-brand { display: flex; flex-direction: column; align-items: center; gap: 12px; }
-}
-
 @media (max-width: 479px) {
   .auth-form-wrapper { padding: 40px 20px; }
 }
@@ -457,8 +449,8 @@ function GoogleIcon() {
 
 function AppleIcon() {
   return (
-    <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
-      <path d="M16.365 7.733c-.022 3.02 2.64 4.043 2.663 4.053-.024.08-4.22 13.064-9.332 13.064-2.454 0-3.3-1.554-6.023-1.554-2.73 0-3.714 1.51-6.024 1.554C-4.116 24.897-6.2 16.14 0.945 8.164 2.89 6.002 5.405 4.672 7.828 4.672c2.41 0 3.86 1.48 5.768 1.48 2.062 0 3.86-1.63 6.014-1.63 1.94-.038 4.26 1.05 5.516 2.89C23.084 9.49 19.333 11.236 16.365 7.733zM12.72 3.193C11.53 4.63 9.4 5.6 7.425 5.337c.29-2.06 1.487-4.14 2.88-5.337 1.144-1.026 3.16-1.927 5.09-1.927-.245 1.874-.963 3.664-2.677 5.12z" />
+    <svg viewBox="0 0 384 512" width="16" height="16" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+      <path d="M318.7 268.7c-.2-36.7 16.4-64.4 50-84.8-18.8-26.9-47.2-41.7-84.7-44.6-35.5-2.8-74.3 20.7-88.5 20.7-15 0-49.4-19.7-76.4-19.7C63.3 141.2 4 184.8 4 273.5q0 39.3 14.4 81.2c12.8 36.7 59 126.7 107.2 125.2 25.2-.6 43-17.9 75.8-17.9 31.8 0 48.3 17.9 76.4 17.9 48.6-.7 90.4-82.5 102.6-119.3-65.2-30.7-61.7-90-61.7-91.9zm-56.6-164.2c27.3-32.4 24.8-61.9 24-72.5-24.1 1.4-52 16.4-67.9 34.9-17.5 19.8-27.8 44.3-25.6 71.9 26.1 2 49.9-11.4 69.5-34.3z" />
     </svg>
   );
 }
@@ -634,25 +626,6 @@ export default function AuthPage() {
       </svg>
 
       <div className="auth-container">
-
-        {/* Left Panel - Desktop Only */}
-        <div className="auth-left">
-          <div className="auth-noise" style={{ filter: 'url(#noiseFilter)' }} />
-          <div className="auth-rings">
-            <div className="ring ring-1" />
-            <div className="ring ring-2" />
-            <div className="ring ring-3" />
-          </div>
-
-          <div className="auth-left-content">
-            <Logo src="/logo.png" light />
-            <h2 className="brand-tagline">&quot;Il cinema non si cerca, si scopre.&quot;</h2>
-            <div className="brand-separator" />
-            <p className="brand-desc">Una sfera semantica che connette i film attraverso fili editoriali invisibili.</p>
-          </div>
-
-          <div className="film-strip" />
-        </div>
 
         {/* Right Panel - Form Container */}
         <div className="auth-right">
