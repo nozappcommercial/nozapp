@@ -70,16 +70,15 @@ export async function updateSession(request: NextRequest) {
     }
 
     if (user) {
-        /* TEMPORARILY DISABLED: /onboarding page does not exist yet
         const { data: profile } = await supabase
             .from('users')
             .select('onboarding_complete')
             .eq('id', user.id)
             .single();
 
-        const onboardingComplete = profile?.onboarding_complete ?? false;
+        const onboardingComplete = (profile as any)?.onboarding_complete ?? false;
 
-        /* TEMPORARILY DISABLED: /onboarding page does not exist yet
+        // Ensure we don't end in an infinite redirect loop if going to /onboarding
         if (!onboardingComplete && path !== '/onboarding' && !isAuthRoute) {
             // User must complete onboarding
             const url = request.nextUrl.clone();
@@ -93,9 +92,10 @@ export async function updateSession(request: NextRequest) {
             url.pathname = '/sphere';
             return NextResponse.redirect(url);
         }
-        */
 
-        // For now, always redirect authenticated users away from root or login to /sphere
+        // For now, always redirect authenticated users away from root or login to /sphere if onboarding is complete
+        // The above condition covers this, so we can remove the fallback block below if we want.
+        // Let's keep it as a safety net if neither condition matched.
         if (isAuthRoute || path === '/') {
             const url = request.nextUrl.clone();
             url.pathname = '/sphere';

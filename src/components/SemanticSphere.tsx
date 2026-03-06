@@ -32,6 +32,8 @@ interface SemanticSphereProps {
 export default function SemanticSphere({ files = [], edges = [] }: SemanticSphereProps) {
     const containerRef = useRef<HTMLDivElement>(null);
     const mounted = useRef(false);
+    const [selectedFilm, setSelectedFilm] = React.useState<FilmNode | null>(null);
+    const [selectedEdges, setSelectedEdges] = React.useState<any[]>([]);
 
     useEffect(() => {
         if (mounted.current) return;
@@ -127,7 +129,8 @@ export default function SemanticSphere({ files = [], edges = [] }: SemanticSpher
                 new THREE.SphereGeometry(cfg.size * 3.5, 16, 12),
                 new THREE.MeshBasicMaterial({ color: cfg.color, transparent: true, opacity: cfg.glow, blending: THREE.NormalBlending })
             );
-            gl.position.copy(pos); gl.raycast = () => { };
+            gl.position.copy(pos);
+            gl.userData.index = index; // Allow raycasting on glow
             group.add(gl); glowMeshes.push(gl);
         });
 
@@ -262,11 +265,12 @@ export default function SemanticSphere({ files = [], edges = [] }: SemanticSpher
             const children = neighbors(filmId, null).filter(id => FILMS[id].shell > shell);
             children.sort((a, b) => FILMS[a].shell - FILMS[b].shell); // nearest shell first
 
-            // Visible set: current + parent + siblings + children
+            // Visible set: current + parent + siblings + children + all direct neighbors
             const visible = new Set([filmId]);
             if (parent !== null) visible.add(parent);
             sibs.forEach(s => visible.add(s));
             children.forEach(c => visible.add(c));
+            connectedTo(filmId).forEach(n => visible.add(n));
 
             return { current: filmId, parent, siblings: sibs, siblingIndex: idx, children, visible, stack };
         }
@@ -414,79 +418,19 @@ export default function SemanticSphere({ files = [], edges = [] }: SemanticSpher
         // ─── Panel & Poster ─────────────────────────────────────────
         function showPanel(nodeIndex: number) {
             const film = FILMS[nodeIndex];
-            const dStr = `
-                <span style="opacity:.6; font-family:'Fragment_Mono'; letter-spacing:1px; text-transform:uppercase; font-size:10px;">${film.dir}</span>
-                <span style="opacity:.3; margin:0 8px;">|</span>
-                <span style="opacity:.5; font-family:'Fragment_Mono'; letter-spacing:1px;">${film.year}</span>
-            `;
-
-            const posterTitle = document.getElementById('poster-title');
-            if (posterTitle) posterTitle.innerHTML = film.title;
-            const posterMeta = document.getElementById('poster-meta');
-            if (posterMeta) posterMeta.innerHTML = dStr;
-
-            // Badge
-            const badgeClasses = ['p-badge-pillar', 'p-badge-primary', 'p-badge-secondary'];
-            const badgeLabels = ['Pilastro del gusto', 'Affinità diretta', 'Scoperta laterale'];
-            const pBadge = document.getElementById('p-badge');
-            if (pBadge) {
-                pBadge.innerHTML = `<div class="p-badge ${badgeClasses[film.shell]}">${badgeLabels[film.shell]}</div>`;
-            }
-
-            // Tags
-            const pTags = document.getElementById('p-tags');
-            if (pTags) {
-                pTags.innerHTML = film.tags.map(t => `<div class="p-tag">${t}</div>`).join('');
-            }
-
-            // Connections
             const connEdges = EDGES.filter(e => e.from === nodeIndex || e.to === nodeIndex);
-            const connLabel = document.getElementById('conn-section-label');
-            const connEl = document.getElementById('p-conns');
-            if (connEdges.length) {
-                connLabel!.textContent = 'Connessioni editoriali';
-                const dotColor = ['var(--ember)', 'var(--gold)', 'var(--cold)'];
-                connEl!.innerHTML = connEdges.map(e => {
-                    const oid = e.from === nodeIndex ? e.to : e.from;
-                    const o = FILMS[oid];
-                    return `<div class="p-conn">
-        <div class="p-conn-dot" style="background:${dotColor[o.shell]}"></div>
-        <span>${o.title}</span>
-        <span class="p-conn-type">· ${e.type}</span>
-      </div>`;
-                }).join('');
-            } else {
-                if (connLabel) connLabel.textContent = '';
-                if (connEl) connEl.innerHTML = '';
-            }
-
-            const p = document.getElementById('poster-img');
-            if (p) {
-                // Try setting image if available
-                if (film.poster_url) {
-                    p.style.backgroundImage = `url(${film.poster_url})`;
-                    p.style.backgroundSize = "cover";
-                    p.style.backgroundPosition = "center";
-                } else {
-                    const len = film.poster?.length || 0; // Assuming film.poster is an array of colors
-                    if (len > 0 && film.poster) {
-                        p.style.background = `linear-gradient(135deg, ${film.poster[0]}, ${film.poster[len - 1]})`;
-                    } else {
-                        p.style.background = `linear-gradient(135deg, #1a1a1a, #454545)`;
-                    }
-                }
-            }
-
-            const pnl = document.getElementById('panel');
-            if (pnl) {
-                pnl.classList.add('visible');
-            }
+            const edgeData = connEdges.map(e => {
+                const oid = e.from === nodeIndex ? e.to : e.from;
+                return { id: e.from + '-' + e.to, type: e.type, film: FILMS[oid] };
+            });
+            setSelectedFilm(film);
+            setSelectedEdges(edgeData);
         }
 
         function closePanel() {
-            document.getElementById('panel').classList.remove('visible');
-            document.getElementById('nav-controls').classList.remove('visible');
-            document.getElementById('breadcrumb').classList.remove('visible');
+            setSelectedFilm(null);
+            document.getElementById('nav-controls')?.classList.remove('visible');
+            document.getElementById('breadcrumb')?.classList.remove('visible');
             navContext = null;
             // Reset visuals
             FILMS.forEach((f, i) => {
@@ -496,7 +440,7 @@ export default function SemanticSphere({ files = [], edges = [] }: SemanticSpher
             edgeLines.forEach((l, i) => { l.material.opacity = ECFG[EDGES[i].type].base; });
         }
 
-        document.getElementById('panel-close').addEventListener('click', closePanel);
+        window.addEventListener('closeSpherePanel', closePanel);
 
         // ═══════════════════════════════════════════════════════════
         // MOUSE
@@ -508,7 +452,8 @@ export default function SemanticSphere({ files = [], edges = [] }: SemanticSpher
         function getHit(x, y) {
             mouse.x = (x / W()) * 2 - 1; mouse.y = -(y / H()) * 2 + 1;
             raycaster.setFromCamera(mouse, camera);
-            const hits = raycaster.intersectObjects(nodeMeshes);
+            // Intersect both nodes and glows to increase hit area
+            const hits = raycaster.intersectObjects([...nodeMeshes, ...glowMeshes]);
             return hits.length ? hits[0].object.userData.index : null; // Return index
         }
 
@@ -617,12 +562,17 @@ export default function SemanticSphere({ files = [], edges = [] }: SemanticSpher
 
         // Keyboard navigation — mirrors button logic (↑=outward, ↓=inward)
         window.addEventListener('keydown', e => {
+            if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(e.key)) {
+                e.preventDefault();
+            }
+            if (e.key === 'Escape') {
+                closePanel();
+            }
             if (!navContext) return;
-            if (e.key === 'ArrowUp') document.getElementById('btn-up').click();
-            if (e.key === 'ArrowDown') document.getElementById('btn-down').click();
-            if (e.key === 'ArrowLeft') document.getElementById('btn-left').click();
-            if (e.key === 'ArrowRight') document.getElementById('btn-right').click();
-            if (e.key === 'Escape') closePanel();
+            if (e.key === 'ArrowUp') document.getElementById('btn-up')?.click();
+            if (e.key === 'ArrowDown') document.getElementById('btn-down')?.click();
+            if (e.key === 'ArrowLeft') document.getElementById('btn-left')?.click();
+            if (e.key === 'ArrowRight') document.getElementById('btn-right')?.click();
         });
 
         // ═══════════════════════════════════════════════════════════
@@ -725,29 +675,55 @@ export default function SemanticSphere({ files = [], edges = [] }: SemanticSpher
                 <div className="nav-counter" id="nav-counter"></div>
             </div>
 
-            {/* Info Panel */}
-            <div id="panel">
-                <button id="panel-close">×</button>
-                <div id="panel-poster">
-                    <img id="poster-img" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', zIndex: 0, display: 'none' }} alt="" />
-                    <div className="poster-bg" id="poster-bg"></div>
-                    <div className="poster-overlay"></div>
-                    <div className="poster-content">
-                        <div className="poster-eyebrow" id="poster-eyebrow"></div>
-                        <div className="poster-film-title" id="poster-title"></div>
-                        <div className="poster-film-meta" id="poster-meta"></div>
+            {/* Info Panel -> React State */}
+            {selectedFilm && (
+                <div id="panel" className="visible">
+                    <button id="panel-close" onClick={() => { setSelectedFilm(null); window.dispatchEvent(new Event('closeSpherePanel')); }}>×</button>
+                    <div id="panel-poster">
+                        <img id="poster-img"
+                            src={selectedFilm.poster_url || '/placeholder.jpg'}
+                            style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', zIndex: 0 }}
+                            alt=""
+                        />
+                        <div className="poster-bg" id="poster-bg"></div>
+                        <div className="poster-overlay"></div>
+                        <div className="poster-content">
+                            <div className="poster-eyebrow" id="poster-eyebrow"></div>
+                            <div className="poster-film-title" id="poster-title">{selectedFilm.title}</div>
+                            <div className="poster-film-meta" id="poster-meta">
+                                <span style={{ opacity: .6, fontFamily: 'Fragment_Mono', letterSpacing: '1px', textTransform: 'uppercase', fontSize: '10px' }}>{selectedFilm.dir}</span>
+                                <span style={{ opacity: .3, margin: '0 8px' }}>|</span>
+                                <span style={{ opacity: .5, fontFamily: 'Fragment_Mono', letterSpacing: '1px' }}>{selectedFilm.year}</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div className="panel-body">
+                        <div id="p-badge">
+                            <div className={`p-badge p-badge-${['pillar', 'primary', 'secondary'][selectedFilm.shell]}`}>
+                                {['Pilastro del gusto', 'Affinità diretta', 'Scoperta laterale'][selectedFilm.shell]}
+                            </div>
+                        </div>
+                        <div className="p-section">Temi editoriali</div>
+                        <div className="p-tags" id="p-tags">
+                            {selectedFilm.tags.map((t: string) => <div key={t} className="p-tag">{t}</div>)}
+                        </div>
+                        {selectedEdges.length > 0 && (
+                            <>
+                                <div className="p-section" id="conn-section-label">Connessioni editoriali</div>
+                                <div className="p-conns" id="p-conns">
+                                    {selectedEdges.map((e: any) => (
+                                        <div key={e.id} className="p-conn">
+                                            <div className="p-conn-dot" style={{ background: ['var(--ember)', 'var(--gold)', 'var(--cold)'][e.film.shell] }}></div>
+                                            <span>{e.film.title}</span>
+                                            <span className="p-conn-type">· {e.type}</span>
+                                        </div>
+                                    ))}
+                                </div>
+                            </>
+                        )}
                     </div>
                 </div>
-                <div className="panel-body">
-                    <div id="p-badge"></div>
-                    <div className="p-section">Temi editoriali</div>
-                    <div className="p-tags" id="p-tags"></div>
-                    <div className="p-section" id="conn-section-label"></div>
-                    <div className="p-conns" id="p-conns"></div>
-                </div>
-            </div>
-
-
+            )}
         </div>
     );
 }
