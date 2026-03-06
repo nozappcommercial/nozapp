@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useEffect, useRef, useCallback } from "react";
-import { useRouter } from "next/navigation";
 import type { OnboardingFilm } from "@/app/onboarding/page";
 
 /* ─── Constants ─────────────────────────────────────────────────── */
@@ -17,7 +16,7 @@ interface OnboardingFlowProps {
 
 /* ─── Helpers ───────────────────────────────────────────────────── */
 function useIsMobile() {
-    const [mobile, setMobile] = useState(false);
+    const [mobile, setMobile] = useState<boolean | undefined>(undefined);
     useEffect(() => {
         const check = () => setMobile(window.innerWidth < 640);
         check();
@@ -28,7 +27,6 @@ function useIsMobile() {
 }
 
 export default function OnboardingFlow({ films }: OnboardingFlowProps) {
-    const router = useRouter();
     const isMobile = useIsMobile();
 
     // Split films into 3 groups based on onboarding_group
@@ -229,6 +227,13 @@ export default function OnboardingFlow({ films }: OnboardingFlowProps) {
         };
     }
 
+    const [mounted, setMounted] = useState(false);
+    useEffect(() => setMounted(true), []);
+
+    if (!mounted) {
+        return <div className="ob-root ob-faded"></div>;
+    }
+
     return (
         <>
             {/* eslint-disable-next-line @next/next/no-page-custom-font */}
@@ -327,7 +332,7 @@ export default function OnboardingFlow({ films }: OnboardingFlowProps) {
                                         </div>
 
                                         {/* swipe hint mobile */}
-                                        {isMobile && <div className="ob-swipe-hint">swipe per valutare · frecce per navigare</div>}
+                                        {isMobile === true && <div className="ob-swipe-hint">swipe per valutare · frecce per navigare</div>}
                                     </>
                                 ) : null}
 
@@ -518,7 +523,7 @@ export default function OnboardingFlow({ films }: OnboardingFlowProps) {
                                 </div>
                             ))}
                         </div>
-                        <button className="ob-btn-p" onClick={() => router.push("/sphere")}>
+                        <button className="ob-btn-p" onClick={() => { window.location.href = "/sphere"; }}>
                             Entra nella Sfera →
                         </button>
                     </div>
