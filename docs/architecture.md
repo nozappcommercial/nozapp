@@ -40,7 +40,8 @@ src/
 ├── components/
 │   ├── ui/                     # shadcn/ui components (non modificare)
 │   ├── sphere/                 # Componenti 3D Sfera Semantica
-│   │   ├── SemanticSphere.tsx  # Wrapper Client Component
+│   │   ├── SemanticSphere.tsx  # Wrapper Client Component (incl. NavigationState e TWEEN)
+│   │   ├── ShellNavigator.tsx  # Overlay per selezione shell (0, 1, 2)
 │   │   ├── SphereScene.ts      # Logica Three.js (non React)
 │   │   └── NodeLabels.tsx      # HTML labels overlay
 │   ├── onboarding/             # Form psicografico

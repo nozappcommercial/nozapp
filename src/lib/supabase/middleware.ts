@@ -76,7 +76,7 @@ export async function updateSession(request: NextRequest) {
             .eq('id', user.id)
             .single();
 
-        const onboardingComplete = (profile as any)?.onboarding_complete ?? false;
+        const onboardingComplete = (profile as unknown as { onboarding_complete?: boolean })?.onboarding_complete ?? false;
 
         // Ensure we don't end in an infinite redirect loop if going to /onboarding
         if (!onboardingComplete && path !== '/onboarding' && !isAuthRoute) {

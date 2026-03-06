@@ -24,7 +24,7 @@ export async function GET(request: Request) {
                 .eq('id', session.user.id)
                 .single();
 
-            const onboardingComplete = (profile as any)?.onboarding_complete ?? false;
+            const onboardingComplete = (profile as unknown as { onboarding_complete?: boolean })?.onboarding_complete ?? false;
 
             if (!onboardingComplete) {
                 return NextResponse.redirect(new URL('/onboarding', requestUrl.origin));
