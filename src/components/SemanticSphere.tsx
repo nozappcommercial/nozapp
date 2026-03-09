@@ -412,10 +412,12 @@ export default function SemanticSphere({ files = [], edges = [] }: SemanticSpher
 
         // ↑ = outward — go deeper (children)
         document.getElementById('btn-up').addEventListener('click', () => {
-            if (!navContext || navContext.children.length === 0) return;
+            if (!navContext || !navContext.children || navContext.children.length === 0) return;
             const { current, children, stack } = navContext;
             const newStack = [...stack, { parent: navContext.parent, siblings: navContext.siblings, siblingIndex: navContext.siblingIndex }];
             const firstChild = children[0];
+            if (firstChild === undefined) return;
+
             const firstShell = FILMS[firstChild].shell;
             const sameLevelSibs = children.filter(idx => FILMS[idx].shell === firstShell); // Use idx
             animatePanel('up', () => applyNavContext(buildNavContext(firstChild, current, sameLevelSibs, 0, newStack)));
@@ -534,7 +536,8 @@ export default function SemanticSphere({ files = [], edges = [] }: SemanticSpher
             raycaster.setFromCamera(mouse, camera);
             // Intersect both nodes and glows to increase hit area
             const hits = raycaster.intersectObjects([...nodeMeshes, ...glowMeshes]);
-            return hits.length ? hits[0].object.userData.index : null; // Return index
+            const visibleHit = hits.find(h => h.object.material.opacity > 0);
+            return visibleHit ? visibleHit.object.userData.index : null; // Return index
         }
 
         window.addEventListener('mousemove', e => {
