@@ -98,7 +98,7 @@ export default function SemanticSphere({ files = [], edges = [] }: SemanticSpher
                         if (navContext) {
                             // Only show if connected to navContext.current
                             const conns = connectedTo(navContext.current);
-                            if (!conns.includes(i)) shouldShow = false;
+                            if (!conns.has(i)) shouldShow = false;
                         } else {
                             // If no focused node, show none or all? Let's show all for now, or maybe none.
                             // Rules: "Mostrare solo i nodi Shell 2 collegati al film selezionato in Shell 1."
@@ -111,8 +111,12 @@ export default function SemanticSphere({ files = [], edges = [] }: SemanticSpher
                     const targetBaseOp = shouldShow ? 1 : 0; // for nodeMeshes
 
                     if (shouldShow && glowMeshes[i].material.opacity === 0) {
-                        // Fade IN (Staggered)
-                        const delay = isCurrentShell ? i * 20 : 0; // 20ms stagger (80 is too slow for 100 nodes)
+                        // Fade IN (Staggered sequentially by shell level)
+                        // Shell 0 (Red) -> Shell 1 (Yellow) -> Shell 2 (Blue)
+                        const baseDelay = isCurrentShell ? f.shell * 300 : 0;
+                        const individualDelay = isCurrentShell ? i * 5 : 0;
+                        const delay = baseDelay + individualDelay;
+
                         addTween(glowMeshes[i].material, 'opacity', targetOp, 600, delay);
                         addTween(nodeMeshes[i].material, 'opacity', targetBaseOp, 600, delay);
                     } else if (!shouldShow && glowMeshes[i].material.opacity > 0) {
