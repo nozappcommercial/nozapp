@@ -177,13 +177,20 @@ export default function OnboardingFlow({ films }: OnboardingFlowProps) {
             });
 
             if (!res.ok) {
-                console.error("Failed to save onboarding results");
+                const errData = await res.json().catch(() => ({}));
+                console.error("Failed to save onboarding results:", errData);
+                alert(`Errore di salvataggio: ${errData.error || res.statusText}`);
+                setSaving(false);
+                return;
             }
+
+            setSaving(false);
+            pageTransition(() => setPhase("done"));
         } catch (err) {
             console.error("Error saving onboarding:", err);
+            alert("Errore di rete durante il salvataggio.");
+            setSaving(false);
         }
-        setSaving(false);
-        pageTransition(() => setPhase("done"));
     }
 
     /* ─── Card animation style ────────────────────────────────────── */

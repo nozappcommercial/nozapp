@@ -18,13 +18,7 @@ export async function POST(request: Request) {
             return NextResponse.json({ error: "Invalid pillars data" }, { status: 400 });
         }
 
-        // 1. Delete existing pillars for this user (in case of re-onboarding)
-        await supabase
-            .from("user_pillars")
-            .delete()
-            .eq("user_id", user.id);
-
-        // 2. Insert new pillars
+        // Insert or Update pillars
         if (pillars.length > 0) {
             const pillarRows = pillars.map((p: { filmId: number; rank: number }) => ({
                 user_id: user.id,
@@ -34,11 +28,11 @@ export async function POST(request: Request) {
 
             const { error: pillarError } = await supabase
                 .from("user_pillars")
-                .insert(pillarRows);
+                .upsert(pillarRows, { onConflict: "user_id, film_id" });
 
             if (pillarError) {
-                console.error("Error inserting pillars:", pillarError);
-                return NextResponse.json({ error: "Failed to save pillars" }, { status: 500 });
+                console.error("Error upserting pillars:", pillarError);
+                return NextResponse.json({ error: `Pillar Error: ${pillarError.message} (${pillarError.code})` }, { status: 500 });
             }
         }
 
@@ -59,7 +53,7 @@ export async function POST(request: Request) {
 
         if (resultError) {
             console.error("Error saving onboarding result:", resultError);
-            // Non-fatal: pillars already saved
+            return NextResponse.json({ error: `JSON Error: ${resultError.message}` }, { status: 500 });
         }
 
         // 4. Mark onboarding as complete
@@ -70,6 +64,7 @@ export async function POST(request: Request) {
 
         if (updateError) {
             console.error("Error updating onboarding status:", updateError);
+            return NextResponse.json({ error: `User Update Error: ${updateError.message}` }, { status: 500 });
         }
 
         return NextResponse.json({ success: true });
