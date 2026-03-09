@@ -35,7 +35,7 @@ export default function SemanticSphere({ files = [], edges = [] }: SemanticSpher
     const mounted = useRef(false);
     const [selectedFilm, setSelectedFilm] = React.useState<FilmNode | null>(null);
     const [selectedEdges, setSelectedEdges] = React.useState<any[]>([]);
-    
+
     // Shell Navigation State
     const [activeShell, setActiveShell] = React.useState<ShellLevel>(0);
     const [isAnimating, setIsAnimating] = React.useState(false);
@@ -91,25 +91,25 @@ export default function SemanticSphere({ files = [], edges = [] }: SemanticSpher
                 FILMS.forEach((f, i) => {
                     const isVisible = f.shell <= shell;
                     const isCurrentShell = f.shell === shell;
-                    
+
                     // If moving forward to Shell 2, only show nodes connected to selected Shell 1
                     let shouldShow = isVisible;
                     if (shell === 2 && f.shell === 2) {
-                         if (navContext) {
-                             // Only show if connected to navContext.current
-                             const conns = connectedTo(navContext.current);
-                             if (!conns.includes(i)) shouldShow = false;
-                         } else {
-                             // If no focused node, show none or all? Let's show all for now, or maybe none.
-                             // Rules: "Mostrare solo i nodi Shell 2 collegati al film selezionato in Shell 1."
-                             // If none selected, don't show Shell 2 nodes.
-                             shouldShow = false; 
-                         }
+                        if (navContext) {
+                            // Only show if connected to navContext.current
+                            const conns = connectedTo(navContext.current);
+                            if (!conns.includes(i)) shouldShow = false;
+                        } else {
+                            // If no focused node, show none or all? Let's show all for now, or maybe none.
+                            // Rules: "Mostrare solo i nodi Shell 2 collegati al film selezionato in Shell 1."
+                            // If none selected, don't show Shell 2 nodes.
+                            shouldShow = false;
+                        }
                     }
 
                     const targetOp = shouldShow ? NCFG[f.shell].glow : 0;
                     const targetBaseOp = shouldShow ? 1 : 0; // for nodeMeshes
-                    
+
                     if (shouldShow && glowMeshes[i].material.opacity === 0) {
                         // Fade IN (Staggered)
                         const delay = isCurrentShell ? i * 20 : 0; // 20ms stagger (80 is too slow for 100 nodes)
@@ -121,7 +121,7 @@ export default function SemanticSphere({ files = [], edges = [] }: SemanticSpher
                         addTween(nodeMeshes[i].material, 'opacity', 0, 400, 0);
                     }
                 });
-                
+
                 // Hide/show edges
                 edgeLines.forEach((l, i) => {
                     const e = EDGES[i];
@@ -133,8 +133,6 @@ export default function SemanticSphere({ files = [], edges = [] }: SemanticSpher
             }
         };
 
-        // Initialize camera to Shell 0 z-index instead of 11
-        camera.position.z = 3;
         // ═══════════════════════════════════════════════════════════
         // THREE SETUP
         // ═══════════════════════════════════════════════════════════
@@ -148,7 +146,8 @@ export default function SemanticSphere({ files = [], edges = [] }: SemanticSpher
         const scene = new THREE.Scene();
         scene.fog = new THREE.FogExp2(0xf8f8ee, .032);
         const camera = new THREE.PerspectiveCamera(48, W() / H(), .1, 500);
-        camera.position.set(0, 0, 11);
+        // Initialize camera to Shell 0 z-index instead of 11
+        camera.position.set(0, 0, 3);
 
         const RADII = [1.35, 2.8, 4.4];
 
@@ -659,7 +658,7 @@ export default function SemanticSphere({ files = [], edges = [] }: SemanticSpher
         function animate() {
             requestAnimationFrame(animate);
             t += .01;
-            
+
             // Camera dolly lerp
             camera.position.z += (targetCameraZ - camera.position.z) * 0.05;
 
@@ -675,7 +674,7 @@ export default function SemanticSphere({ files = [], edges = [] }: SemanticSpher
                 // easeInOutQuad
                 const ease = progress < 0.5 ? 2 * progress * progress : 1 - Math.pow(-2 * progress + 2, 2) / 2;
                 task.obj[task.prop] = task.start + (task.target - task.start) * ease;
-                
+
                 if (progress >= 1) TWEEN_TASKS.splice(i, 1);
             }
 
@@ -758,10 +757,10 @@ export default function SemanticSphere({ files = [], edges = [] }: SemanticSpher
                 </div>
             </div>
 
-            <ShellNavigator 
-                activeShell={activeShell} 
-                onShellChange={setActiveShell} 
-                isAnimating={isAnimating} 
+            <ShellNavigator
+                activeShell={activeShell}
+                onShellChange={setActiveShell}
+                isAnimating={isAnimating}
             />
 
             {/* Breadcrumb */}
