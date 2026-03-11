@@ -1,5 +1,6 @@
 import { createClient } from "@/lib/supabase/server";
 import OnboardingFlow from "@/components/onboarding/OnboardingFlow";
+import "@/components/onboarding/onboarding.css";
 
 export interface OnboardingFilm {
     id: number;
