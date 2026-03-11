@@ -16,13 +16,27 @@ export interface OnboardingFilm {
 export default async function OnboardingPage() {
     const supabase = createClient();
 
+    // Helper for network retries (e.g., UND_ERR_CONNECT_TIMEOUT)
+    const fetchWithRetry = async <T,>(operation: () => Promise<{ data: T | null, error: any }>, retries = 3, delayMs = 1500) => {
+        for (let i = 0; i < retries; i++) {
+            try {
+                return await operation();
+            } catch (error: any) {
+                console.warn(`[Supabase Network] Onboarding fetch failed (attempt ${i + 1}/${retries}), retrying...`, error.message || error);
+                if (i === retries - 1) throw error;
+                await new Promise(resolve => setTimeout(resolve, delayMs));
+            }
+        }
+        return { data: null, error: new Error("Unreachable") };
+    };
+
     // Fetch probe films ordered by group
-    const { data: films, error } = await supabase
+    const { data: films, error } = await fetchWithRetry(async () => await supabase
         .from("films")
         .select("id, title, year, director, poster_url, color_primary, color_accent, mood, onboarding_group")
         .eq("is_onboarding_probe", true)
         .order("onboarding_group", { ascending: true })
-        .order("id", { ascending: true });
+        .order("id", { ascending: true }));
 
     if (error || !films || films.length === 0) {
         console.error("Error fetching onboarding films:", error);
@@ -42,7 +56,7 @@ export default async function OnboardingPage() {
     }
 
     // Convert to typed array
-    const typedFilms: OnboardingFilm[] = films.map(f => ({
+    const typedFilms: OnboardingFilm[] = (films as any[]).map((f: any) => ({
         id: f.id,
         title: f.title,
         year: f.year || 0,

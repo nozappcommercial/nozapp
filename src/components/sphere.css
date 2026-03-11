@@ -25,30 +25,26 @@ body.dragging {
     cursor: grabbing !important
 }
 
-.sphere-wrapper canvas {
-    position: absolute;
-    inset: 0;
-    display: block;
-    cursor: grab;
-    touch-action: none;
-    overscroll-behavior: none;
+/* Main layout container support for scrolling */
+.main-sphere-wrapper {
+  background: var(--bg);
+  min-height: 100vh;
+  position: relative;
+  z-index: 0;
 }
 
-/* Vignette */
-.vignette {
-    position: absolute;
-    inset: 0;
-    pointer-events: none;
-    z-index: 1;
-    background: radial-gradient(ellipse 75% 75% at 50% 50%, transparent 30%, rgba(4, 5, 11, .85) 100%)
+#c {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  display: block;
 }
 
-/* Labels */
 #labels {
-    position: absolute;
-    inset: 0;
-    pointer-events: none;
-    z-index: 5
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 5;
 }
 
 .node-label {
@@ -121,48 +117,53 @@ body.dragging {
 }
 
 /* Header */
-.sphere-wrapper>header {
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    z-index: 10;
-    padding: 24px 32px;
-    display: flex;
-    align-items: flex-start;
-    justify-content: space-between;
-    pointer-events: none
+/* Sphere Header (Fixed Hero) */
+.sphere-header {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  padding: 32px 40px;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  pointer-events: none;
+  z-index: 100;
 }
 
-.brand {
-    font-family: 'Fragment Mono', monospace;
-    font-size: 8px;
-    letter-spacing: .35em;
-    text-transform: uppercase;
-    color: var(--ember);
-    opacity: .7;
-    margin-bottom: 5px
+.sh-left {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
 }
 
-.title {
-    font-family: 'Cormorant Garamond', serif;
-    font-size: 26px;
-    font-weight: 300;
-    color: var(--text)
+.sh-logo {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 28px;
+  font-weight: 300;
+  color: var(--text);
+  letter-spacing: -0.01em;
 }
 
-.title em {
-    font-style: italic;
-    color: var(--gold)
+.sh-logo em {
+  font-style: italic;
+  color: var(--gold);
+}
+
+.sh-hint {
+  font-family: 'Fragment Mono', monospace;
+  font-size: 10px;
+  text-transform: uppercase;
+  color: var(--gold);
+  letter-spacing: 0.25em;
+  opacity: 0.8;
 }
 
 .hints {
-    font-family: 'Fragment Mono', monospace;
-    font-size: 9px;
-    color: rgba(22, 10, 12, 0.85);
-    letter-spacing: .08em;
-    line-height: 2;
-    text-align: right
+  font-family: 'Fragment Mono', monospace;
+  font-size: 10px;
+  text-align: right;
+  line-height: 1.8;
+  color: var(--dim);
+  letter-spacing: 0.05em;
 }
 
 /* Shell legend */

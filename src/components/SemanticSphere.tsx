@@ -36,15 +36,24 @@ export default function SemanticSphere({ files = [], edges = [] }: SemanticSpher
     const [selectedFilm, setSelectedFilm] = React.useState<FilmNode | null>(null);
     const [selectedEdges, setSelectedEdges] = React.useState<any[]>([]);
 
-    // Shell Navigation State
     const [activeShell, setActiveShell] = React.useState<ShellLevel>(0);
+    const activeShellRef = useRef(0);
     const [isAnimating, setIsAnimating] = React.useState(false);
     const sphereApi = useRef<any>(null);
 
     useEffect(() => {
+        activeShellRef.current = activeShell;
         if (sphereApi.current) {
             setIsAnimating(true);
             sphereApi.current.setShell(activeShell);
+
+            // Flash overlay trigger
+            const flash = document.getElementById('shell-flash');
+            if (flash) {
+                flash.style.opacity = '1';
+                setTimeout(() => { flash.style.opacity = '0'; }, 150);
+            }
+
             setTimeout(() => setIsAnimating(false), 1000); // lock nav during transition
         }
     }, [activeShell]);
@@ -540,46 +549,28 @@ export default function SemanticSphere({ files = [], edges = [] }: SemanticSpher
             return visibleHit ? visibleHit.object.userData.index : null; // Return index
         }
 
-        window.addEventListener('mousemove', e => {
-            if (isDown) {
-                const dx = e.clientX - lastXY.x, dy = e.clientY - lastXY.y;
-                if (Math.abs(dx) + Math.abs(dy) > 2) isDragging = true;
-                vel.x = dy * .006; vel.y = dx * .006;
-                group.rotation.x += vel.x; group.rotation.y += vel.y;
-            } else if (!navContext) {
-                const hit = getHit(e.clientX, e.clientY);
-                if (hit !== hoveredId) {
-                    hoveredId = hit;
-                    if (hit !== null) {
-                        // Hover highlight
-                        const conn = connectedTo(hit);
-                        FILMS.forEach((f, i) => {
-                            if (conn.has(i)) {
-                                nodeMeshes[i].material.color.setHex(NCFG[f.shell].color);
-                                nodeMeshes[i].material.color.multiplyScalar(i === hit ? 0.8 : 0.9);
-                                glowMeshes[i].material.opacity = NCFG[f.shell].glow * (i === hit ? 3 : 1.8);
-                            } else {
-                                nodeMeshes[i].material.color.setHex(0xe0ddd5);
-                                glowMeshes[i].material.opacity = .008;
-                            }
-                        });
-                        const eids = edgesOf(hit);
-                        edgeLines.forEach((l, i) => {
-                            l.material.opacity = eids.includes(i) ? ECFG[EDGES[i].type].base * 2.5 : .02;
-                        });
-                        canvas.style.cursor = 'pointer';
-                    } else {
-                        FILMS.forEach((f, i) => {
-                            nodeMeshes[i].material.color.setHex(NCFG[f.shell].color);
-                            glowMeshes[i].material.opacity = NCFG[f.shell].glow;
-                        });
-                        edgeLines.forEach((l, i) => { l.material.opacity = ECFG[EDGES[i].type].base; });
-                        canvas.style.cursor = 'grab';
-                    }
+        let scrollAccum = 0;
+        const SCROLL_THRESHOLD = 80;
+
+        window.addEventListener('wheel', e => {
+            const rect = canvas.getBoundingClientRect();
+            const cx = rect.left + rect.width / 2;
+            const cy = rect.top + rect.height / 2;
+            const dist = Math.sqrt((e.clientX - cx) ** 2 + (e.clientY - cy) ** 2);
+            const activeRadius = Math.min(rect.width, rect.height) * 0.45;
+
+            if (dist < activeRadius && rect.bottom > 0) {
+                e.preventDefault();
+                scrollAccum += e.deltaY;
+                if (scrollAccum > SCROLL_THRESHOLD) {
+                    scrollAccum = 0;
+                    if (activeShellRef.current < 2) setActiveShell(s => s + 1);
+                } else if (scrollAccum < -SCROLL_THRESHOLD) {
+                    scrollAccum = 0;
+                    if (activeShellRef.current > 0) setActiveShell(s => s - 1);
                 }
             }
-            lastXY = { x: e.clientX, y: e.clientY };
-        });
+        }, { passive: false });
 
         window.addEventListener('mousedown', e => {
             isDown = true; isDragging = false;
@@ -645,13 +636,22 @@ export default function SemanticSphere({ files = [], edges = [] }: SemanticSpher
 
         // Keyboard navigation — mirrors button logic (↑=outward, ↓=inward)
         window.addEventListener('keydown', e => {
-            if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(e.key)) {
-                e.preventDefault();
+            if (e.key === 'Escape') { closePanel(); return; }
+
+            if (!navContext) {
+                // Shell navigation mode
+                if (e.key === 'ArrowDown' && activeShellRef.current < 2) {
+                    e.preventDefault();
+                    setActiveShell(s => s + 1);
+                }
+                if (e.key === 'ArrowUp' && activeShellRef.current > 0) {
+                    e.preventDefault();
+                    setActiveShell(s => s - 1);
+                }
+                return;
             }
-            if (e.key === 'Escape') {
-                closePanel();
-            }
-            if (!navContext) return;
+
+            if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(e.key)) e.preventDefault();
             if (e.key === 'ArrowUp') document.getElementById('btn-up')?.click();
             if (e.key === 'ArrowDown') document.getElementById('btn-down')?.click();
             if (e.key === 'ArrowLeft') document.getElementById('btn-left')?.click();
@@ -687,7 +687,9 @@ export default function SemanticSphere({ files = [], edges = [] }: SemanticSpher
 
             // Auto-rotate when idle
             if (!isDown && !navContext && !hoveredId) {
-                group.rotation.y += .0016; group.rotation.x += .0003;
+                const rotSpeed = 0.0016 + activeShellRef.current * 0.0005;
+                group.rotation.y += rotSpeed;
+                group.rotation.x += 0.0002 + activeShellRef.current * 0.0001;
             }
             if (!isDown) {
                 vel.x *= .93; vel.y *= .93;
@@ -735,15 +737,20 @@ export default function SemanticSphere({ files = [], edges = [] }: SemanticSpher
     }, []);
 
     return (
-        <div ref={containerRef} className="sphere-wrapper w-full h-full relative" style={{ background: 'var(--bg)', color: 'var(--text)', overflow: 'hidden', height: '100vh', width: '100vw' }}>
-            <canvas id="c"></canvas>
-            <div className="vignette"></div>
-            <div id="labels"></div>
+        <div id="sphere-canvas-container" className="main-sphere-wrapper" style={{ overflow: 'visible', minHeight: '100vh', position: 'relative' }}>
+            <canvas id="c" style={{ position: 'fixed', inset: 0, zIndex: 0 }} />
+            <div id="labels" style={{ position: 'fixed', inset: 0, pointerEvents: 'none', zIndex: 5 }} />
 
-            <header>
-                <div>
-                    <div className="brand">Editorial Graph</div>
-                    <div className="title">La <em>Sfera</em> Semantica</div>
+            <div id="shell-flash" style={{
+                position: 'fixed', inset: 0, pointerEvents: 'none',
+                background: 'radial-gradient(ellipse at center, rgba(248,244,238,0.65) 0%, transparent 65%)',
+                opacity: 0, transition: 'opacity 0.5s ease', zIndex: 5
+            }} />
+
+            <header className="sphere-header" style={{ position: 'fixed', top: 0, left: 0, right: 0, zIndex: 10 }}>
+                <div className="sh-left">
+                    <div className="sh-logo">SFERA <em>SEMANTICA</em></div>
+                    <div className="sh-hint">SCROLL · cambia shell</div>
                 </div>
                 <div className="hints">
                     TRASCINA · ruota &nbsp;·&nbsp; SCROLL · zoom<br />
