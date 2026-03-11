@@ -1,5 +1,15 @@
 import { createClient } from "@/lib/supabase/server";
 import { NextResponse } from "next/server";
+import { z } from "zod";
+
+const OnboardingSchema = z.object({
+    pillars: z.array(z.object({
+        filmId: z.number(),
+        rank: z.number().int().min(1)
+    })).min(1),
+    reactions: z.record(z.string(), z.any()).optional(),
+    timestamp: z.string().optional()
+});
 
 export async function POST(request: Request) {
     const supabase = createClient();
@@ -9,10 +19,17 @@ export async function POST(request: Request) {
         for (let i = 0; i < retries; i++) {
             try {
                 const res = await operation();
+                if (res.error) {
+                    const msg = (res.error.message || "").toLowerCase();
+                    const code = (res.error.code || "").toLowerCase();
+                    if (msg.includes("fetch") || msg.includes("timeout") || msg.includes("network") || code === 'und_err_connect_timeout') {
+                        throw res.error; // Force retry
+                    }
+                }
                 return res; // Return both data and postgres error
             } catch (error: any) {
                 console.warn(`[Supabase Network] Operation failed (attempt ${i + 1}/${retries}), retrying...`, error.message || error);
-                if (i === retries - 1) throw error;
+                if (i === retries - 1) return { data: null, error };
                 await new Promise(resolve => setTimeout(resolve, delayMs));
             }
         }
@@ -27,11 +44,13 @@ export async function POST(request: Request) {
 
     try {
         const body = await request.json();
-        const { pillars, reactions, timestamp } = body;
+        const parsed = OnboardingSchema.safeParse(body);
 
-        if (!pillars || !Array.isArray(pillars)) {
-            return NextResponse.json({ error: "Invalid pillars data" }, { status: 400 });
+        if (!parsed.success) {
+            return NextResponse.json({ error: "Invalid payload", details: parsed.error.format() }, { status: 400 });
         }
+
+        const { pillars, reactions, timestamp } = parsed.data;
 
         // 2. Delete old pillars and insert new ones
         console.log(`[Onboarding] Saving ${pillars.length} pillars for user ${user.id}`);

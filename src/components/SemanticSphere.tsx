@@ -6,6 +6,7 @@ import React, { useEffect, useRef } from 'react';
 import * as THREE from 'three';
 import ShellNavigator, { ShellLevel } from './sphere/ShellNavigator';
 import './sphere.css';
+import { connectedTo, edgesOf, buildNavContext } from '../lib/graph/traversal';
 
 export interface FilmNode {
     id: number;
@@ -40,6 +41,9 @@ export default function SemanticSphere({ files = [], edges = [] }: SemanticSpher
     const activeShellRef = useRef(0);
     const [isAnimating, setIsAnimating] = React.useState(false);
     const sphereApi = useRef<any>(null);
+
+    const labelRefs = useRef<(HTMLDivElement | null)[]>([]);
+    const titleRefs = useRef<(HTMLDivElement | null)[]>([]);
 
     useEffect(() => {
         activeShellRef.current = activeShell;
@@ -106,7 +110,7 @@ export default function SemanticSphere({ files = [], edges = [] }: SemanticSpher
                     if (shell === 2 && f.shell === 2) {
                         if (navContext) {
                             // Only show if connected to navContext.current
-                            const conns = connectedTo(navContext.current);
+                            const conns = connectedTo(navContext.current, EDGES);
                             if (!conns.has(i)) shouldShow = false;
                         } else {
                             // If no focused node, show none or all? Let's show all for now, or maybe none.
@@ -262,21 +266,11 @@ export default function SemanticSphere({ files = [], edges = [] }: SemanticSpher
         // ═══════════════════════════════════════════════════════════
         // LABELS
         // ═══════════════════════════════════════════════════════════
-        const labelsDiv = document.getElementById('labels');
-        if (labelsDiv) labelsDiv.innerHTML = ''; // Ensure no ghost labels from React Strict Mode double-invocations
-        const labelEls = new Array(FILMS.length);
-        FILMS.forEach((f, index) => {
-            const d = document.createElement('div');
-            d.className = `node-label label-${['pillar', 'primary', 'secondary'][f.shell]}`;
-            d.innerHTML = `<div class="label-title" id="lt-${index}">${f.title}</div>`;
-            labelsDiv!.appendChild(d);
-            labelEls[index] = d;
-        });
-
         function updateLabels(hov: number | null, sel: number | null) {
             const tmp = new THREE.Vector3();
             FILMS.forEach((f, index) => {
-                const el = labelEls[index], lt = document.getElementById(`lt-${index}`);
+                const el = labelRefs.current[index];
+                const lt = titleRefs.current[index];
                 if (!el || !lt) return;
                 const p = positions[index].clone().applyEuler(group.rotation);
                 tmp.copy(p).project(camera);
@@ -290,34 +284,17 @@ export default function SemanticSphere({ files = [], edges = [] }: SemanticSpher
                     const active = navContext && navContext.visible.has(f.id);
                     op = active ? (f.id === sel ? 1 : .75) : 0;
                 } else if (hov !== null) {
-                    op = connectedTo(hov).has(f.id) ? (f.id === hov ? 1 : .7) : 0;
+                    op = connectedTo(hov, EDGES).has(f.id) ? (f.id === hov ? 1 : .7) : 0;
                 } else {
                     op = .22;
                 }
-                el.style.opacity = behind ? 0 : op;
-                lt.classList.toggle('active', f.id === sel);
+                el.style.opacity = behind ? "0" : op.toString();
+                if (f.id === sel) {
+                    lt.classList.add('active');
+                } else {
+                    lt.classList.remove('active');
+                }
             });
-        }
-
-        // ═══════════════════════════════════════════════════════════
-        // GRAPH HELPERS
-        // ═══════════════════════════════════════════════════════════
-        function connectedTo(id) {
-            const s = new Set([id]);
-            EDGES.forEach(e => { if (e.from === id) s.add(e.to); if (e.to === id) s.add(e.from); });
-            return s;
-        }
-        function edgesOf(id) {
-            return EDGES.reduce((a, e, i) => { if (e.from === id || e.to === id) a.push(i); return a; }, []);
-        }
-        // neighbors on specific shell(s)
-        function neighbors(id, shells) {
-            const res = [];
-            EDGES.forEach(e => {
-                if (e.from === id && (shells === null || shells.includes(FILMS[e.to].shell))) res.push(e.to);
-                if (e.to === id && (shells === null || shells.includes(FILMS[e.from].shell))) res.push(e.from);
-            });
-            return [...new Set(res)];
         }
 
         // ═══════════════════════════════════════════════════════════
@@ -326,43 +303,6 @@ export default function SemanticSphere({ files = [], edges = [] }: SemanticSpher
         // navContext: { current, parent, siblings, siblingIndex, children, visible(Set), stack }
         let navContext = null;
         let hoveredId = null;
-
-        function buildNavContext(filmId, parent = null, siblings = null, sibIdx = 0, stack = []) {
-            const film = FILMS[filmId];
-            const shell = film.shell;
-
-            // Siblings: (same-shell children of parent) UNION (direct same-shell neighbors of filmId)
-            // The union ensures lateral edges (e.g. Under the Skin <-> Enter the Void) are
-            // reachable with <-/-> even when they don't share the same parent.
-            let sibs;
-            if (siblings !== null) {
-                sibs = siblings;
-            } else {
-                let baseSibs;
-                if (parent !== null) {
-                    baseSibs = neighbors(parent, [shell]);
-                } else {
-                    baseSibs = FILMS.filter(f => f.shell === 0).map(f => f.id);
-                }
-                const lateral = neighbors(filmId, [shell]).filter(id => !baseSibs.includes(id));
-                sibs = [...new Set([...baseSibs, ...lateral])];
-            }
-            const idx = siblings !== null ? sibIdx : sibs.indexOf(filmId);
-
-            // Children: ALL connected nodes on any shell deeper than current
-            // (handles direct pillar→shell-2 edges, no depth restriction)
-            const children = neighbors(filmId, null).filter(id => FILMS[id].shell > shell);
-            children.sort((a, b) => FILMS[a].shell - FILMS[b].shell); // nearest shell first
-
-            // Visible set: current + parent + siblings + children + all direct neighbors
-            const visible = new Set([filmId]);
-            if (parent !== null) visible.add(parent);
-            sibs.forEach(s => visible.add(s));
-            children.forEach(c => visible.add(c));
-            connectedTo(filmId).forEach(n => visible.add(n));
-
-            return { current: filmId, parent, siblings: sibs, siblingIndex: idx, children, visible, stack };
-        }
 
         function applyNavContext(ctx) {
             navContext = ctx;
@@ -429,7 +369,7 @@ export default function SemanticSphere({ files = [], edges = [] }: SemanticSpher
 
             const firstShell = FILMS[firstChild].shell;
             const sameLevelSibs = children.filter(idx => FILMS[idx].shell === firstShell); // Use idx
-            animatePanel('up', () => applyNavContext(buildNavContext(firstChild, current, sameLevelSibs, 0, newStack)));
+            animatePanel('up', () => applyNavContext(buildNavContext(firstChild, current, sameLevelSibs, 0, newStack, FILMS, EDGES)));
         });
 
         // ↓ = inward — go back to parent
@@ -438,7 +378,7 @@ export default function SemanticSphere({ files = [], edges = [] }: SemanticSpher
             const { parent, stack } = navContext;
             const prev = stack.length ? stack[stack.length - 1] : null;
             const newStack = stack.slice(0, -1);
-            animatePanel('down', () => applyNavContext(buildNavContext(parent, prev ? prev.parent : null, prev ? prev.siblings : null, prev ? prev.siblingIndex : 0, newStack)));
+            animatePanel('down', () => applyNavContext(buildNavContext(parent, prev ? prev.parent : null, prev ? prev.siblings : null, prev ? prev.siblingIndex : 0, newStack, FILMS, EDGES)));
         });
 
         document.getElementById('btn-left').addEventListener('click', () => {
@@ -447,7 +387,7 @@ export default function SemanticSphere({ files = [], edges = [] }: SemanticSpher
             if (siblingIndex <= 0) return;
             const newIdx = siblingIndex - 1;
             const newId = siblings[newIdx];
-            animatePanel('left', () => applyNavContext(buildNavContext(newId, parent, siblings, newIdx, stack)));
+            animatePanel('left', () => applyNavContext(buildNavContext(newId, parent, siblings, newIdx, stack, FILMS, EDGES)));
         });
 
         document.getElementById('btn-right').addEventListener('click', () => {
@@ -456,7 +396,7 @@ export default function SemanticSphere({ files = [], edges = [] }: SemanticSpher
             if (siblingIndex >= siblings.length - 1) return;
             const newIdx = siblingIndex + 1;
             const newId = siblings[newIdx];
-            animatePanel('right', () => applyNavContext(buildNavContext(newId, parent, siblings, newIdx, stack)));
+            animatePanel('right', () => applyNavContext(buildNavContext(newId, parent, siblings, newIdx, stack, FILMS, EDGES)));
         });
 
         // Breadcrumb
@@ -594,12 +534,12 @@ export default function SemanticSphere({ files = [], edges = [] }: SemanticSpher
                             const newStack = [...stack, { parent: navContext.parent, siblings: navContext.siblings, siblingIndex: navContext.siblingIndex }];
                             const hitShell = FILMS[hit].shell;
                             const sameLevelSibs = children.filter(id => FILMS[id].shell === hitShell);
-                            animatePanel('up', () => applyNavContext(buildNavContext(hit, current, sameLevelSibs, sameLevelSibs.indexOf(hit), newStack)));
+                            animatePanel('up', () => applyNavContext(buildNavContext(hit, current, sameLevelSibs, sameLevelSibs.indexOf(hit), newStack, FILMS, EDGES)));
                         } else if (navContext.siblings.includes(hit)) {
                             const { siblings, parent, stack } = navContext;
                             const newIdx = siblings.indexOf(hit);
                             const dir = newIdx > navContext.siblingIndex ? 'right' : 'left';
-                            animatePanel(dir, () => applyNavContext(buildNavContext(hit, parent, siblings, newIdx, stack)));
+                            animatePanel(dir, () => applyNavContext(buildNavContext(hit, parent, siblings, newIdx, stack, FILMS, EDGES)));
                         } else if (hit === navContext.parent) {
                             document.getElementById('btn-down').click();
                         }
@@ -607,7 +547,7 @@ export default function SemanticSphere({ files = [], edges = [] }: SemanticSpher
                         // Fresh selection
                         const film = FILMS[hit];
                         const sibs = FILMS.filter(f => f.shell === film.shell).map(f => f.id);
-                        applyNavContext(buildNavContext(hit, null, sibs, sibs.indexOf(hit), []));
+                        applyNavContext(buildNavContext(hit, null, sibs, sibs.indexOf(hit), [], FILMS, EDGES));
                     }
                 } else {
                     if (navContext) closePanel();
@@ -707,7 +647,7 @@ export default function SemanticSphere({ files = [], edges = [] }: SemanticSpher
             }
             // Active shimmer
             if (navContext) {
-                edgesOf(navContext.current).forEach(i => {
+                edgesOf(navContext.current, EDGES).forEach(i => {
                     const base = ECFG[EDGES[i].type].base;
                     edgeLines[i].material.opacity = base * (2.6 + Math.sin(t * 4 + i) * .35);
                 });
@@ -730,8 +670,6 @@ export default function SemanticSphere({ files = [], edges = [] }: SemanticSpher
             window.removeEventListener('mouseup', () => { });
             window.removeEventListener('wheel', () => { });
             window.removeEventListener('keydown', () => { });
-            const labelsDiv = document.getElementById('labels');
-            if (labelsDiv) labelsDiv.innerHTML = '';
             mounted.current = false;
         };
     }, []);
@@ -739,7 +677,24 @@ export default function SemanticSphere({ files = [], edges = [] }: SemanticSpher
     return (
         <div id="sphere-canvas-container" className="main-sphere-wrapper" style={{ overflow: 'visible', minHeight: '100vh', position: 'relative' }}>
             <canvas id="c" style={{ position: 'fixed', inset: 0, zIndex: 0 }} />
-            <div id="labels" style={{ position: 'fixed', inset: 0, pointerEvents: 'none', zIndex: 5 }} />
+            
+            <div id="labels" style={{ position: 'fixed', inset: 0, pointerEvents: 'none', zIndex: 5 }}>
+                {files.map((f, i) => (
+                    <div
+                        key={f.id}
+                        ref={(el) => { labelRefs.current[i] = el; }}
+                        className={`node-label label-${['pillar', 'primary', 'secondary'][f.shell]}`}
+                    >
+                        <div 
+                            className="label-title" 
+                            id={`lt-${i}`}
+                            ref={(el) => { titleRefs.current[i] = el; }}
+                        >
+                            {f.title}
+                        </div>
+                    </div>
+                ))}
+            </div>
 
             <div id="shell-flash" style={{
                 position: 'fixed', inset: 0, pointerEvents: 'none',
