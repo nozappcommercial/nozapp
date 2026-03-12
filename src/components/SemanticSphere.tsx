@@ -79,8 +79,13 @@ export default function SemanticSphere({ files = [], edges = [] }: SemanticSpher
             stylistic: { from: 0xb58c2a, to: 0x3b8b9e, base: .5 },
             contrast: { from: 0x3b8b9e, to: 0x225560, base: .3 },
         };
+
+        //═══════════════════════════════════════════════════════════
+        //NODE DIMENSIONS
+        //═══════════════════════════════════════════════════════════
+
         const NCFG = [
-            { color: 0x78272e, size: .015, glow: .04 }, // shell 0
+            { color: 0x78272e, size: .05, glow: .10 }, // shell 0
             { color: 0xb58c2a, size: .0075, glow: .02 }, // shell 1
             { color: 0x3b8b9e, size: .0037, glow: .01 }, // shell 2
         ];
@@ -104,10 +109,10 @@ export default function SemanticSphere({ files = [], edges = [] }: SemanticSpher
                 targetCameraZ = zTargets[shell];
 
                 FILMS.forEach((f, i) => {
-                    const isVisible = f.shell <= shell;
+                    const isVisible = f.shell === shell;
                     const isCurrentShell = f.shell === shell;
 
-                    // If moving forward to Shell 2, only show nodes connected to selected Shell 1
+                    // Show only nodes on the active shell; connected nodes from other shells revealed on click
                     let shouldShow = isVisible;
                     if (shell === 2 && f.shell === 2) {
                         if (navContext) {
@@ -125,17 +130,13 @@ export default function SemanticSphere({ files = [], edges = [] }: SemanticSpher
                     const targetOp = shouldShow ? NCFG[f.shell].glow : 0;
                     const targetBaseOp = shouldShow ? 1 : 0; // for nodeMeshes
 
-                    if (shouldShow && glowMeshes[i].material.opacity === 0) {
-                        // Fade IN (Staggered sequentially by shell level)
-                        // Shell 0 (Red) -> Shell 1 (Yellow) -> Shell 2 (Blue)
+                    if (shouldShow) {
                         const baseDelay = isCurrentShell ? f.shell * 300 : 0;
                         const individualDelay = isCurrentShell ? i * 5 : 0;
                         const delay = baseDelay + individualDelay;
-
                         addTween(glowMeshes[i].material, 'opacity', targetOp, 600, delay);
                         addTween(nodeMeshes[i].material, 'opacity', targetBaseOp, 600, delay);
-                    } else if (!shouldShow && glowMeshes[i].material.opacity > 0) {
-                        // Fade OUT
+                    } else {
                         addTween(glowMeshes[i].material, 'opacity', 0, 400, 0);
                         addTween(nodeMeshes[i].material, 'opacity', 0, 400, 0);
                     }
@@ -157,13 +158,13 @@ export default function SemanticSphere({ files = [], edges = [] }: SemanticSpher
         // ═══════════════════════════════════════════════════════════
         const canvas = document.getElementById('c');
         const W = () => window.innerWidth, H = () => window.innerHeight;
-        const renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
+        const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
         renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
         renderer.setSize(W(), H());
-        renderer.setClearColor(0xf8f8ee, 1);
+        renderer.setClearColor(0x000000, 0);
 
         const scene = new THREE.Scene();
-        scene.fog = new THREE.FogExp2(0xf8f8ee, .005);
+        scene.fog = new THREE.FogExp2(0xc8b89a, .004);
         const camera = new THREE.PerspectiveCamera(48, W() / H(), .1, 500);
         camera.position.set(0, 0, 3.5);
 
@@ -207,9 +208,10 @@ export default function SemanticSphere({ files = [], edges = [] }: SemanticSpher
         FILMS.forEach((f: any, index) => {
             const cfg = NCFG[f?.shell] || NCFG[2]; // Fallback to shell 2 
             const pos = positions[index] || new THREE.Vector3(0, 0, 0);
+            const initVisible = f.shell === 0;
             const core = new THREE.Mesh(
                 new THREE.SphereGeometry(cfg.size, 20, 14),
-                new THREE.MeshBasicMaterial({ color: cfg.color })
+                new THREE.MeshBasicMaterial({ color: cfg.color, transparent: true, opacity: initVisible ? 1 : 0 })
             );
             core.position.copy(pos);
             core.userData.index = index;
@@ -217,7 +219,7 @@ export default function SemanticSphere({ files = [], edges = [] }: SemanticSpher
 
             const gl = new THREE.Mesh(
                 new THREE.SphereGeometry(cfg.size * 3.5, 16, 12),
-                new THREE.MeshBasicMaterial({ color: cfg.color, transparent: true, opacity: cfg.glow, blending: THREE.NormalBlending })
+                new THREE.MeshBasicMaterial({ color: cfg.color, transparent: true, opacity: initVisible ? cfg.glow : 0, blending: THREE.NormalBlending })
             );
             gl.position.copy(pos);
             gl.userData.index = index; // Allow raycasting on glow
@@ -311,20 +313,19 @@ export default function SemanticSphere({ files = [], edges = [] }: SemanticSpher
             navContext = ctx;
             const { current, parent, siblings, siblingIndex, children, visible } = ctx;
 
-            // Reset all
+            // Reveal connected nodes (any shell), dim everything else
             FILMS.forEach((f, i) => {
-                nodeMeshes[i].material.color.setHex(NCFG[f.shell].color);
-                glowMeshes[i].material.opacity = NCFG[f.shell].glow;
-            });
-            edgeLines.forEach((l, i) => { l.material.opacity = ECFG[EDGES[i].type].base; });
-
-            // Dim everything not in visible
-            FILMS.forEach((f, i) => {
-                if (!visible.has(i)) {
+                if (visible.has(i)) {
+                    nodeMeshes[i].material.color.setHex(NCFG[f.shell].color);
+                    nodeMeshes[i].material.opacity = 1;
+                    glowMeshes[i].material.opacity = NCFG[f.shell].glow;
+                } else {
                     nodeMeshes[i].material.color.setHex(0xe0ddd5);
-                    glowMeshes[i].material.opacity = .01;
+                    nodeMeshes[i].material.opacity = 0.15;
+                    glowMeshes[i].material.opacity = .008;
                 }
             });
+            edgeLines.forEach((l, i) => { l.material.opacity = ECFG[EDGES[i].type].base; });
             edgeLines.forEach((l, i) => {
                 const e = EDGES[i];
                 const bothVis = visible.has(e.from) && visible.has(e.to);
@@ -353,8 +354,8 @@ export default function SemanticSphere({ files = [], edges = [] }: SemanticSpher
             // ↓ = inward  (back to parent/center)
             document.getElementById('btn-up').disabled = children.length === 0;
             document.getElementById('btn-down').disabled = parent === null;
-            document.getElementById('btn-left').disabled = siblingIndex <= 0;
-            document.getElementById('btn-right').disabled = siblingIndex >= siblings.length - 1;
+            document.getElementById('btn-left').disabled = siblings.length <= 1;
+            document.getElementById('btn-right').disabled = siblings.length <= 1;
 
             const ctr = document.getElementById('nav-counter');
             if (siblings.length > 1) {
@@ -387,8 +388,7 @@ export default function SemanticSphere({ files = [], edges = [] }: SemanticSpher
         document.getElementById('btn-left').addEventListener('click', () => {
             if (!navContext) return;
             const { siblings, siblingIndex, parent, stack } = navContext;
-            if (siblingIndex <= 0) return;
-            const newIdx = siblingIndex - 1;
+            const newIdx = (siblingIndex - 1 + siblings.length) % siblings.length;
             const newId = siblings[newIdx];
             animatePanel('left', () => applyNavContext(buildNavContext(newId, parent, siblings, newIdx, stack, FILMS, EDGES)));
         });
@@ -396,8 +396,7 @@ export default function SemanticSphere({ files = [], edges = [] }: SemanticSpher
         document.getElementById('btn-right').addEventListener('click', () => {
             if (!navContext) return;
             const { siblings, siblingIndex, parent, stack } = navContext;
-            if (siblingIndex >= siblings.length - 1) return;
-            const newIdx = siblingIndex + 1;
+            const newIdx = (siblingIndex + 1) % siblings.length;
             const newId = siblings[newIdx];
             animatePanel('right', () => applyNavContext(buildNavContext(newId, parent, siblings, newIdx, stack, FILMS, EDGES)));
         });
@@ -496,6 +495,7 @@ export default function SemanticSphere({ files = [], edges = [] }: SemanticSpher
         const SCROLL_THRESHOLD = 80;
 
         window.addEventListener('wheel', e => {
+            if (navContext) return; // locked while a film is selected
             const rect = canvas.getBoundingClientRect();
             const cx = rect.left + rect.width / 2;
             const cy = rect.top + rect.height / 2;
@@ -507,10 +507,16 @@ export default function SemanticSphere({ files = [], edges = [] }: SemanticSpher
                 scrollAccum += e.deltaY;
                 if (scrollAccum > SCROLL_THRESHOLD) {
                     scrollAccum = 0;
-                    if (activeShellRef.current < 2) setActiveShell(s => s + 1);
+                    if (activeShellRef.current < 2) {
+                        activeShellRef.current += 1;
+                        setActiveShell(activeShellRef.current);
+                    }
                 } else if (scrollAccum < -SCROLL_THRESHOLD) {
                     scrollAccum = 0;
-                    if (activeShellRef.current > 0) setActiveShell(s => s - 1);
+                    if (activeShellRef.current > 0) {
+                        activeShellRef.current -= 1;
+                        setActiveShell(activeShellRef.current);
+                    }
                 }
             }
         }, { passive: false });
@@ -583,14 +589,16 @@ export default function SemanticSphere({ files = [], edges = [] }: SemanticSpher
             if (e.key === 'Escape') { closePanel(); return; }
 
             if (!navContext) {
-                // Shell navigation mode
+                // Shell navigation mode — only when no film selected
                 if (e.key === 'ArrowDown' && activeShellRef.current < 2) {
                     e.preventDefault();
-                    setActiveShell(s => s + 1);
+                    activeShellRef.current += 1;
+                    setActiveShell(activeShellRef.current);
                 }
                 if (e.key === 'ArrowUp' && activeShellRef.current > 0) {
                     e.preventDefault();
-                    setActiveShell(s => s - 1);
+                    activeShellRef.current -= 1;
+                    setActiveShell(activeShellRef.current);
                 }
                 return;
             }
@@ -612,21 +620,34 @@ export default function SemanticSphere({ files = [], edges = [] }: SemanticSpher
 
             // Camera & Centering
             if (navContext && navContext.current !== null) {
-                const selId = navContext.current;
-                const idx = files.findIndex(f => f.id === selId);
-                if (idx !== -1) {
-                    const worldPos = new THREE.Vector3();
-                    nodeMeshes[idx].getWorldPosition(worldPos);
-                    const offset = worldPos.clone().normalize().multiplyScalar(1.5);
-                    camTarget.copy(worldPos).add(offset);
-                    lookTarget.copy(worldPos);
-                }
+                const idx = navContext.current;
+                const worldPos = new THREE.Vector3();
+                nodeMeshes[idx].getWorldPosition(worldPos);
+                // Project camera onto the orbital shell surface, never cutting through
+                const dir = worldPos.clone().normalize();
+                const orbitRadii = [4.5, 10.0, 18.5];
+                const orbitRadius = orbitRadii[FILMS[idx].shell] + 1.8;
+                camTarget.copy(dir).multiplyScalar(orbitRadius);
+                lookTarget.lerp(worldPos, 0.06);
             } else {
                 camTarget.set(0, 0, SHELL_DISTANCES[activeShellRef.current]);
                 lookTarget.set(0, 0, 0);
             }
 
-            camera.position.lerp(camTarget, 0.08);
+            // Slerp direzionale: la camera rimane sempre sulla superficie orbitale
+            if (navContext && navContext.current !== null) {
+                const currentDir = camera.position.clone().normalize();
+                const targetDir = camTarget.clone().normalize();
+                // Interpolazione sferica sulla direzione
+                const slerpedDir = currentDir.clone().lerp(targetDir, 0.035).normalize();
+                // Interpolazione lineare solo sul raggio (distanza dal centro)
+                const currentRadius = camera.position.length();
+                const targetRadius = camTarget.length();
+                const newRadius = currentRadius + (targetRadius - currentRadius) * 0.035;
+                camera.position.copy(slerpedDir.multiplyScalar(newRadius));
+            } else {
+                camera.position.lerp(camTarget, 0.035);
+            }
             camera.lookAt(lookTarget);
 
             // Custom tweens
@@ -693,7 +714,7 @@ export default function SemanticSphere({ files = [], edges = [] }: SemanticSpher
     }, []);
 
     return (
-        <div id="sphere-canvas-container" className="main-sphere-wrapper" style={{ overflow: 'hidden', height: '100%', width: '100%', position: 'absolute', top: 0, left: 0 }}>
+        <div id="sphere-canvas-container" className="main-sphere-wrapper" style={{ overflow: 'hidden', height: '100%', width: '100%', position: 'absolute', top: 0, left: 0, background: 'radial-gradient(ellipse 80% 70% at 50% 50%, #faf7f2 0%, #f0ebe0 30%, #e4ddd0 55%, #d8cfc0 75%, #ccc2b0 100%)' }}>
             <canvas id="c" style={{ position: 'absolute', inset: 0, zIndex: 0 }} />
 
             <div id="labels" style={{ position: 'absolute', inset: 0, pointerEvents: 'none', zIndex: 5 }}>
@@ -734,11 +755,15 @@ export default function SemanticSphere({ files = [], edges = [] }: SemanticSpher
 
 
 
-            <ShellNavigator
-                activeShell={activeShell}
-                onShellChange={setActiveShell}
-                isAnimating={isAnimating}
-            />
+            <div style={{ position: 'absolute', left: 28, top: '50%', transform: 'translateY(-50%)', zIndex: 10, display: 'flex', flexDirection: 'column', gap: 8, transformOrigin: 'left center' }}>
+                <div style={{ transform: 'scale(0.82)', transformOrigin: 'left center' }}>
+                    <ShellNavigator
+                        activeShell={activeShell}
+                        onShellChange={setActiveShell}
+                        isAnimating={isAnimating}
+                    />
+                </div>
+            </div>
 
             {/* Breadcrumb */}
             <div id="breadcrumb" style={{ position: 'absolute' }}></div>

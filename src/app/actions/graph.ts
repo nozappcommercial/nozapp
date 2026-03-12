@@ -20,7 +20,7 @@ interface FilmWithRelations {
 }
 
 export async function getPersonalizedGraph() {
-    const supabase = createClient();
+    const supabase = await createClient();
 
     // 1. Get Current User
     const { data: { user } } = await supabase.auth.getUser();

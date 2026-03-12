@@ -14,7 +14,7 @@ export interface OnboardingFilm {
 }
 
 export default async function OnboardingPage() {
-    const supabase = createClient();
+    const supabase = await createClient();
 
     // Helper for network retries (e.g., UND_ERR_CONNECT_TIMEOUT)
     const fetchWithRetry = async <T,>(operation: () => Promise<{ data: T | null, error: any }>, retries = 3, delayMs = 1500) => {

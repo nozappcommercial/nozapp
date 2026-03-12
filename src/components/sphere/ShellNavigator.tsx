@@ -1,7 +1,6 @@
 'use client';
 
-import React, { useEffect } from 'react';
-import { cn } from '@/lib/utils';
+import React, { useEffect, useRef } from 'react';
 
 export type ShellLevel = 0 | 1 | 2;
 
@@ -11,49 +10,150 @@ interface ShellNavigatorProps {
     isAnimating?: boolean;
 }
 
+const SHELLS = [
+    { level: 0 as ShellLevel, label: 'PILASTRI', color: '#78272e', colorRgb: '120,39,46' },
+    { level: 1 as ShellLevel, label: 'AFFINITÀ', color: '#b58c2a', colorRgb: '181,140,42' },
+    { level: 2 as ShellLevel, label: 'SCOPERTA', color: '#3b8b9e', colorRgb: '59,139,158' },
+];
+
 export default function ShellNavigator({ activeShell, onShellChange, isAnimating }: ShellNavigatorProps) {
-    const shells: { level: ShellLevel; label: string; color: string; var: string }[] = [
-        { level: 0, label: 'Pilastri', color: '#ff4d4d', var: '--ember' },
-        { level: 1, label: 'Affinità', color: '#ffcc33', var: '--gold' },
-        { level: 2, label: 'Scoperta', color: '#33ccff', var: '--cold' },
-    ];
+    const btnRefs = useRef<(HTMLButtonElement | null)[]>([]);
+    const labelRefs = useRef<(HTMLSpanElement | null)[]>([]);
+    const dotRefs = useRef<(HTMLSpanElement | null)[]>([]);
+    const prevShell = useRef<ShellLevel>(activeShell);
+
+    useEffect(() => {
+        import('animejs').then(({ default: anime }) => {
+            const prev = prevShell.current;
+            const next = activeShell;
+            if (prev === next) return;
+            prevShell.current = next;
+
+            SHELLS.forEach(({ level }) => {
+                const btn = btnRefs.current[level];
+                const label = labelRefs.current[level];
+                const dot = dotRefs.current[level];
+                if (!btn || !label || !dot) return;
+
+                const isActive = level === next;
+                const wasActive = level === prev;
+
+                if (isActive) {
+                    anime.remove([btn, label, dot]);
+                    anime({
+                        targets: btn,
+                        width: ['32px', '136px'],
+                        paddingLeft: ['6px', '12px'],
+                        paddingRight: ['6px', '12px'],
+                        duration: 420,
+                        easing: 'cubicBezier(0.34, 1.56, 0.64, 1)',
+                    });
+                    anime({
+                        targets: dot,
+                        scale: [1, 1.3, 1],
+                        duration: 400,
+                        easing: 'easeOutElastic(1, .5)',
+                    });
+                    anime({
+                        targets: label,
+                        opacity: [0, 1],
+                        translateX: ['-10px', '0px'],
+                        duration: 280,
+                        delay: 160,
+                        easing: 'easeOutQuad',
+                    });
+                } else if (wasActive) {
+                    anime.remove([btn, label]);
+                    anime({
+                        targets: label,
+                        opacity: [1, 0],
+                        translateX: ['0px', '-8px'],
+                        duration: 160,
+                        easing: 'easeInQuad',
+                    });
+                    anime({
+                        targets: btn,
+                        width: ['136px', '32px'],
+                        paddingLeft: ['12px', '6px'],
+                        paddingRight: ['12px', '6px'],
+                        delay: 80,
+                        duration: 300,
+                        easing: 'easeInOutQuart',
+                    });
+                }
+            });
+        });
+    }, [activeShell]);
 
     return (
-        <div className="absolute bottom-10 left-10 z-50 flex items-center gap-4">
-            {shells.map(({ level, label, var: colorVar }) => {
+        <div style={{
+            position: 'absolute',
+            left: 28,
+            top: '50%',
+            transform: 'translateY(-50%)',
+            zIndex: 10,
+            display: 'flex',
+            flexDirection: 'column',
+            gap: 10,
+            pointerEvents: 'auto',
+        }}>
+            {SHELLS.map(({ level, label, color, colorRgb }) => {
                 const isActive = activeShell === level;
-                const isVisited = level <= activeShell;
-
                 return (
-                    <div
+                    <button
                         key={level}
-                        onClick={() => !isAnimating && onShellChange?.(level)}
-                        className={cn(
-                            'flex items-center gap-2 px-5 py-2.5 rounded-full border transition-all duration-500 backdrop-blur-md select-none cursor-pointer group',
-                            isActive
-                                ? 'border-black/15 bg-black/5 text-[#160a0c] shadow-sm'
-                                : 'border-black/5 bg-black/5 text-[#160a0c]/65 hover:bg-black/10 hover:border-black/20'
-                        )}
+                        ref={el => { btnRefs.current[level] = el; }}
+                        onClick={() => { if (!isAnimating) onShellChange?.(level); }}
                         style={{
-                            fontFamily: "'Courier Prime', monospace",
-                            fontSize: '11px',
-                            textTransform: 'uppercase',
-                            letterSpacing: '2px',
-                            boxShadow: isActive ? `0 0 25px var(${colorVar})22` : 'none',
-                            pointerEvents: 'auto'
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: 8,
+                            width: isActive ? '136px' : '32px',
+                            height: '32px',
+                            paddingLeft: isActive ? '12px' : '6px',
+                            paddingRight: isActive ? '12px' : '6px',
+                            borderRadius: '999px',
+                            border: `1.5px solid rgba(${colorRgb}, ${isActive ? '0.4' : '0.18'})`,
+                            background: isActive
+                                ? `rgba(${colorRgb}, 0.10)`
+                                : 'rgba(255,255,255,0.15)',
+                            backdropFilter: 'blur(8px)',
+                            boxShadow: isActive ? `0 2px 14px rgba(${colorRgb},0.18)` : 'none',
+                            cursor: isAnimating ? 'default' : 'pointer',
+                            overflow: 'hidden',
+                            whiteSpace: 'nowrap',
+                            outline: 'none',
+                            transition: 'border-color 0.35s, background 0.35s, box-shadow 0.35s',
                         }}
                     >
-                        <div
-                            className="w-2.5 h-2.5 rounded-full transition-all duration-500 group-hover:scale-110"
+                        <span
+                            ref={el => { dotRefs.current[level] = el; }}
                             style={{
-                                background: isVisited ? `var(${colorVar})` : 'rgba(0,0,0,0.1)',
-                                boxShadow: isActive ? `0 0 12px var(${colorVar})` : 'none'
+                                display: 'inline-block',
+                                width: 9,
+                                height: 9,
+                                borderRadius: '50%',
+                                background: color,
+                                flexShrink: 0,
+                                boxShadow: isActive ? `0 0 7px 2px rgba(${colorRgb},0.45)` : 'none',
+                                transition: 'box-shadow 0.35s',
                             }}
                         />
-                        <span className={cn("font-bold transition-colors", isActive ? "text-[#160a0c]" : "group-hover:text-[#160a0c]/70")}>
+                        <span
+                            ref={el => { labelRefs.current[level] = el; }}
+                            style={{
+                                fontFamily: "'Fragment Mono', 'Courier Prime', monospace",
+                                fontSize: '9px',
+                                letterSpacing: '1.8px',
+                                color: color,
+                                opacity: isActive ? 1 : 0,
+                                pointerEvents: 'none',
+                                userSelect: 'none',
+                            }}
+                        >
                             {label}
                         </span>
-                    </div>
+                    </button>
                 );
             })}
         </div>
