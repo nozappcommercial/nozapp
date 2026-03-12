@@ -180,10 +180,8 @@ export default function OnboardingFlow({ films }: OnboardingFlowProps) {
           title: p.title,
           rank: i + 1,
         })),
-        reactions: Object.entries(reactions).map(([filmId, reaction]) => ({
-          filmId: Number(filmId),
-          reaction,
-        })),
+        reactions, // Use the raw object {id: reaction}
+
         timestamp: new Date().toISOString(),
       };
 
@@ -784,8 +782,8 @@ const ONBOARDING_CSS = `
 .ob-stage {
   display: flex; flex-direction: column;
   align-items: center; justify-content: center;
-  padding: clamp(16px,3vw,40px) clamp(20px,5vw,56px);
-  gap: clamp(16px,2.5vh,28px);
+  padding: clamp(10px,2vh,20px) clamp(20px,5vw,56px);
+  gap: clamp(12px,2vh,20px);
 }
 .ob-stage-headline { text-align: center; }
 .ob-stage-headline h2 {
@@ -808,7 +806,7 @@ const ONBOARDING_CSS = `
 }
 
 .ob-film-card-sizer {
-  height: clamp(220px, 46vh, 420px);
+  height: clamp(200px, 40vh, 380px);
   aspect-ratio: 2/3;
   flex-shrink: 0;
   position: relative;
@@ -874,24 +872,21 @@ const ONBOARDING_CSS = `
   width: 100%; max-width: 480px; margin: 0 auto;
 }
 .ob-rxn-btn {
-  flex: 1; min-width: 100px; max-width: 120px;
-  display: flex; flex-direction: column;
-  align-items: center; justify-content: center; gap: 5px;
-  padding: clamp(10px,1.8vh,14px) 8px;
-  border-radius: var(--ob-r);
-  border: 1.5px solid var(--ob-cream-dark);
-  background: transparent; cursor: pointer;
-  transition: background 0.17s, border-color 0.17s, transform 0.12s;
+  flex: 1; min-width: 110px; max-width: 130px;
+  height: 88px;
+  background: transparent; border: 1.5px solid var(--ob-cream-dark);
+  border-radius: 4px; padding: 12px 6px; cursor: pointer;
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px;
+  transition: border-color 0.18s, background 0.18s;
 }
 .ob-rxn-icon {
-  font-size: clamp(18px,3vw,22px); line-height: 1;
+  font-size: clamp(16px,2vw,20px); line-height: 1;
   transition: transform 0.14s;
 }
 .ob-rxn-lbl {
-  font-family: var(--ob-mono);
-  font-size: clamp(7px,1vw,8px);
-  letter-spacing: 0.15em; text-transform: uppercase;
-  color: var(--ob-ink-faint); text-align: center; line-height: 1.45;
+  font-family: var(--ob-mono); font-size: 8px; font-weight: 500;
+  letter-spacing: 0.18em; text-transform: uppercase; line-height: 1.25;
+  color: var(--ob-ink-light); text-align: center;
 }
 .ob-rxn-btn.loved   { border-color: var(--ob-gold-faint); }
 .ob-rxn-btn.loved:hover   { background: var(--ob-gold); border-color: var(--ob-gold); }
@@ -904,9 +899,9 @@ const ONBOARDING_CSS = `
 
 /* SPLIT BUTTON seen/unseen (Fixed & Polished) */
 .ob-rxn-split {
-  flex: 1; min-width: 130px; max-width: 140px;
-  height: 84px;
-  border-radius: var(--ob-r);
+  flex: 1; min-width: 110px; max-width: 130px;
+  height: 88px;
+  border-radius: 4px;
   border: 1.5px solid var(--ob-cream-dark);
   position: relative; overflow: hidden;
   background: transparent;
@@ -1196,8 +1191,11 @@ const ONBOARDING_CSS = `
 .ob-side-toggle.open {
   transform: translateY(-50%) rotate(180deg) translateX(320px);
 }
-.ob-side-toggle-icon { font-size: 24px; line-height: 1; margin-top:/* SIDEBAR */
+.ob-side-toggle-icon { font-size: 24px; line-height: 1; }
+
+/* ── SIDEBAR ── */
 .ob-pyr-sidebar {
+
   position: fixed; top: 0; right: 0; bottom: 0;
   width: 280px; background: rgba(242, 237, 227, 0.85);
   backdrop-filter: blur(24px);
@@ -1306,20 +1304,22 @@ const ONBOARDING_CSS = `
 
 /* ── NAV ARROWS ── */
 .ob-nav-arrows {
-  display: flex; flex-direction: row; align-items: center;
-  justify-content: space-between; flex-wrap: nowrap;
-  width: 100%; min-width: 300px; padding: 0 5%;
-  margin-top: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  max-width: 420px;
+  padding: 0 4px;
 }
 .ob-nav-arrow {
-  width: clamp(36px,5vw,44px);
-  height: clamp(36px,5vw,44px);
+  width: clamp(36px, 5vw, 44px);
+  height: clamp(36px, 5vw, 44px);
   border-radius: 50%;
   border: 1.5px solid var(--ob-cream-dark);
   background: transparent;
   cursor: pointer;
   display: flex; align-items: center; justify-content: center;
-  font-size: clamp(14px,2vw,18px);
+  font-size: clamp(14px, 2vw, 18px);
   color: var(--ob-ink-light);
   transition: border-color 0.18s, background 0.18s, color 0.18s, transform 0.12s, opacity 0.18s;
   flex-shrink: 0;
@@ -1331,7 +1331,7 @@ const ONBOARDING_CSS = `
 }
 .ob-nav-arrow:active:not(:disabled) { transform: scale(0.93); }
 .ob-nav-arrow:disabled { opacity: 0.22; cursor: not-allowed; }
-.ob-nav-center { flex: 0 1 auto; display: flex; justify-content: center; padding: 0 16px; min-width: 140px; }
+.ob-nav-center { flex: 1; display: flex; justify-content: center; }
 
 /* ── ANIMATIONS ── */
 @keyframes ob-au {

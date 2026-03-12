@@ -1,10 +1,10 @@
-import { createClient } from "@/lib/supabase/server";
+import { createClient, createAdminClient } from "@/lib/supabase/server";
 import { NextResponse } from "next/server";
 import { z } from "zod";
 
 const OnboardingSchema = z.object({
     pillars: z.array(z.object({
-        filmId: z.number(),
+        filmId: z.union([z.string(), z.number()]),
         rank: z.number().int().min(1)
     })).min(1),
     reactions: z.record(z.string(), z.any()).optional(),
@@ -47,6 +47,7 @@ export async function POST(request: Request) {
         const parsed = OnboardingSchema.safeParse(body);
 
         if (!parsed.success) {
+            console.error("[Onboarding] Validation failed:", JSON.stringify(parsed.error.format(), null, 2));
             return NextResponse.json({ error: "Invalid payload", details: parsed.error.format() }, { status: 400 });
         }
 
@@ -66,9 +67,9 @@ export async function POST(request: Request) {
         }
 
         if (pillars.length > 0) {
-            const pillarRows = pillars.map((p: { filmId: number; rank: number }) => ({
+            const pillarRows = pillars.map((p: { filmId: string | number; rank: number }) => ({
                 user_id: user.id,
-                film_id: p.filmId,
+                film_id: String(p.filmId),
                 rank: p.rank,
             }));
 
@@ -102,17 +103,21 @@ export async function POST(request: Request) {
             return NextResponse.json({ error: `JSON Error: ${resultError.message}` }, { status: 500 });
         }
 
-        // 4. Mark onboarding as complete
-        console.log(`[Onboarding] Marking user ${user.id} as complete`);
-        const { error: updateError } = await fetchWithRetry(async () => await supabase
+        const adminSupabase = createAdminClient();
+        const { error: updateError, data: updateData } = await fetchWithRetry(async () => await adminSupabase
             .from("users")
-            .update({ onboarding_complete: true })
-            .eq("id", user.id));
+            .upsert({ 
+                id: user.id, 
+                onboarding_complete: true 
+            }, { onConflict: "id" })
+            .select());
 
         if (updateError) {
-            console.error("[Onboarding] Error updating onboarding status:", updateError);
+            console.error(`[Onboarding] Error upserting onboarding status for ${user.id}:`, updateError);
             return NextResponse.json({ error: `User Update Error: ${updateError.message}` }, { status: 500 });
         }
+
+        console.log(`[Onboarding] Success for user ${user.id}. Update result data:`, updateData);
 
         console.log(`[Onboarding] Success for user ${user.id}`);
 

@@ -61,8 +61,9 @@ export async function updateSession(request: NextRequest) {
 
     const path = request.nextUrl.pathname;
     const isAuthRoute = path.startsWith('/login');
+    const isApiRoute = path.startsWith('/api');
 
-    if (!user && !isAuthRoute && path !== '/') {
+    if (!user && !isAuthRoute && path !== '/' && !isApiRoute) {
         // Redirect unauthenticated users to login, except root.
         const url = request.nextUrl.clone();
         url.pathname = '/login';
@@ -70,33 +71,42 @@ export async function updateSession(request: NextRequest) {
     }
 
     if (user) {
-        const { data: profile } = await supabase
+        const { data: profile, error: profileError } = await supabase
             .from('users')
             .select('onboarding_complete')
             .eq('id', user.id)
             .single();
 
+        if (profileError) {
+            console.error(`[Middleware] Error fetching profile for ${user.id}:`, profileError);
+        }
+
         const onboardingComplete = (profile as unknown as { onboarding_complete?: boolean })?.onboarding_complete ?? false;
+        
+        console.log(`[Middleware] User: ${user.email} (${user.id}), onboarding_complete: ${onboardingComplete}, path: ${path}`);
+
+        // If it's an API route, don't redirect, just let the request through
+        if (isApiRoute) {
+            return supabaseResponse;
+        }
 
         // Ensure we don't end in an infinite redirect loop if going to /onboarding
         if (!onboardingComplete && path !== '/onboarding' && !isAuthRoute) {
-            // User must complete onboarding
+            console.log(`[Middleware] Case 1: Not complete & not on /onboarding -> Redirecting to /onboarding`);
             const url = request.nextUrl.clone();
             url.pathname = '/onboarding';
             return NextResponse.redirect(url);
         }
 
         if (onboardingComplete && (path === '/onboarding' || isAuthRoute || path === '/')) {
-            // User is fully authenticated, redirect them to main app view (/sphere)
+            console.log(`[Middleware] Case 2: Complete & (on /onboarding, /login, or root) -> Redirecting to /sphere`);
             const url = request.nextUrl.clone();
             url.pathname = '/sphere';
             return NextResponse.redirect(url);
         }
 
-        // For now, always redirect authenticated users away from root or login to /sphere if onboarding is complete
-        // The above condition covers this, so we can remove the fallback block below if we want.
-        // Let's keep it as a safety net if neither condition matched.
         if (isAuthRoute || path === '/') {
+            console.log(`[Middleware] Case 3: (Auth route or root) -> Redirecting to /sphere`);
             const url = request.nextUrl.clone();
             url.pathname = '/sphere';
             return NextResponse.redirect(url);
