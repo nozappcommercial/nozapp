@@ -42,9 +42,8 @@ export default function ShellNavigator({ activeShell, onShellChange, isAnimating
                     anime.remove([btn, label, dot]);
                     anime({
                         targets: btn,
-                        width: ['32px', '136px'],
-                        paddingLeft: ['6px', '12px'],
-                        paddingRight: ['6px', '12px'],
+                        paddingLeft: ['0px', '10px'],
+                        paddingRight: ['0px', '10px'],
                         duration: 420,
                         easing: 'cubicBezier(0.34, 1.56, 0.64, 1)',
                     });
@@ -73,9 +72,8 @@ export default function ShellNavigator({ activeShell, onShellChange, isAnimating
                     });
                     anime({
                         targets: btn,
-                        width: ['136px', '32px'],
-                        paddingLeft: ['12px', '6px'],
-                        paddingRight: ['12px', '6px'],
+                        paddingLeft: ['10px', '0px'],
+                        paddingRight: ['10px', '0px'],
                         delay: 80,
                         duration: 300,
                         easing: 'easeInOutQuart',
@@ -107,13 +105,14 @@ export default function ShellNavigator({ activeShell, onShellChange, isAnimating
                         style={{
                             display: 'flex',
                             alignItems: 'center',
+                            justifyContent: isActive ? 'flex-start' : 'center',
                             gap: 8,
-                            width: isActive ? '136px' : '32px',
-                            height: '32px',
-                            paddingLeft: isActive ? '12px' : '6px',
-                            paddingRight: isActive ? '12px' : '6px',
+                            width: isActive ? 'auto' : '36px',
+                            height: '36px',
+                            paddingLeft: isActive ? '10px' : '0px',
+                            paddingRight: isActive ? '10px' : '0px',
                             borderRadius: '999px',
-                            border: `1.5px solid rgba(${colorRgb}, ${isActive ? '0.4' : '0.18'})`,
+                            border: `1.5px solid rgba(${colorRgb}, ${isActive ? '0.4' : '0.25'})`,
                             background: isActive
                                 ? `rgba(${colorRgb}, 0.10)`
                                 : 'rgba(255,255,255,0.15)',
