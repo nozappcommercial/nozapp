@@ -493,6 +493,7 @@ export default function SemanticSphere({ files = [], edges = [] }: SemanticSpher
 
         let scrollAccum = 0;
         const SCROLL_THRESHOLD = 80;
+        let scrollLocked = false;
 
         window.addEventListener('wheel', e => {
             if (navContext) return; // locked while a film is selected
@@ -504,18 +505,23 @@ export default function SemanticSphere({ files = [], edges = [] }: SemanticSpher
 
             if (dist < activeRadius && rect.bottom > 0) {
                 e.preventDefault();
+                if (scrollLocked) return;
                 scrollAccum += e.deltaY;
                 if (scrollAccum > SCROLL_THRESHOLD) {
                     scrollAccum = 0;
                     if (activeShellRef.current < 2) {
                         activeShellRef.current += 1;
                         setActiveShell(activeShellRef.current);
+                        scrollLocked = true;
+                        setTimeout(() => { scrollLocked = false; }, 800);
                     }
                 } else if (scrollAccum < -SCROLL_THRESHOLD) {
                     scrollAccum = 0;
                     if (activeShellRef.current > 0) {
                         activeShellRef.current -= 1;
                         setActiveShell(activeShellRef.current);
+                        scrollLocked = true;
+                        setTimeout(() => { scrollLocked = false; }, 800);
                     }
                 }
             }
@@ -626,7 +632,7 @@ export default function SemanticSphere({ files = [], edges = [] }: SemanticSpher
                 // Project camera onto the orbital shell surface, never cutting through
                 const dir = worldPos.clone().normalize();
                 const orbitRadii = [4.5, 10.0, 18.5];
-                const orbitRadius = orbitRadii[FILMS[idx].shell] + 1.8;
+                const orbitRadius = orbitRadii[FILMS[idx].shell] + 1;
                 camTarget.copy(dir).multiplyScalar(orbitRadius);
                 lookTarget.lerp(worldPos, 0.06);
             } else {
