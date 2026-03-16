@@ -80,9 +80,9 @@ export default function SemanticSphere({ files = [], edges = [] }: SemanticSpher
             contrast: { from: 0x3b8b9e, to: 0x225560, base: .3 },
         };
 
-        //═══════════════════════════════════════════════════════════
-        //NODE DIMENSIONS
-        //═══════════════════════════════════════════════════════════
+        // ═══════════════════════════════════════════════════════════
+        // NODE DIMENSIONS
+        // ═══════════════════════════════════════════════════════════
 
         const NCFG = [
             { color: 0x78272e, size: .05, glow: .10 }, // shell 0
@@ -172,12 +172,12 @@ export default function SemanticSphere({ files = [], edges = [] }: SemanticSpher
         const SHELL_DISTANCES = [4.5, 10.0, 18.5];
 
         // Shell wireframes to help understand dimensions
-        //RADII.forEach((r, i) => {
-        //    const geo = new THREE.SphereGeometry(r, 64, 32);
-        //    const mat = new THREE.MeshBasicMaterial({ color: NCFG[i].color, wireframe: true, transparent: true, opacity: 0.05 });
-        //    const s = new THREE.Mesh(geo, mat);
-        //    scene.add(s);
-        //});
+        RADII.forEach((r, i) => {
+            const geo = new THREE.SphereGeometry(r, 64, 32);
+            const mat = new THREE.MeshBasicMaterial({ color: NCFG[i].color, wireframe: true, transparent: true, opacity: 0.05 });
+            const s = new THREE.Mesh(geo, mat);
+            scene.add(s);
+        });
 
         const group = new THREE.Group();
         scene.add(group);
