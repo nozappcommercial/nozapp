@@ -25,7 +25,7 @@ export default function EditorialSection() {
     ];
 
     return (
-        <section className="bg-[var(--bg)] text-[var(--text)] w-full py-24 px-8 md:px-16" style={{ fontFamily: "'Cormorant Garamond', serif" }}>
+        <section id="redazione" className="bg-[var(--bg)] text-[var(--text)] w-full py-24 px-8 md:px-16" style={{ fontFamily: "'Cormorant Garamond', serif" }}>
             <div className="max-w-6xl mx-auto">
                 <header className="mb-16 border-b border-[var(--gold-dim)] pb-8">
                     <h2 className="text-4xl md:text-5xl font-light mb-4">Consigli della <em className="text-[var(--gold)] italic">Redazione</em></h2>
@@ -43,6 +43,7 @@ export default function EditorialSection() {
                                     src={article.coverImage}
                                     alt={article.title}
                                     fill
+                                    sizes="(max-width: 768px) 100vw, 50vw"
                                     className="object-cover transition-transform duration-700 group-hover:scale-105"
                                 />
                                 <div className="absolute inset-0 bg-black/10 group-hover:bg-transparent transition-colors duration-300" />
@@ -67,6 +68,7 @@ export default function EditorialSection() {
                                             src={article.authorAvatar}
                                             alt={article.authorName}
                                             fill
+                                            sizes="40px"
                                             className="object-cover grayscale group-hover:grayscale-0 transition-all duration-300"
                                         />
                                     </div>

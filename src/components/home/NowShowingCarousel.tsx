@@ -133,7 +133,7 @@ export default function NowShowingCarousel({ movies = [] }: NowShowingCarouselPr
     if (!movies || movies.length === 0) return null;
 
     return (
-        <section className="bg-[var(--surface)] text-[var(--text)] w-full py-20 px-8 md:px-16" style={{ fontFamily: "'Cormorant Garamond', serif" }}>
+        <section id="cinema" className="bg-[var(--bg)] text-[var(--text)] w-full py-20 px-8 md:px-16" style={{ fontFamily: "'Cormorant Garamond', serif" }}>
             <div className="max-w-6xl mx-auto">
                 <header className="mb-12 flex items-end justify-between border-b border-black/5 pb-6">
                     <div>
@@ -179,6 +179,7 @@ export default function NowShowingCarousel({ movies = [] }: NowShowingCarouselPr
                                             src={movie.poster}
                                             alt={movie.title}
                                             fill
+                                            sizes="(max-width: 768px) 140px, 170px"
                                             className="object-cover transition-transform duration-700 group-hover:scale-110"
                                         />
                                     )}

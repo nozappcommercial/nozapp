@@ -44,7 +44,7 @@ export default async function Home() {
 
   return (
     <main className="w-full min-h-screen m-0 p-0 relative">
-      <section className="relative w-full h-[100vh] overflow-hidden">
+      <section id="sfera" className="relative w-full h-[100vh] overflow-hidden">
         <SemanticSphere files={nodes} edges={cappedEdges} />
       </section>
       <EditorialSection />

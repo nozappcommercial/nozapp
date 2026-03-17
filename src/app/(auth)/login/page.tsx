@@ -141,6 +141,14 @@ const styles = `
   z-index: 20;
 }
 
+.auth-right.centered {
+  max-width: 420px;
+  min-height: auto;
+  border-radius: 20px;
+  box-shadow: 0 20px 80px rgba(0,0,0,0.08);
+  margin: 0 auto;
+}
+
 .auth-form-wrapper {
   flex: 1;
   display: flex;
@@ -625,29 +633,8 @@ export default function AuthPage() {
       </svg>
 
       <div className="auth-container">
-        {/* Left Panel - Visual Branding (Desktop only) */}
-        <div className="auth-left">
-          <div className="auth-noise" style={{ filter: 'url(#noiseFilter)' }}></div>
-          <div className="auth-rings">
-            <div className="ring ring-1"></div>
-            <div className="ring ring-2"></div>
-            <div className="ring ring-3"></div>
-          </div>
-          
-          <div className="auth-left-content">
-            <Logo light />
-            <div className="brand-separator"></div>
-            <h2 className="brand-tagline">Ogni film è una<br />porta sul mondo.</h2>
-            <p className="brand-desc">
-              Esplora le connessioni invisibili tra le opere 
-              che ami e scopri nuovi orizzonti cinematografici.
-            </p>
-          </div>
-          <div className="film-strip"></div>
-        </div>
-
-        {/* Right Panel - Form Container */}
-        <div className="auth-right">
+        {/* Right Panel - Form Container (Now Centered) */}
+        <div className="auth-right centered">
           <div className="auth-form-wrapper">
 
             <div className="mobile-brand">

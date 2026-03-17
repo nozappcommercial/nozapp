@@ -91,8 +91,8 @@ export default function SemanticSphere({ files = [], edges = [] }: SemanticSpher
         ];
 
 
-        let targetCameraZ = 3; // Starts at shell 0
-        const camTarget = new THREE.Vector3(0, 0, 3.5);
+        let targetCameraZ = 2.2; // Starts at shell 0
+        const camTarget = new THREE.Vector3(0, 0, 2.6);
         const lookTarget = new THREE.Vector3(0, 0, 0);
         const TWEEN_TASKS: any[] = []; // Custom tweening engine
 
@@ -105,7 +105,7 @@ export default function SemanticSphere({ files = [], edges = [] }: SemanticSpher
 
         sphereApi.current = {
             setShell: (shell: number) => {
-                const zTargets = { 0: 3, 1: 5.5, 2: 8.5 };
+                const zTargets = { 0: 2.2, 1: 4.2, 2: 6.5 };
                 targetCameraZ = zTargets[shell];
 
                 FILMS.forEach((f, i) => {
@@ -166,10 +166,10 @@ export default function SemanticSphere({ files = [], edges = [] }: SemanticSpher
         const scene = new THREE.Scene();
         scene.fog = new THREE.FogExp2(0xc8b89a, .004);
         const camera = new THREE.PerspectiveCamera(48, W() / H(), .1, 500);
-        camera.position.set(0, 0, 3.5);
+        camera.position.set(0, 0, 2.6);
 
-        const RADII = [1.5, 3.5, 7.5];
-        const SHELL_DISTANCES = [4.5, 10.0, 18.5];
+        const RADII = [1.1, 2.6, 5.6];
+        const SHELL_DISTANCES = [3.4, 7.5, 14.0];
 
         // Shell wireframes to help understand dimensions
         RADII.forEach((r, i) => {
@@ -707,8 +707,8 @@ export default function SemanticSphere({ files = [], edges = [] }: SemanticSpher
                 nodeMeshes[idx].getWorldPosition(worldPos);
                 // Project camera onto the orbital shell surface, never cutting through
                 const dir = worldPos.clone().normalize();
-                const orbitRadii = [4.5, 10.0, 18.5];
-                const orbitRadius = orbitRadii[FILMS[idx].shell] + 1;
+                const orbitRadii = [3.4, 7.5, 14.0];
+                const orbitRadius = orbitRadii[FILMS[idx].shell] + 0.8;
                 camTarget.copy(dir).multiplyScalar(orbitRadius);
                 lookTarget.lerp(worldPos, 0.06);
             } else {
