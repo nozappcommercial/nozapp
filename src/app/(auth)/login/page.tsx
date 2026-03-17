@@ -156,11 +156,21 @@ const styles = `
   justify-content: center;
   padding: 40px 60px;
   animation: cardIn 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  transition: padding 0.3s ease;
 }
 
 @keyframes cardIn {
   from { opacity: 0; transform: translateY(14px); }
   to { opacity: 1; transform: translateY(0); }
+}
+
+.view-container {
+  display: grid;
+  transition: grid-template-rows 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.view-inner {
+  overflow: hidden;
 }
 
 @keyframes viewIn {
@@ -213,7 +223,8 @@ const styles = `
   background: var(--paper);
   border-radius: 100px;
   box-shadow: 0 2px 8px rgba(0,0,0,0.04);
-  transition: transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+  /* Less pronounced bounce: from (0.34, 1.56, 0.64, 1) to (0.34, 1.15, 0.64, 1) */
+  transition: transform 0.4s cubic-bezier(0.34, 1.15, 0.64, 1);
   z-index: 1;
 }
 
@@ -225,13 +236,16 @@ const styles = `
 .input-group {
   margin-bottom: 20px;
   position: relative;
+}
+
+.input-group.initial-anim {
   animation: slideIn 0.4s ease forwards;
   opacity: 0;
 }
 
 @keyframes slideIn {
-  from { opacity: 0; transform: translateX(-5px); }
-  to { opacity: 1; transform: translateX(0); }
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
 .input-label {
@@ -388,6 +402,8 @@ const styles = `
   border-top-color: rgb(248, 248, 238);
   border-radius: 50%;
   animation: spin 0.8s linear infinite;
+  margin: 0; /* Reset margins to ensure proper centering in flex container */
+  display: inline-block;
 }
 
 .alert {
@@ -674,22 +690,32 @@ export default function AuthPage() {
                   <div className={`tab ${view === 'register' ? 'active' : ''}`} onClick={() => setView('register')}>Registrazione</div>
                 </div>
 
-                <form onSubmit={handleSubmit}>
-                  {view === 'register' && (
-                    <div className="input-group" style={{ animationDelay: '0ms' }}>
-                      <label className="input-label">Nome Utente</label>
-                      <input autoFocus type="text" className={`input-field ${errors.username ? 'has-error' : ''}`} value={username} onChange={e => setUsername(e.target.value)} disabled={loading} placeholder="Il tuo nome" />
-                      {errors.username && <span className="field-error">{errors.username}</span>}
+                <div className="view-container" style={{ gridTemplateRows: view === 'register' ? '1fr' : '0fr' }}>
+                  <div className="view-inner">
+                    <div style={{ 
+                        paddingBottom: view === 'register' ? '0.1px' : '0',
+                        opacity: view === 'register' ? 1 : 0,
+                        transform: view === 'register' ? 'translateY(0)' : 'translateY(-10px)',
+                        transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
+                        pointerEvents: view === 'register' ? 'auto' : 'none'
+                    }}>
+                      <div className="input-group" style={{ marginBottom: view === 'register' ? '20px' : '0' }}>
+                        <label className="input-label">Nome Utente</label>
+                        <input type="text" className={`input-field ${errors.username ? 'has-error' : ''}`} value={username} onChange={e => setUsername(e.target.value)} disabled={loading} placeholder="Il tuo nome" tabIndex={view === 'register' ? 0 : -1} />
+                        {errors.username && <span className="field-error">{errors.username}</span>}
+                      </div>
                     </div>
-                  )}
+                  </div>
+                </div>
 
-                  <div className="input-group" style={{ animationDelay: view === 'register' ? '100ms' : '0ms' }}>
+                <form onSubmit={handleSubmit}>
+                  <div className="input-group initial-anim" style={{ animationDelay: '0ms' }}>
                     <label className="input-label">Email</label>
                     <input autoFocus={view === 'login'} type="email" className={`input-field ${errors.email ? 'has-error' : ''}`} value={email} onChange={e => setEmail(e.target.value)} disabled={loading} placeholder="nome@esempio.com" />
                     {errors.email && <span className="field-error">{errors.email}</span>}
                   </div>
 
-                  <div className="input-group" style={{ animationDelay: view === 'register' ? '200ms' : '100ms' }}>
+                  <div className="input-group initial-anim" style={{ animationDelay: '100ms' }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
                       <label className="input-label">Password {view === 'register' && '(Min. 8 caratteri)'}</label>
                     </div>
@@ -700,25 +726,47 @@ export default function AuthPage() {
                       </button>
                     </div>
                     {errors.password && <span className="field-error">{errors.password}</span>}
-                    {view === 'login' && (
+                    
+                    <div style={{ 
+                        opacity: view === 'login' ? 1 : 0, 
+                        height: view === 'login' ? 'auto' : 0, 
+                        overflow: 'hidden', 
+                        transition: 'opacity 0.3s ease' 
+                    }}>
                       <a href="#" className="forgot-link" onClick={(e) => { e.preventDefault(); setView('reset'); }}>Password dimenticata?</a>
-                    )}
+                    </div>
                   </div>
 
-                  {view === 'register' && (
-                    <div className="input-group" style={{ animationDelay: '300ms' }}>
-                      <label className="input-label">Conferma Password</label>
-                      <div className="password-wrapper">
-                        <input type={showConfirmPassword ? 'text' : 'password'} className={`input-field ${errors.confirmPassword ? 'has-error' : ''}`} value={confirmPassword} onChange={e => setConfirmPassword(e.target.value)} disabled={loading} placeholder="••••••••" style={{ paddingRight: 40 }} />
-                        <button type="button" tabIndex={-1} className="password-toggle" onClick={() => setShowConfirmPassword(!showConfirmPassword)}>
-                          <EyeIcon off={showConfirmPassword} />
-                        </button>
+                  <div className="view-container" style={{ gridTemplateRows: view === 'register' ? '1fr' : '0fr' }}>
+                    <div className="view-inner">
+                      <div style={{ 
+                          paddingBottom: view === 'register' ? '0.1px' : '0',
+                          opacity: view === 'register' ? 1 : 0,
+                          transform: view === 'register' ? 'translateY(0)' : 'translateY(-10px)',
+                          transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
+                          pointerEvents: view === 'register' ? 'auto' : 'none'
+                      }}>
+                        <div className="input-group" style={{ marginBottom: 0 }}>
+                          <label className="input-label">Conferma Password</label>
+                          <div className="password-wrapper">
+                            <input type={showConfirmPassword ? 'text' : 'password'} className={`input-field ${errors.confirmPassword ? 'has-error' : ''}`} value={confirmPassword} onChange={e => setConfirmPassword(e.target.value)} disabled={loading} placeholder="••••••••" style={{ paddingRight: 40 }} tabIndex={view === 'register' ? 0 : -1} />
+                            <button type="button" tabIndex={-1} className="password-toggle" onClick={() => setShowConfirmPassword(!showConfirmPassword)}>
+                              <EyeIcon off={showConfirmPassword} />
+                            </button>
+                          </div>
+                          {errors.confirmPassword && <span className="field-error">{errors.confirmPassword}</span>}
+                        </div>
                       </div>
-                      {errors.confirmPassword && <span className="field-error">{errors.confirmPassword}</span>}
                     </div>
-                  )}
+                  </div>
 
-                  <button type="submit" className="btn-submit" disabled={loading} style={{ animation: `slideIn 0.4s ease forwards`, animationDelay: view === 'register' ? '400ms' : '200ms', opacity: 0 }}>
+                  <button type="submit" className="btn-submit" disabled={loading} style={{ 
+                      animation: `slideIn 0.4s ease forwards`, 
+                      animationDelay: '200ms', 
+                      opacity: 0, 
+                      marginTop: view === 'register' ? '20px' : '12px',
+                      transition: 'margin-top 0.4s cubic-bezier(0.4, 0, 0.2, 1), transform 0.2s, box-shadow 0.2s'
+                  }}>
                     {loading ? <div className="spinner" /> : view === 'login' ? 'Entra nella Sfera' : 'Crea Account'}
                   </button>
 

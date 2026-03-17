@@ -22,6 +22,10 @@ export default function ShellNavigator({ activeShell, onShellChange, isAnimating
     const dotRefs = useRef<(HTMLSpanElement | null)[]>([]);
     const prevShell = useRef<ShellLevel>(activeShell);
 
+    /**
+     * Effect hook to trigger anime.js animations whenever the activeShell changes.
+     * It handles the expansion/contraction of the buttons and the appearance of labels.
+     */
     useEffect(() => {
         import('animejs').then(({ default: anime }) => {
             const prev = prevShell.current;
@@ -39,6 +43,7 @@ export default function ShellNavigator({ activeShell, onShellChange, isAnimating
                 const wasActive = level === prev;
 
                 if (isActive) {
+                    // Animation for the NEWLY active button
                     anime.remove([btn, label, dot]);
                     anime({
                         targets: btn,
@@ -62,6 +67,7 @@ export default function ShellNavigator({ activeShell, onShellChange, isAnimating
                         easing: 'easeOutQuad',
                     });
                 } else if (wasActive) {
+                    // Animation to revert the PREVIOUSLY active button
                     anime.remove([btn, label]);
                     anime({
                         targets: label,
@@ -84,11 +90,11 @@ export default function ShellNavigator({ activeShell, onShellChange, isAnimating
     }, [activeShell]);
 
     return (
-        <div 
+        <div
             className="shell-navigator-container"
             style={{
                 position: 'absolute',
-                left: 28,
+                left: 0,
                 top: '50%',
                 transform: 'translateY(-50%)',
                 zIndex: 10,

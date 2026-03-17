@@ -7,6 +7,15 @@ import * as THREE from 'three';
 import ShellNavigator, { ShellLevel } from './sphere/ShellNavigator';
 import './sphere.css';
 import { connectedTo, edgesOf, buildNavContext } from '../lib/graph/traversal';
+import { upsertMovieInteraction, InteractionType } from '@/app/actions/movies';
+
+/**
+ * SEMANTIC SPHERE COMPONENT
+ * -------------------------
+ * This is the core visualization engine of the application. It uses Three.js to render
+ * a 3D graph of interconnected films organized into "shells" (concentric levels of abstraction).
+ */
+
 
 export interface FilmNode {
     id: number;
@@ -17,6 +26,7 @@ export interface FilmNode {
     tags: string[];
     poster?: string[];
     poster_url?: string | null;
+    interaction?: 'seen' | 'liked' | 'ignored';
 }
 
 export interface FilmEdge {
@@ -34,17 +44,60 @@ interface SemanticSphereProps {
 export default function SemanticSphere({ files = [], edges = [] }: SemanticSphereProps) {
     const containerRef = useRef<HTMLDivElement>(null);
     const mounted = useRef(false);
+    
+    // UI State for the movie detail panel
     const [selectedFilm, setSelectedFilm] = React.useState<FilmNode | null>(null);
     const [selectedEdges, setSelectedEdges] = React.useState<any[]>([]);
+    
+    // Feedback state (Seen, Liked, Ignored) - persisted in Supabase
+    const [nodeInteractions, setNodeInteractions] = React.useState<Record<number, InteractionType | undefined>>({});
 
+    // Sync interactions from props
+    useEffect(() => {
+        const initialMap: Record<number, InteractionType | undefined> = {};
+        files.forEach(f => {
+            if (f.interaction) initialMap[f.id] = f.interaction;
+        });
+        setNodeInteractions(initialMap);
+    }, [files]);
+
+    const handleInteraction = async (filmId: number, type: InteractionType) => {
+        const currentType = nodeInteractions[filmId];
+        const newType = currentType === type ? null : type; // Toggle if clicking same
+
+        // Optimistic update
+        setNodeInteractions(prev => ({
+            ...prev,
+            [filmId]: newType || undefined
+        }));
+
+        try {
+            await upsertMovieInteraction(filmId, newType);
+        } catch (err) {
+            console.error("Failed to update interaction", err);
+            // Rollback on error
+            setNodeInteractions(prev => ({
+                ...prev,
+                [filmId]: currentType
+            }));
+        }
+    };
+
+    // State for the currently active shell (0, 1, or 2)
     const [activeShell, setActiveShell] = React.useState<ShellLevel>(0);
+    // Ref to keep track of the active shell inside the Three.js animation loop
     const activeShellRef = useRef(0);
+    // State to manage animation lock during shell transitions
     const [isAnimating, setIsAnimating] = React.useState(false);
+    
+    // API exposed by the internal Three.js loop to the React component
     const sphereApi = useRef<any>(null);
 
+    // References to DOM elements for 2D labels that overlay the 3D scene
     const labelRefs = useRef<(HTMLDivElement | null)[]>([]);
     const titleRefs = useRef<(HTMLDivElement | null)[]>([]);
 
+    // Effect to handle changes in the active shell
     useEffect(() => {
         activeShellRef.current = activeShell;
         if (sphereApi.current) {
@@ -95,6 +148,20 @@ export default function SemanticSphere({ files = [], edges = [] }: SemanticSpher
         const camTarget = new THREE.Vector3(0, 0, 2.6);
         const lookTarget = new THREE.Vector3(0, 0, 0);
         const TWEEN_TASKS: any[] = []; // Custom tweening engine
+        
+        // INTERACTION STATE
+        // -----------------
+        let navContext: any = null; // Tracks current navigation depth/path
+        let hoveredId: number | null = null; // Currently hovered node index
+        let isDown = false; // Mouse/Touch press state
+        let isDragging = false; // Whether the user is currently rotating the sphere
+        let lastXY = { x: 0, y: 0 }; // Last recorded pointer position for momentum
+        let vel = { x: 0, y: 0 }; // Current rotational velocity
+        
+        // THREE.js HELPERS
+        const raycaster = new THREE.Raycaster();
+        const mouse = new THREE.Vector2();
+
 
         function addTween(obj, prop, target, duration, delay = 0) {
             TWEEN_TASKS.push({
@@ -104,6 +171,10 @@ export default function SemanticSphere({ files = [], edges = [] }: SemanticSpher
         }
 
         sphereApi.current = {
+            /**
+             * Transition between shells (0: Pillars, 1: Affinity, 2: Discovery)
+             * Updates node visibility, glow intensity, and camera position.
+             */
             setShell: (shell: number) => {
                 const zTargets = { 0: 2.2, 1: 4.2, 2: 6.5 };
                 targetCameraZ = zTargets[shell];
@@ -134,8 +205,12 @@ export default function SemanticSphere({ files = [], edges = [] }: SemanticSpher
                         const baseDelay = isCurrentShell ? f.shell * 300 : 0;
                         const individualDelay = isCurrentShell ? i * 5 : 0;
                         const delay = baseDelay + individualDelay;
-                        addTween(glowMeshes[i].material, 'opacity', targetOp, 600, delay);
-                        addTween(nodeMeshes[i].material, 'opacity', targetBaseOp, 600, delay);
+                        // Active shell gets glow and full base opacity. Non-active shells (previously visible) lose glow, keeping only a muted core.
+                        const finalGlow = isCurrentShell ? targetOp : 0;
+                        const finalBase = isCurrentShell ? targetBaseOp : 0.15; // Set to 0.15 for a muted core
+
+                        addTween(glowMeshes[i].material, 'opacity', finalGlow, 600, delay);
+                        addTween(nodeMeshes[i].material, 'opacity', finalBase, 600, delay);
                     } else {
                         addTween(glowMeshes[i].material, 'opacity', 0, 400, 0);
                         addTween(nodeMeshes[i].material, 'opacity', 0, 400, 0);
@@ -171,13 +246,15 @@ export default function SemanticSphere({ files = [], edges = [] }: SemanticSpher
         const RADII = [1.1, 2.6, 5.6];
         const SHELL_DISTANCES = [3.4, 7.5, 14.0];
 
-        // Shell wireframes to help understand dimensions
+        // Shell wireframes to help understand dimensions (Commented per user request)
+        /*
         RADII.forEach((r, i) => {
             const geo = new THREE.SphereGeometry(r, 64, 32);
             const mat = new THREE.MeshBasicMaterial({ color: NCFG[i].color, wireframe: true, transparent: true, opacity: 0.05 });
             const s = new THREE.Mesh(geo, mat);
             scene.add(s);
         });
+        */
 
         const group = new THREE.Group();
         scene.add(group);
@@ -197,18 +274,23 @@ export default function SemanticSphere({ files = [], edges = [] }: SemanticSpher
             byShell[f.shell].push(f)
         });
         const positions = new Array(FILMS.length);
+        // Map films to their calculated positions based on shell radius
         byShell.forEach((films, s) => films.forEach((f: any, i) => {
             if (f._index !== undefined) {
                 positions[f._index] = fibPos(i, films.length, RADII[s]);
             }
         }));
 
-        // Nodes
+        // NODES CONSTRUCTION
+        // ------------------
+        // We create two meshes for each film: a 'core' (solid sphere) and a 'glow' (larger, semi-transparent).
         const nodeMeshes: THREE.Mesh[] = [], glowMeshes: THREE.Mesh[] = [];
         FILMS.forEach((f: any, index) => {
             const cfg = NCFG[f?.shell] || NCFG[2]; // Fallback to shell 2 
             const pos = positions[index] || new THREE.Vector3(0, 0, 0);
             const initVisible = f.shell === 0;
+            
+            // The solid core of the node
             const core = new THREE.Mesh(
                 new THREE.SphereGeometry(cfg.size, 20, 14),
                 new THREE.MeshBasicMaterial({ color: cfg.color, transparent: true, opacity: initVisible ? 1 : 0 })
@@ -217,6 +299,7 @@ export default function SemanticSphere({ files = [], edges = [] }: SemanticSpher
             core.userData.index = index;
             group.add(core); nodeMeshes.push(core);
 
+            // The soft glow surrounding the node
             const gl = new THREE.Mesh(
                 new THREE.SphereGeometry(cfg.size * 3.5, 16, 12),
                 new THREE.MeshBasicMaterial({ color: cfg.color, transparent: true, opacity: initVisible ? cfg.glow : 0, blending: THREE.NormalBlending })
@@ -226,13 +309,18 @@ export default function SemanticSphere({ files = [], edges = [] }: SemanticSpher
             group.add(gl); glowMeshes.push(gl);
         });
 
-        // Edges
+        // EDGES CONSTRUCTION
+        // ------------------
+        // Edges use Quadratic Bezier curves to create smooth, curved connections between nodes.
         const edgeLines = [];
         function buildEdge(a, b, cfg) {
             const mid = a.clone().add(b).multiplyScalar(.5);
+            // Push mid-point slightly outwards for curvature
             mid.add(mid.clone().normalize().multiplyScalar(a.distanceTo(b) * .3));
             const curve = new THREE.QuadraticBezierCurve3(a, mid, b);
             const pts = curve.getPoints(50);
+            
+            // Build geometry with vertex colors for gradients
             const pos3 = [], cols = [];
             const cA = new THREE.Color(cfg.from), cB = new THREE.Color(cfg.to), tmp = new THREE.Color();
             pts.forEach((p, i) => {
@@ -254,9 +342,12 @@ export default function SemanticSphere({ files = [], edges = [] }: SemanticSpher
 
         // Space visuals removed per user request
 
-        // ═══════════════════════════════════════════════════════════
-        // LABELS
-        // ═══════════════════════════════════════════════════════════
+        // 2D UI LABELS
+        // -----------
+        /**
+         * Updates the 2D labels position by projecting 3D node coordinates to screen space.
+         * Adjusts visibility/opacity based on hover/selection state and depth.
+         */
         function updateLabels(hov: number | null, sel: number | null) {
             const tmp = new THREE.Vector3();
             FILMS.forEach((f, index) => {
@@ -275,10 +366,14 @@ export default function SemanticSphere({ files = [], edges = [] }: SemanticSpher
                 // Adjust label offset: use smaller multiplier for smaller nodes
                 const offset = NCFG[f.shell].size * 100 + 8;
                 el.style.transform = `translate(-50%,calc(-50% - ${offset}px))`;
+                // Only show labels for the shell we are currently viewing
+                const isCurrentShell = f.shell === activeShellRef.current;
 
                 const behind = tmp.z > 1;
                 let op = 0;
-                if (isOverHeader) {
+                // Hide labels if we're hovering over the header
+                // OR if the node does not belong to the currently active shell (we only want the muted core visible)
+                if (isOverHeader || !isCurrentShell) { 
                     op = 0;
                 } else if (sel !== null) {
                     const active = navContext && navContext.visible.has(f.id);
@@ -289,7 +384,7 @@ export default function SemanticSphere({ files = [], edges = [] }: SemanticSpher
                         op = active && !behind ? 0.75 : 0;
                     }
                 } else if (hov !== null) {
-                    op = connectedTo(hov, EDGES).has(f.id) ? (f.id === hov ? 1 : .7) : 0;
+                    op = (f.id === hov) ? 1 : (connectedTo(hov, EDGES).has(f.id) ? 0.7 : 0.05);
                 } else {
                     op = .22;
                 }
@@ -302,13 +397,12 @@ export default function SemanticSphere({ files = [], edges = [] }: SemanticSpher
             });
         }
 
-        // ═══════════════════════════════════════════════════════════
-        // NAVIGATION STATE
-        // ═══════════════════════════════════════════════════════════
-        // navContext: { current, parent, siblings, siblingIndex, children, visible(Set), stack }
-        let navContext = null;
-        let hoveredId = null;
-
+        // NAVIGATION CONTEXT (Selection Logic)
+        // ------------------------------------
+        /**
+         * Applies the active navigation context (current node, parent, children, siblings).
+         * Highlights the selected path and dims irrelevant nodes.
+         */
         function applyNavContext(ctx) {
             navContext = ctx;
             const { current, parent, siblings, siblingIndex, children, visible } = ctx;
@@ -401,7 +495,12 @@ export default function SemanticSphere({ files = [], edges = [] }: SemanticSpher
             animatePanel('right', () => applyNavContext(buildNavContext(newId, parent, siblings, newIdx, stack, FILMS, EDGES)));
         });
 
-        // Breadcrumb
+        // BREADCRUMB UPDATE
+        // -----------------
+        /**
+         * Updates the navigation path displayed at the top of the screen.
+         * Shows the progression between shells (e.g., Pilastri › Affinità).
+         */
         function updateBreadcrumb(ctx) {
             const bc = document.getElementById('breadcrumb');
             const { stack, current } = ctx;
@@ -422,9 +521,13 @@ export default function SemanticSphere({ files = [], edges = [] }: SemanticSpher
             bc.innerHTML = html;
         }
 
-        // ─── Panel animation ────────────────────────────────────────
-        // dir: 'left'|'right'|'up'|'down'
-        // The panel exits in `dir` direction, new content enters from the opposite side.
+        // PANEL ANIMATIONS
+        // ----------------
+        /**
+         * Orchestrates the transition of the movie detail panel.
+         * When switching between films, the panel slides out in one direction
+         * and slides in from the opposite side with the new content.
+         */
         function animatePanel(dir, callback) {
             const panel = document.getElementById('panel');
             // exit
@@ -448,7 +551,12 @@ export default function SemanticSphere({ files = [], edges = [] }: SemanticSpher
             }, 130);
         }
 
-        // ─── Panel & Poster ─────────────────────────────────────────
+        // PANEL VISIBILITY
+        // ----------------
+        /**
+         * Populates and displays the movie detail panel for a specific node.
+         * Also triggers the header hide animation to avoid visual clutter.
+         */
         function showPanel(nodeIndex: number) {
             const film = FILMS[nodeIndex];
             const connEdges = EDGES.filter(e => e.from === nodeIndex || e.to === nodeIndex);
@@ -458,6 +566,12 @@ export default function SemanticSphere({ files = [], edges = [] }: SemanticSpher
             });
             setSelectedFilm(film);
             setSelectedEdges(edgeData);
+
+            // Hide vertical header to not overlap with panel
+            const headerVertical = document.querySelector('header[class*="headerVertical"]');
+            if (headerVertical) {
+                headerVertical.classList.add('header-hidden-right');
+            }
         }
 
         function closePanel() {
@@ -465,6 +579,13 @@ export default function SemanticSphere({ files = [], edges = [] }: SemanticSpher
             document.getElementById('nav-controls')?.classList.remove('visible');
             document.getElementById('breadcrumb')?.classList.remove('visible');
             navContext = null;
+            
+            // Show vertical header
+            const headerVertical = document.querySelector('header[class*="headerVertical"]');
+            if (headerVertical) {
+                headerVertical.classList.remove('header-hidden-right');
+            }
+
             // Reset visuals
             FILMS.forEach((f, i) => {
                 nodeMeshes[i].material.color.setHex(NCFG[f.shell].color);
@@ -478,23 +599,31 @@ export default function SemanticSphere({ files = [], edges = [] }: SemanticSpher
         // ═══════════════════════════════════════════════════════════
         // MOUSE
         // ═══════════════════════════════════════════════════════════
-        const raycaster = new THREE.Raycaster();
-        const mouse = new THREE.Vector2();
-        let isDown = false, isDragging = false, lastXY = { x: 0, y: 0 }, vel = { x: 0, y: 0 };
-
+        // RAYCASTING (Hit Detection)
+        // --------------------------
+        /**
+         * Determines which node is under the mouse cursor.
+         * Raycasts into the scene and checks for intersections with node/glow meshes.
+         */
         function getHit(x, y) {
             mouse.x = (x / W()) * 2 - 1; mouse.y = -(y / H()) * 2 + 1;
             raycaster.setFromCamera(mouse, camera);
-            // Intersect both nodes and glows to increase hit area
+            // Intersect both nodes and glows to increase hit area (better UX)
             const hits = raycaster.intersectObjects([...nodeMeshes, ...glowMeshes]);
             const visibleHit = hits.find(h => h.object.material.opacity > 0);
-            return visibleHit ? visibleHit.object.userData.index : null; // Return index
+            return visibleHit ? visibleHit.object.userData.index : null;
         }
 
         let scrollAccum = 0;
         const SCROLL_THRESHOLD = 80;
         let scrollLocked = false;
 
+        // SCROLL INTERACTION
+        // -------------------
+        /**
+         * Navigates between shells (0, 1, 2) using the mouse wheel.
+         * Includes thresholding and locking to prevent rapid accidental switching.
+         */
         window.addEventListener('wheel', e => {
             if (navContext) return; // locked while a film is selected
             const rect = canvas.getBoundingClientRect();
@@ -527,6 +656,12 @@ export default function SemanticSphere({ files = [], edges = [] }: SemanticSpher
             }
         }, { passive: false });
 
+        // CLICK / MOUSE DOWN INTERACTION
+        // -----------------------------
+        /**
+         * Handles single clicks to select nodes or navigate through the graph.
+         * Differentiates between dragging (rotation) and clicking (selection).
+         */
         window.addEventListener('mousedown', e => {
             isDown = true; isDragging = false;
             lastXY = { x: e.clientX, y: e.clientY }; vel = { x: 0, y: 0 };
@@ -542,7 +677,7 @@ export default function SemanticSphere({ files = [], edges = [] }: SemanticSpher
                     hoveredId = null;
                     // If we have a navContext and click on a visible node → navigate to it
                     if (navContext && navContext.visible.has(hit) && hit !== navContext.current) {
-                        // Determine relation
+                        // Determine relation (child, sibling, or parent) and animate transition
                         if (navContext.children.includes(hit)) {
                             // Go deeper (outward) — animate up
                             const { current, children, stack } = navContext;
@@ -551,17 +686,18 @@ export default function SemanticSphere({ files = [], edges = [] }: SemanticSpher
                             const sameLevelSibs = children.filter(id => FILMS[id].shell === hitShell);
                             animatePanel('up', () => applyNavContext(buildNavContext(hit, current, sameLevelSibs, sameLevelSibs.indexOf(hit), newStack, FILMS, EDGES)));
                         } else if (navContext.siblings.includes(hit)) {
+                            // Switch to sibling node — animate left/right
                             const { siblings, parent, stack } = navContext;
                             const newIdx = siblings.indexOf(hit);
                             const dir = newIdx > navContext.siblingIndex ? 'right' : 'left';
                             animatePanel(dir, () => applyNavContext(buildNavContext(hit, parent, siblings, newIdx, stack, FILMS, EDGES)));
                         } else if (hit === navContext.parent) {
+                            // Go back to parent — animate down
                             document.getElementById('btn-down').click();
                         }
                     } else {
-                        // Fresh selection
+                        // First-level node selection
                         const film = FILMS[hit];
-                        // USE INDICES for sibs, not IDs
                         const sibs = FILMS
                             .map((f, i) => f.shell === film.shell ? i : -1)
                             .filter(idx => idx !== -1);
@@ -569,6 +705,7 @@ export default function SemanticSphere({ files = [], edges = [] }: SemanticSpher
                         applyNavContext(buildNavContext(hit, null, sibs, sibs.indexOf(hit), [], FILMS, EDGES));
                     }
                 } else {
+                    // Clicking background closes the panel
                     if (navContext) closePanel();
                 }
             }
@@ -666,12 +803,17 @@ export default function SemanticSphere({ files = [], edges = [] }: SemanticSpher
             }
         }, { passive: false });
 
-        // Keyboard navigation — mirrors button logic (↑=outward, ↓=inward)
+        // KEYBOARD NAVIGATION
+        // -------------------
+        /**
+         * Allows navigating the sphere using arrow keys and Escape.
+         * Mirrors the onscreen button logic.
+         */
         window.addEventListener('keydown', e => {
             if (e.key === 'Escape') { closePanel(); return; }
 
             if (!navContext) {
-                // Shell navigation mode — only when no film selected
+                // Shell switching via keyboard when no film is focused
                 if (e.key === 'ArrowDown' && activeShellRef.current < 2) {
                     e.preventDefault();
                     activeShellRef.current += 1;
@@ -685,6 +827,7 @@ export default function SemanticSphere({ files = [], edges = [] }: SemanticSpher
                 return;
             }
 
+            // Map arrow keys to navigation buttons
             if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(e.key)) e.preventDefault();
             if (e.key === 'ArrowUp') document.getElementById('btn-up')?.click();
             if (e.key === 'ArrowDown') document.getElementById('btn-down')?.click();
@@ -692,37 +835,40 @@ export default function SemanticSphere({ files = [], edges = [] }: SemanticSpher
             if (e.key === 'ArrowRight') document.getElementById('btn-right')?.click();
         });
 
-        // ═══════════════════════════════════════════════════════════
-        // RENDER LOOP
-        // ═══════════════════════════════════════════════════════════
+        // 3D RENDER LOOP
+        // --------------
         let t = 0;
+        /**
+         * The core animation function called on every frame via requestAnimationFrame.
+         * Handles camera movement, physics-based rotation, tweening, and shimmer effects.
+         */
         function animate() {
             requestAnimationFrame(animate);
             t += .01;
 
-            // Camera & Centering
+            // 1. Camera Movement Logic
             if (navContext && navContext.current !== null) {
+                // When a node is selected, anchor the camera to face it
                 const idx = navContext.current;
                 const worldPos = new THREE.Vector3();
                 nodeMeshes[idx].getWorldPosition(worldPos);
-                // Project camera onto the orbital shell surface, never cutting through
+                
                 const dir = worldPos.clone().normalize();
                 const orbitRadii = [3.4, 7.5, 14.0];
                 const orbitRadius = orbitRadii[FILMS[idx].shell] + 0.8;
                 camTarget.copy(dir).multiplyScalar(orbitRadius);
                 lookTarget.lerp(worldPos, 0.06);
             } else {
+                // Default view centered on the sphere
                 camTarget.set(0, 0, SHELL_DISTANCES[activeShellRef.current]);
                 lookTarget.set(0, 0, 0);
             }
 
-            // Slerp direzionale: la camera rimane sempre sulla superficie orbitale
+            // 2. Camera Smoothing (Slerp-style interpolation)
             if (navContext && navContext.current !== null) {
                 const currentDir = camera.position.clone().normalize();
                 const targetDir = camTarget.clone().normalize();
-                // Interpolazione sferica sulla direzione
                 const slerpedDir = currentDir.clone().lerp(targetDir, 0.035).normalize();
-                // Interpolazione lineare solo sul raggio (distanza dal centro)
                 const currentRadius = camera.position.length();
                 const targetRadius = camTarget.length();
                 const newRadius = currentRadius + (targetRadius - currentRadius) * 0.035;
@@ -732,47 +878,51 @@ export default function SemanticSphere({ files = [], edges = [] }: SemanticSpher
             }
             camera.lookAt(lookTarget);
 
-            // Custom tweens
+            // 3. Process Custom Tweens (Opacity/Transforms)
             for (let i = TWEEN_TASKS.length - 1; i >= 0; i--) {
                 const task = TWEEN_TASKS[i];
                 if (task.delay > 0) {
-                    task.delay -= 16.6; // approx 1 frame at 60fps
+                    task.delay -= 16.6; 
                     continue;
                 }
                 task.elapsed += 16.6;
                 const progress = Math.min(task.elapsed / task.duration, 1);
-                // easeInOutQuad
                 const ease = progress < 0.5 ? 2 * progress * progress : 1 - Math.pow(-2 * progress + 2, 2) / 2;
                 task.obj[task.prop] = task.start + (task.target - task.start) * ease;
 
                 if (progress >= 1) TWEEN_TASKS.splice(i, 1);
             }
 
-            // Auto-rotate when idle
+            // 4. Physics & Momentum (Inertia after drag)
             if (!isDown && !navContext && !hoveredId) {
+                // Automatic slow rotation when idle
                 const rotSpeed = 0.0016 + activeShellRef.current * 0.0005;
                 group.rotation.y += rotSpeed;
                 group.rotation.x += 0.0002 + activeShellRef.current * 0.0001;
             }
             if (!isDown) {
+                // Friction for drag momentum
                 vel.x *= .93; vel.y *= .93;
                 group.rotation.x += vel.x; group.rotation.y += vel.y;
             }
-            // Pillar pulse
+
+            // 5. Visual "Breathe" / Shimmer Effects
             if (!navContext && !hoveredId) {
+                // Pulse pillars (shell 0) to make them look alive
                 FILMS.forEach((f, i) => {
                     if (f.shell === 0) {
                         glowMeshes[i].material.opacity = NCFG[0].glow * (1 + Math.sin(t * 2 + i * 1.4) * .35);
                     }
                 });
             }
-            // Active shimmer
             if (navContext) {
+                // Shimmer active connections
                 edgesOf(navContext.current, EDGES).forEach(i => {
                     const base = ECFG[EDGES[i].type].base;
                     edgeLines[i].material.opacity = base * (2.6 + Math.sin(t * 4 + i) * .35);
                 });
             }
+
             updateLabels(hoveredId, navContext ? navContext.current : null);
             renderer.render(scene, camera);
         }
@@ -907,6 +1057,39 @@ export default function SemanticSphere({ files = [], edges = [] }: SemanticSpher
                                 </div>
                             </>
                         )}
+                        {/* Tasti Feedback (Persistenti) */}
+                        <div className="p-feedback-actions" style={{ marginTop: '16px', paddingTop: '16px', borderTop: '1px solid rgba(181, 140, 42, 0.1)', display: 'flex', gap: '8px', justifyContent: 'center' }}>
+                            {[
+                                { type: 'seen' as InteractionType, label: 'Visto', title: 'L\'ho visto' },
+                                { type: 'liked' as InteractionType, label: 'Mi Piace', title: 'Mi è piaciuto' },
+                                { type: 'ignored' as InteractionType, label: 'Ignora', title: 'Non mi interessa' }
+                            ].map((btn) => {
+                                const isActive = selectedFilm && nodeInteractions[selectedFilm.id] === btn.type;
+                                return (
+                                    <button 
+                                        key={btn.type}
+                                        className={`feedback-btn ${isActive ? 'active' : ''}`}
+                                        title={btn.title} 
+                                        onClick={() => selectedFilm && handleInteraction(selectedFilm.id, btn.type)}
+                                        style={{ 
+                                            flex: 1, 
+                                            padding: '8px 0', 
+                                            borderRadius: '8px', 
+                                            border: isActive ? '1px solid var(--gold)' : '1px solid rgba(181, 140, 42, 0.3)', 
+                                            background: isActive ? 'rgba(181, 140, 42, 0.2)' : 'rgba(255, 255, 255, 0.5)', 
+                                            fontFamily: 'Fragment Mono, monospace', 
+                                            fontSize: '9px', 
+                                            textTransform: 'uppercase', 
+                                            cursor: 'pointer', 
+                                            transition: 'all 0.2s', 
+                                            color: isActive ? 'var(--gold)' : 'var(--text)' 
+                                        }}
+                                    >
+                                        {btn.label}
+                                    </button>
+                                );
+                            })}
+                        </div>
                     </div>
                 </div>
             )}

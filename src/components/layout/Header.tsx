@@ -17,8 +17,9 @@ export default function Header() {
     const [activeSection, setActiveSection] = useState('sfera');
     const [hoveredSection, setHoveredSection] = useState<string | null>(null);
     const [isCollapsed, setIsCollapsed] = useState(true);
-    const [bubbleStyle, setBubbleStyle] = useState({ left: 0, width: 0, opacity: 0 });
+    const [bubbleStyle, setBubbleStyle] = useState<{ left?: number, width?: number, top?: number, height?: number, opacity: number }>({ left: 0, width: 0, top: 0, height: 0, opacity: 0 });
     const navItemsRef = useRef<{ [key: string]: HTMLAnchorElement | null }>({});
+    const navContainerRef = useRef<HTMLElement>(null);
     const headerRef = useRef<HTMLElement>(null);
     const pathname = usePathname();
     const [isLoggingOut, setIsLoggingOut] = useState(false);
@@ -40,27 +41,41 @@ export default function Header() {
     };
 
     // Toggle this to test experimental vertical layout
-    const isVerticalLayout = true; 
+    const isVerticalLayout = true;
 
+    /**
+     * Updates the navigation bubble's position and size.
+     * Supports both vertical (sidebar) and horizontal (top-bar) layouts.
+     * Uses getBoundingClientRect to ensure pixel-perfect alignment over the active nav item.
+     */
     const updateBubble = useCallback(() => {
         const itemToShow = hoveredSection || activeSection;
         const activeItem = navItemsRef.current[itemToShow];
-        if (activeItem) {
-            // Check if we are in vertical mode
-            const isVertical = activeItem.parentElement?.parentElement?.className.includes(styles.headerVertical);
+        const container = navContainerRef.current;
+        
+        if (activeItem && container) {
+            const itemRect = activeItem.getBoundingClientRect();
+            const containerRect = container.getBoundingClientRect();
             
+            // Determine layout mode (vertical vs horizontal)
+            const headerEl = container.closest('header');
+            const isVertical = headerEl?.className.includes(styles.headerVertical);
+
             if (isVertical) {
+                // For vertical: the bubble is a small circular indicator (28px) centered on the icon
+                const bubbleSize = 28;
                 setBubbleStyle({
-                    top: activeItem.offsetTop,
-                    height: activeItem.offsetHeight,
-                    width: activeItem.offsetWidth - 8,
-                    left: 4,
+                    top: itemRect.top - containerRect.top + (itemRect.height - bubbleSize) / 2,
+                    left: itemRect.left - containerRect.left + (itemRect.width - bubbleSize) / 2,
+                    height: bubbleSize,
+                    width: bubbleSize,
                     opacity: 1
                 });
             } else {
+                // For horizontal: the bubble is a pill shape covering the entire nav item width
                 setBubbleStyle({
-                    left: activeItem.offsetLeft,
-                    width: activeItem.offsetWidth,
+                    left: itemRect.left - containerRect.left,
+                    width: itemRect.width,
                     top: 0,
                     height: 0,
                     opacity: 1
@@ -103,24 +118,11 @@ export default function Header() {
                     setIsCollapsed(true);
                 }
 
-                const spyPos = scrollPos + 180;
-                let current = 'sfera';
-
-                NAV_ITEMS.forEach(item => {
-                    const section = document.getElementById(item.id);
-                    if (section && spyPos >= section.offsetTop) {
-                        current = item.id;
-                    }
-                });
-
-                if (current !== activeSection) {
-                    setActiveSection(current);
-                }
-
+                // Remove purely scroll-based tracking; handled by IntersectionObserver
                 // Dynamic Glassmorphism effects via CSS Variables (More stable in Safari)
                 const blurValue = Math.min(40 + (scrollPos / 10), 60);
                 const opacityValue = Math.min(0.08 + (scrollPos / 800), 0.75);
-                
+
                 const blurStr = `blur(${blurValue}px)`;
                 const bgStr = `rgba(248, 248, 238, ${opacityValue})`;
 
@@ -141,6 +143,41 @@ export default function Header() {
 
         return () => window.removeEventListener('scroll', handleScroll);
     }, [activeSection, isCollapsed, updateBubble]);
+
+    /**
+     * INTERSECTION OBSERVER (Scroll Spy)
+     * Tracks with section of the home page is currently visible in the viewport.
+     * Updates activeSection state which in turn moves the navigation bubble.
+     */
+    useEffect(() => {
+        const observerOptions = {
+            root: null,
+            rootMargin: '-40% 0px -40% 0px', // Balanced detection window (center 20% of viewport)
+            threshold: 0
+        };
+
+        const observerCallback = (entries: IntersectionObserverEntry[]) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    setActiveSection(entry.target.id);
+                }
+            });
+        };
+
+        const observer = new IntersectionObserver(observerCallback, observerOptions);
+
+        NAV_ITEMS.forEach(item => {
+            const el = document.getElementById(item.id);
+            if (el) observer.observe(el);
+        });
+
+        return () => observer.disconnect();
+    }, []);
+
+    // Explicitly update bubble when section changes
+    useEffect(() => {
+        updateBubble();
+    }, [activeSection, updateBubble]);
 
     // Re-check on resize
     useLayoutEffect(() => {
@@ -175,12 +212,14 @@ export default function Header() {
 
     const renderContent = (isVertical: boolean) => (
         <React.Fragment>
-            <nav className={styles.navContainer}>
+            <nav className={styles.navContainer} ref={navContainerRef as any}>
                 <div
-                    className={`${styles.navBubble} ${(isCollapsed || isVertical) ? styles.hiddenContent : ''}`}
+                    className={`${styles.navBubble} ${(isCollapsed && !isVertical) ? styles.hiddenContent : ''}`}
                     style={{
                         left: `${bubbleStyle.left}px`,
+                        top: `${bubbleStyle.top}px`,
                         width: `${bubbleStyle.width}px`,
+                        height: `${bubbleStyle.height || 28}px`,
                         opacity: bubbleStyle.opacity
                     }}
                 />
@@ -194,7 +233,7 @@ export default function Header() {
                     );
 
                     // Logic fix: Show all icons even when collapsed (but hide labels)
-                    const isHidden = false; 
+                    const isHidden = false;
 
                     return (
                         <Link
@@ -211,15 +250,15 @@ export default function Header() {
                         </Link>
                     );
                 })}
-                <div className={`${styles.navSeparator} ${(isCollapsed && !isVertical) ? '' : styles.hiddenContent}`} />
+                {!isVertical && <div className={`${styles.navSeparator} ${(isCollapsed) ? '' : styles.hiddenContent}`} />}
             </nav>
 
             <div className={`${styles.headerActions} ${isVertical ? styles.verticalActions : ''}`}>
                 <button className={styles.actionBtn} title="Profilo">
                     <User size={14} strokeWidth={1.1} />
                 </button>
-                <button 
-                    className={`${styles.actionBtn} ${isLoggingOut ? styles.loading : ''}`} 
+                <button
+                    className={`${styles.actionBtn} ${isLoggingOut ? styles.loading : ''}`}
                     title="Logout"
                     onClick={handleLogout}
                     disabled={isLoggingOut}
