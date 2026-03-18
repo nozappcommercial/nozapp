@@ -1,4 +1,4 @@
-import { createClient } from "@/lib/supabase/server";
+import { createClient } from "@supabase/supabase-js";
 import { NextResponse } from "next/server";
 
 const RAPIDAPI_URL = "https://streaming-availability.p.rapidapi.com/shows/search/title";
@@ -10,7 +10,14 @@ export async function GET(req: Request) {
     return NextResponse.json({ error: "Manca la 'RAPIDAPI_KEY' nel file .env (assicurati di aver salvato il file e riavviato npm run dev)" }, { status: 500 });
   }
 
-  const supabase = await createClient();
+  // Use Service Role Key to bypass Row Level Security on the `films` table
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  if (!supabaseUrl || !supabaseServiceKey) {
+     return NextResponse.json({ error: "Manca la 'SUPABASE_SERVICE_ROLE_KEY' nel file .env" }, { status: 500 });
+  }
+  
+  const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
   // 1. Fetch movies that don't have streaming_providers set yet.
   // Since you are running this locally, we can increase the limit to process up to 100 movies at once.
