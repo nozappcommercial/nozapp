@@ -48,6 +48,8 @@ export default function SemanticSphere({ files = [], edges = [] }: SemanticSpher
     // UI State for the movie detail panel
     const [selectedFilm, setSelectedFilm] = React.useState<FilmNode | null>(null);
     const [selectedEdges, setSelectedEdges] = React.useState<any[]>([]);
+    const [panelVisible, setPanelVisible] = React.useState(false);
+    const [panelMinimized, setPanelMinimized] = React.useState(false);
     
     // Feedback state (Seen, Liked, Ignored) - persisted in Supabase
     const [nodeInteractions, setNodeInteractions] = React.useState<Record<number, InteractionType | undefined>>({});
@@ -530,8 +532,18 @@ export default function SemanticSphere({ files = [], edges = [] }: SemanticSpher
             const panel = document.getElementById('panel');
             // exit
             panel.style.transition = 'opacity 120ms ease, transform 120ms ease';
-            const exitMap = { left: 'translateX(-18px)', right: 'translateX(18px)', up: 'translateY(-14px)', down: 'translateY(14px)' };
-            const enterMap = { left: 'translateX(18px)', right: 'translateX(-18px)', up: 'translateY(14px)', down: 'translateY(-14px)' };
+            const exitMap = {
+                left:  'translateY(-50%) translateX(-18px)',
+                right: 'translateY(-50%) translateX(18px)',
+                up:    'translateY(calc(-50% - 14px))',
+                down:  'translateY(calc(-50% + 14px))'
+            };
+            const enterMap = {
+                left:  'translateY(-50%) translateX(18px)',
+                right: 'translateY(-50%) translateX(-18px)',
+                up:    'translateY(calc(-50% + 14px))',
+                down:  'translateY(calc(-50% - 14px))'
+            };
             panel.style.opacity = '0';
             panel.style.transform = exitMap[dir];
             setTimeout(() => {
@@ -543,7 +555,7 @@ export default function SemanticSphere({ files = [], edges = [] }: SemanticSpher
                     requestAnimationFrame(() => {
                         panel.style.transition = 'opacity 160ms ease, transform 160ms ease';
                         panel.style.opacity = '1';
-                        panel.style.transform = 'none';
+                        panel.style.transform = 'translateY(-50%)';
                     });
                 });
             }, 130);
@@ -551,10 +563,6 @@ export default function SemanticSphere({ files = [], edges = [] }: SemanticSpher
 
         // PANEL VISIBILITY
         // ----------------
-        /**
-         * Populates and displays the movie detail panel for a specific node.
-         * Also triggers the header hide animation to avoid visual clutter.
-         */
         function showPanel(nodeIndex: number) {
             const film = FILMS[nodeIndex];
             const connEdges = EDGES.filter(e => e.from === nodeIndex || e.to === nodeIndex);
@@ -562,8 +570,10 @@ export default function SemanticSphere({ files = [], edges = [] }: SemanticSpher
                 const oid = e.from === nodeIndex ? e.to : e.from;
                 return { id: e.from + '-' + e.to, type: e.type, film: FILMS[oid] };
             });
+            setPanelVisible(false);
             setSelectedFilm(film);
             setSelectedEdges(edgeData);
+            requestAnimationFrame(() => requestAnimationFrame(() => setPanelVisible(true)));
 
             // Hide vertical header to not overlap with panel
             const headerVertical = document.querySelector('header[class*="headerVertical"]');
@@ -573,6 +583,8 @@ export default function SemanticSphere({ files = [], edges = [] }: SemanticSpher
         }
 
         function closePanel() {
+            setPanelVisible(false);
+            setPanelMinimized(false);
             setSelectedFilm(null);
             document.getElementById('nav-controls')?.classList.remove('visible');
             document.getElementById('breadcrumb')?.classList.remove('visible');
@@ -1013,8 +1025,39 @@ export default function SemanticSphere({ files = [], edges = [] }: SemanticSpher
             </div>
 
             {/* Info Panel -> React State */}
+            {selectedFilm && panelMinimized && (
+                <div id="panel-dock" className="panel-dock-visible" style={{ position: 'absolute' }}>
+                    <button className="dock-expand-btn" onClick={() => setPanelMinimized(false)}>↑</button>
+                    <span className="dock-title">{selectedFilm.title}</span>
+                    <div className="dock-actions">
+                        {(['seen', 'liked', 'ignored'] as InteractionType[]).map((type) => {
+                            const btnLabel = { seen: 'Visto', liked: 'Mi Piace', ignored: 'Ignora' }[type];
+                            const isActive = nodeInteractions[selectedFilm.id] === type;
+                            return (
+                                <button
+                                    key={type}
+                                    className={`dock-feedback-btn ${isActive ? 'active' : ''}`}
+                                    onClick={() => handleInteraction(selectedFilm.id, type)}
+                                >
+                                    {btnLabel}
+                                </button>
+                            );
+                        })}
+                    </div>
+                    <button className="dock-close-btn" onClick={() => {
+                        setPanelMinimized(false);
+                        setSelectedFilm(null);
+                        window.dispatchEvent(new Event('closeSpherePanel'));
+                    }}>×</button>
+                </div>
+            )}
+
             {selectedFilm && (
-                <div id="panel" className="visible" style={{ position: 'absolute' }}>
+                <div 
+                    id="panel" 
+                    className={panelVisible && !panelMinimized ? 'visible' : ''} 
+                    style={{ position: 'absolute' }}
+                >
                     {/* Full Card Poster Background */}
                     <img id="panel-poster-full"
                         src={selectedFilm.poster_url || '/placeholder.jpg'}
@@ -1024,7 +1067,8 @@ export default function SemanticSphere({ files = [], edges = [] }: SemanticSpher
                     
                     {/* Frosted Glass Content Overlay */}
                     <div className="panel-glass-content">
-                        <button id="panel-close" onClick={() => { setSelectedFilm(null); window.dispatchEvent(new Event('closeSpherePanel')); }}>×</button>
+                        <button id="panel-minimize" onClick={() => setPanelMinimized(true)}>↓</button>
+                        <button id="panel-close" onClick={() => { setPanelMinimized(false); setPanelVisible(false); setSelectedFilm(null); window.dispatchEvent(new Event('closeSpherePanel')); }}>×</button>
                         
                         <div className="pg-header">
                             <div className="p-badge-container">

@@ -38,28 +38,28 @@ body.dragging {
    MAIN LAYOUT & CANVAS
    ═══════════════════════════════════════════════════════════ */
 .main-sphere-wrapper {
-  background: var(--bg);
-  min-height: 100vh;
-  position: relative;
-  z-index: 0;
-  overflow: hidden;
+    background: var(--bg);
+    min-height: 100vh;
+    position: relative;
+    z-index: 0;
+    overflow: hidden;
 }
 
 #c {
-  position: absolute;
-  inset: 0;
-  z-index: 0;
-  display: block;
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    display: block;
 }
 
 /* ═══════════════════════════════════════════════════════════
    FLOATING NODE LABELS (Projected from 3D)
    ═══════════════════════════════════════════════════════════ */
 #labels {
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  z-index: 5;
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    z-index: 5;
 }
 
 .node-label {
@@ -137,46 +137,48 @@ body.dragging {
    UI HEADERS & HINTS
    ═══════════════════════════════════════════════════════════ */
 .sphere-header {
-  position: absolute;
-  top: 0; left: 0; right: 0;
-  padding: 24px;
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  pointer-events: none;
-  z-index: 100;
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    padding: 24px;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    pointer-events: none;
+    z-index: 100;
 }
 
 .sh-logo {
-  font-family: 'Cormorant Garamond', serif;
-  font-size: 28px;
-  font-weight: 300;
-  color: var(--text);
-  letter-spacing: -0.01em;
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 28px;
+    font-weight: 300;
+    color: var(--text);
+    letter-spacing: -0.01em;
 }
 
 .sh-logo em {
-  font-style: italic;
-  color: var(--gold);
+    font-style: italic;
+    color: var(--gold);
 }
 
 .sh-hint {
-  font-family: 'Fragment Mono', monospace;
-  font-size: 10px;
-  text-transform: uppercase;
-  color: var(--gold);
-  letter-spacing: 0.25em;
-  opacity: 0.8;
+    font-family: 'Fragment Mono', monospace;
+    font-size: 10px;
+    text-transform: uppercase;
+    color: var(--gold);
+    letter-spacing: 0.25em;
+    opacity: 0.8;
 }
 
 .hints {
-  font-family: 'Fragment Mono', monospace;
-  font-size: 10px;
-  text-align: right;
-  line-height: 1.8;
-  color: var(--text);
-  letter-spacing: 0.05em;
-  opacity: 0.6;
+    font-family: 'Fragment Mono', monospace;
+    font-size: 10px;
+    text-align: right;
+    line-height: 1.8;
+    color: var(--text);
+    letter-spacing: 0.05em;
+    opacity: 0.6;
 }
 
 /* ═══════════════════════════════════════════════════════════
@@ -233,9 +235,19 @@ body.dragging {
     display: flex
 }
 
-.bc-item { color: var(--gold); opacity: .7 }
-.bc-sep { opacity: .3 }
-.bc-current { color: var(--text); opacity: .9 }
+.bc-item {
+    color: var(--gold);
+    opacity: .7
+}
+
+.bc-sep {
+    opacity: .3
+}
+
+.bc-current {
+    color: var(--text);
+    opacity: .9
+}
 
 /* ═══════════════════════════════════════════════════════════
    NAVIGATION CONTROLS (Bottom Directional Pad)
@@ -329,9 +341,9 @@ body.dragging {
     z-index: 1;
     height: 100%;
     width: 100%;
-    background: rgba(255, 255, 255, 0.18);
-    backdrop-filter: blur(28px) saturate(180%);
-    -webkit-backdrop-filter: blur(28px) saturate(180%);
+    background: rgba(255, 255, 255, 0.23);
+    backdrop-filter: blur(28px) saturate(160%);
+    -webkit-backdrop-filter: blur(28px) saturate(160%);
     display: flex;
     flex-direction: column;
     padding: 30px;
@@ -383,20 +395,20 @@ body.dragging {
 }
 
 .p-badge-pillar {
-    background: rgba(120, 39, 46, .12);
-    border: 1px solid rgba(120, 39, 46, .35);
+    background: rgba(120, 39, 46, .22);
+    border: 1px solid rgba(120, 39, 46, .45);
     color: var(--ember)
 }
 
 .p-badge-primary {
-    background: rgba(181, 140, 42, .1);
-    border: 1px solid rgba(181, 140, 42, .3);
+    background: rgba(181, 140, 42, .18);
+    border: 1px solid rgba(181, 140, 42, .42);
     color: var(--gold)
 }
 
 .p-badge-secondary {
-    background: rgba(59, 139, 158, .06);
-    border: 1px solid rgba(59, 139, 158, .2);
+    background: rgba(59, 139, 158, .14);
+    border: 1px solid rgba(59, 139, 158, .32);
     color: var(--cold)
 }
 
@@ -408,6 +420,7 @@ body.dragging {
     line-height: 1.05;
     margin-bottom: 8px;
     letter-spacing: -0.02em;
+    text-shadow: 0 1px 10px rgba(255, 255, 255, 0.55);
 }
 
 .poster-film-meta {
@@ -423,7 +436,10 @@ body.dragging {
     overflow-y: auto;
     scrollbar-width: none;
 }
-.pg-body::-webkit-scrollbar { display: none; }
+
+.pg-body::-webkit-scrollbar {
+    display: none;
+}
 
 .p-section {
     font-family: 'Fragment Mono', monospace;
@@ -431,7 +447,7 @@ body.dragging {
     letter-spacing: 0.18em;
     text-transform: uppercase;
     color: var(--text);
-    opacity: 0.55;
+    opacity: 0.72;
     margin: 20px 0 10px;
 }
 
@@ -445,9 +461,9 @@ body.dragging {
     font-family: 'Fragment Mono', monospace;
     font-size: 10px;
     padding: 6px 14px;
-    border: 1px solid rgba(22, 10, 12, 0.12);
+    border: 1px solid rgba(22, 10, 12, 0.25);
     color: var(--text);
-    background: rgba(255, 255, 255, 0.35);
+    background: rgba(255, 255, 255, 0.52);
     border-radius: 10px;
     backdrop-filter: blur(4px);
 }
@@ -491,8 +507,8 @@ body.dragging {
     flex: 1;
     height: 50px;
     border-radius: 16px;
-    border: 1px solid rgba(22, 10, 12, 0.12);
-    background: rgba(255, 255, 255, 0.45);
+    border: 1px solid rgba(22, 10, 12, 0.20);
+    background: rgba(255, 255, 255, 0.65);
     font-family: 'Fragment Mono', monospace;
     font-size: 9.5px;
     text-transform: uppercase;
@@ -532,11 +548,20 @@ body.dragging {
         flex-direction: column;
         gap: 8px;
     }
-    .sh-logo { font-size: 22px }
-    .hints { display: none }
-    
+
+    .sh-logo {
+        font-size: 22px
+    }
+
+    .hints {
+        display: none
+    }
+
     #panel {
-        right: 15px; left: 15px; bottom: 0; top: auto;
+        right: 15px;
+        left: 15px;
+        bottom: 0;
+        top: auto;
         width: auto;
         height: 70vh;
         max-height: 85vh;
@@ -548,17 +573,198 @@ body.dragging {
         transform: none;
     }
 
-    .panel-glass-content { padding: 30px 24px }
-    .poster-film-title { font-size: 28px }
-    
+    .panel-glass-content {
+        padding: 30px 24px
+    }
+
+    .poster-film-title {
+        font-size: 28px
+    }
+
     .shells-legend {
         bottom: 80px;
         left: 20px;
         transform: scale(0.9);
         transform-origin: bottom left;
     }
+
     .shell-navigator-container {
         left: 15px !important;
         gap: 8px !important;
+    }
+}
+/* ═══════════════════════════════════════════════════════════
+   PANEL MINIMIZE BUTTON
+   ═══════════════════════════════════════════════════════════ */
+#panel-minimize {
+    position: absolute;
+    top: 18px;
+    right: 58px;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.4);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.6);
+    cursor: pointer;
+    color: var(--text);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    font-family: 'Fragment Mono', monospace;
+    transition: all .2s;
+    z-index: 20;
+}
+
+#panel-minimize:hover {
+    background: rgba(255, 255, 255, 0.6);
+    transform: scale(1.1);
+}
+
+/* ═══════════════════════════════════════════════════════════
+   PANEL DOCK (Minimized State)
+   ═══════════════════════════════════════════════════════════ */
+#panel-dock {
+    position: fixed;
+    bottom: -80px;
+    left: 50%;
+    transform: translateX(-50%);
+    height: 60px;
+    min-width: 480px;
+    max-width: 700px;
+    border-radius: 20px;
+    background: rgba(255, 255, 255, 0.55);
+    backdrop-filter: blur(28px) saturate(160%);
+    -webkit-backdrop-filter: blur(28px) saturate(160%);
+    border: 1px solid rgba(22, 10, 12, 0.1);
+    box-shadow: 0 8px 32px rgba(22, 10, 12, 0.12);
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 0 20px;
+    z-index: 1001;
+    opacity: 0;
+    transition: bottom 0.35s cubic-bezier(0.2, 0, 0.2, 1), opacity 0.3s ease;
+    pointer-events: none;
+}
+
+#panel-dock.panel-dock-visible {
+    bottom: 24px;
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.dock-expand-btn {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.6);
+    border: 1px solid rgba(22, 10, 12, 0.15);
+    cursor: pointer;
+    color: var(--text);
+    font-size: 13px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all .2s;
+    flex-shrink: 0;
+}
+
+.dock-expand-btn:hover {
+    background: rgba(255, 255, 255, 0.9);
+    transform: scale(1.1);
+}
+
+.dock-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 18px;
+    font-weight: 400;
+    color: var(--text);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    flex: 1;
+    letter-spacing: -0.01em;
+}
+
+.dock-actions {
+    display: flex;
+    gap: 6px;
+    flex-shrink: 0;
+}
+
+.dock-feedback-btn {
+    height: 34px;
+    padding: 0 12px;
+    border-radius: 10px;
+    border: 1px solid rgba(22, 10, 12, 0.18);
+    background: rgba(255, 255, 255, 0.5);
+    font-family: 'Fragment Mono', monospace;
+    font-size: 8.5px;
+    text-transform: uppercase;
+    cursor: pointer;
+    color: var(--text);
+    transition: all 0.2s ease;
+    letter-spacing: 0.05em;
+}
+
+.dock-feedback-btn:hover {
+    background: rgba(255, 255, 255, 0.85);
+    border-color: rgba(22, 10, 12, 0.3);
+}
+
+.dock-feedback-btn.active {
+    background: var(--gold);
+    color: white;
+    border-color: var(--gold);
+}
+
+.dock-close-btn {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.6);
+    border: 1px solid rgba(22, 10, 12, 0.15);
+    cursor: pointer;
+    color: var(--text);
+    font-size: 15px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all .2s;
+    flex-shrink: 0;
+    font-family: 'Fragment Mono', monospace;
+}
+
+.dock-close-btn:hover {
+    background: rgba(120, 39, 46, 0.15);
+    border-color: var(--ember);
+    color: var(--ember);
+    transform: scale(1.1);
+}
+
+@media (max-width: 768px) {
+    #panel-dock {
+        min-width: unset;
+        left: 15px;
+        right: 15px;
+        transform: none;
+        border-radius: 16px;
+        padding: 0 14px;
+        gap: 10px;
+    }
+    
+    #panel-dock.panel-dock-visible {
+        bottom: 16px;
+    }
+    
+    .dock-title {
+        font-size: 15px;
+    }
+    
+    .dock-feedback-btn {
+        padding: 0 8px;
+        font-size: 7.5px;
     }
 }
