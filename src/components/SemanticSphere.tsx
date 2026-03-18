@@ -1036,7 +1036,8 @@ export default function SemanticSphere({ files = [], edges = [] }: SemanticSpher
                     className={[
                         'visible',
                         panelMinimized ? 'minimized' : '',
-                        ['panel-shell-pillar', 'panel-shell-primary', 'panel-shell-secondary'][selectedFilm.shell]
+                        ['panel-shell-pillar', 'panel-shell-primary', 'panel-shell-secondary'][selectedFilm.shell],
+                        nodeInteractions[selectedFilm.id] ? 'is-torn' : ''
                     ].filter(Boolean).join(' ')}
                     style={{ position: 'absolute' }}
                 >
@@ -1049,6 +1050,8 @@ export default function SemanticSphere({ files = [], edges = [] }: SemanticSpher
                     
                     {/* Frosted Glass Content Overlay */}
                     <div className="panel-glass-content">
+                        <div className="ticket-serial">№ {selectedFilm.id.toString().slice(-6).toUpperCase()}</div>
+                        <div className="ticket-stamp">Nozapp Première</div>
                         <div className="panel-top-row">
                             <div className="poster-film-title" id="poster-title">{selectedFilm.title}</div>
                             <button id="panel-minimize" onClick={() => setPanelMinimized(prev => !prev)}>{panelMinimized ? '↑' : '↓'}</button>
@@ -1085,32 +1088,30 @@ export default function SemanticSphere({ files = [], edges = [] }: SemanticSpher
                                 </>
                             )}
                             
-                        </div>
-
-                        {/* Actions */}
-                        <div className="ticket-tear">
-                            <div className="ticket-notch ticket-notch-left" />
-                            <div className="ticket-tear-line" />
-                            <div className="ticket-notch ticket-notch-right" />
-                        </div>
-                        <div className="p-feedback-actions">
-                            {[
-                                { type: 'seen' as InteractionType, label: 'Visto', title: 'L\'ho visto' },
-                                { type: 'liked' as InteractionType, label: 'Mi Piace', title: 'Mi è piaciuto' },
-                                { type: 'ignored' as InteractionType, label: 'Ignora', title: 'Non mi interessa' }
-                            ].map((btn) => {
-                                const isActive = selectedFilm && nodeInteractions[selectedFilm.id] === btn.type;
-                                return (
-                                    <button 
-                                        key={btn.type}
-                                        className={`feedback-btn ${isActive ? 'active' : ''}`}
-                                        title={btn.title} 
-                                        onClick={() => selectedFilm && handleInteraction(selectedFilm.id, btn.type)}
-                                    >
-                                        {btn.label}
-                                    </button>
-                                );
-                            })}
+                            
+                            {/* Actions (The Stub) - Aligned with notches */}
+                            <div className="ticket-tear">
+                                <div className="ticket-tear-line" />
+                            </div>
+                            <div className="p-feedback-actions">
+                                {[
+                                    { type: 'seen' as InteractionType, label: 'Visto', title: 'L\'ho visto' },
+                                    { type: 'liked' as InteractionType, label: 'Mi Piace', title: 'Mi è piaciuto' },
+                                    { type: 'ignored' as InteractionType, label: 'Ignora', title: 'Non mi interessa' }
+                                ].map((btn) => {
+                                    const isActive = selectedFilm && nodeInteractions[selectedFilm.id] === btn.type;
+                                    return (
+                                        <button 
+                                            key={btn.type}
+                                            className={`feedback-btn ${isActive ? 'active' : ''}`}
+                                            title={btn.title} 
+                                            onClick={() => selectedFilm && handleInteraction(selectedFilm.id, btn.type)}
+                                        >
+                                            {btn.label}
+                                        </button>
+                                    );
+                                })}
+                            </div>
                         </div>
                     </div>
                 </div>
