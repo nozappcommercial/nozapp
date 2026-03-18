@@ -15,6 +15,7 @@ interface FilmWithRelations {
     year: number | null;
     director: string | null;
     poster_url: string | null;
+    streaming_providers: any[] | null;
     film_themes: { theme: string }[];
     film_genres: { genre: string }[];
 }
@@ -54,7 +55,7 @@ export async function getPersonalizedGraph() {
         .select(`
             rank,
             films (
-                id, title, year, director, poster_url,
+                id, title, year, director, poster_url, streaming_providers,
                 film_themes (theme),
                 film_genres (genre)
             )
@@ -90,7 +91,8 @@ export async function getPersonalizedGraph() {
             tags,
             poster_url: f.poster_url,
             poster: SHELL_POSTER_COLORS[0],
-            interaction: interactionsMap.get(f.id) as any
+            interaction: interactionsMap.get(f.id) as any,
+            streaming_providers: f.streaming_providers
         });
         return f.id;
     }).filter(Boolean) as number[];
@@ -114,7 +116,7 @@ export async function getPersonalizedGraph() {
         if (shell1Ids.size > 0) {
             const { data: nodes1 } = await supabase
                 .from('films')
-                .select(`id, title, year, director, poster_url, film_themes (theme), film_genres (genre)`)
+                .select(`id, title, year, director, poster_url, streaming_providers, film_themes (theme), film_genres (genre)`)
                 .in('id', Array.from(shell1Ids))
                 .limit(40); // Cap Shell 1 to maintain performance
 
@@ -134,7 +136,8 @@ export async function getPersonalizedGraph() {
                         tags,
                         poster_url: f.poster_url,
                         poster: SHELL_POSTER_COLORS[1],
-                        interaction: interactionsMap.get(f.id) as any
+                        interaction: interactionsMap.get(f.id) as any,
+                        streaming_providers: f.streaming_providers
                     });
                 }
             }
@@ -161,7 +164,7 @@ export async function getPersonalizedGraph() {
             if (shell2Ids.size > 0) {
                 const { data: nodes2 } = await supabase
                     .from('films')
-                    .select(`id, title, year, director, poster_url, film_themes (theme), film_genres (genre)`)
+                    .select(`id, title, year, director, poster_url, streaming_providers, film_themes (theme), film_genres (genre)`)
                     .in('id', Array.from(shell2Ids))
                     .limit(100 - nodes.length); // Stay under 100 total nodes for 3D stability
 
@@ -181,7 +184,8 @@ export async function getPersonalizedGraph() {
                             tags,
                             poster_url: f.poster_url,
                             poster: SHELL_POSTER_COLORS[2],
-                            interaction: interactionsMap.get(f.id) as any
+                            interaction: interactionsMap.get(f.id) as any,
+                            streaming_providers: f.streaming_providers
                         });
                     }
                 }

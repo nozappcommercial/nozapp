@@ -27,6 +27,7 @@ export interface FilmNode {
     poster?: string[];
     poster_url?: string | null;
     interaction?: 'seen' | 'liked' | 'ignored';
+    streaming_providers?: any[] | null;
 }
 
 export interface FilmEdge {
