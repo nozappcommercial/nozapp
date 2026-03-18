@@ -58,8 +58,8 @@ export async function GET(req: Request) {
       if (result && result.length > 0) {
         const bestMatch = result.find((item: any) => Math.abs(item.releaseYear - parseInt(movie.year)) <= 2) || result[0];
         
-        if (bestMatch && bestMatch.streamingInfo && bestMatch.streamingInfo.it) {
-            const itProviders = bestMatch.streamingInfo.it;
+        if (bestMatch && bestMatch.streamingOptions && bestMatch.streamingOptions.it) {
+            const itProviders = bestMatch.streamingOptions.it;
             for (const p of itProviders) {
                if (p.service && p.service.name) {
                  // The API returns p.service as an object { id: "netflix", name: "Netflix" }
