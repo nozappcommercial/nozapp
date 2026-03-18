@@ -50,6 +50,12 @@ export default function SemanticSphere({ files = [], edges = [] }: SemanticSpher
     const [selectedEdges, setSelectedEdges] = React.useState<any[]>([]);
     const [panelVisible, setPanelVisible] = React.useState(false);
     const [panelMinimized, setPanelMinimized] = React.useState(false);
+    const [panelExiting, setPanelExiting] = React.useState(false);
+    const panelMinimizedRef = React.useRef(false);
+
+    useEffect(() => {
+        panelMinimizedRef.current = panelMinimized;
+    }, [panelMinimized]);
     
     // Feedback state (Seen, Liked, Ignored) - persisted in Supabase
     const [nodeInteractions, setNodeInteractions] = React.useState<Record<number, InteractionType | undefined>>({});
@@ -570,10 +576,12 @@ export default function SemanticSphere({ files = [], edges = [] }: SemanticSpher
                 const oid = e.from === nodeIndex ? e.to : e.from;
                 return { id: e.from + '-' + e.to, type: e.type, film: FILMS[oid] };
             });
-            setPanelVisible(false);
             setSelectedFilm(film);
             setSelectedEdges(edgeData);
-            requestAnimationFrame(() => requestAnimationFrame(() => setPanelVisible(true)));
+            if (!panelMinimizedRef.current) {
+                setPanelVisible(false);
+                requestAnimationFrame(() => requestAnimationFrame(() => setPanelVisible(true)));
+            }
 
             // Hide vertical header to not overlap with panel
             const headerVertical = document.querySelector('header[class*="headerVertical"]');
@@ -1055,7 +1063,7 @@ export default function SemanticSphere({ files = [], edges = [] }: SemanticSpher
             {selectedFilm && (
                 <div 
                     id="panel" 
-                    className={panelVisible && !panelMinimized ? 'visible' : ''} 
+                    className={`${panelVisible && !panelMinimized ? 'visible' : ''} ${panelExiting ? 'exiting' : ''}`} 
                     style={{ position: 'absolute' }}
                 >
                     {/* Full Card Poster Background */}
@@ -1067,7 +1075,13 @@ export default function SemanticSphere({ files = [], edges = [] }: SemanticSpher
                     
                     {/* Frosted Glass Content Overlay */}
                     <div className="panel-glass-content">
-                        <button id="panel-minimize" onClick={() => setPanelMinimized(true)}>↓</button>
+                        <button id="panel-minimize" onClick={() => {
+                            setPanelExiting(true);
+                            setTimeout(() => {
+                                setPanelExiting(false);
+                                setPanelMinimized(true);
+                            }, 350);
+                        }}>↓</button>
                         <button id="panel-close" onClick={() => { setPanelMinimized(false); setPanelVisible(false); setSelectedFilm(null); window.dispatchEvent(new Event('closeSpherePanel')); }}>×</button>
                         
                         <div className="pg-header">
