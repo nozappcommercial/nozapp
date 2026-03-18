@@ -1055,10 +1055,10 @@ export default function SemanticSphere({ files = [], edges = [] }: SemanticSpher
                             <button id="panel-close" onClick={() => { setPanelMinimized(false); setSelectedFilm(null); window.dispatchEvent(new Event('closeSpherePanel')); }}>×</button>
                         </div>
                         
-                        <div className="poster-film-meta" id="poster-meta" style={{ marginTop: '-10px', marginBottom: '20px' }}>
-                            <span style={{ opacity: .7, fontFamily: 'Fragment Mono, monospace', letterSpacing: '1px', textTransform: 'uppercase', fontSize: '10px' }}>{selectedFilm.dir}</span>
-                            <span style={{ opacity: .35, margin: '0 8px' }}>|</span>
-                            <span style={{ opacity: .6, fontFamily: 'Fragment Mono, monospace', letterSpacing: '1px' }}>{selectedFilm.year}</span>
+                        <div className="poster-film-meta" id="poster-meta">
+                            <span className="p-meta-dir">{selectedFilm.dir}</span>
+                            <span className="p-meta-divider">|</span>
+                            <span className="p-meta-year">{selectedFilm.year}</span>
                         </div>
                         
                         <div className="pg-header">
