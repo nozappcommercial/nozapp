@@ -1086,6 +1086,11 @@ export default function SemanticSphere({ files = [], edges = [] }: SemanticSpher
                             )}
                             
                             {/* Actions */}
+                            <div className="ticket-tear">
+                                <div className="ticket-notch ticket-notch-left" />
+                                <div className="ticket-tear-line" />
+                                <div className="ticket-notch ticket-notch-right" />
+                            </div>
                             <div className="p-feedback-actions">
                                 {[
                                     { type: 'seen' as InteractionType, label: 'Visto', title: 'L\'ho visto' },
