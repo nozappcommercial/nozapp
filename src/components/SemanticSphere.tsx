@@ -534,7 +534,10 @@ export default function SemanticSphere({ files = [], edges = [] }: SemanticSpher
          */
         function animatePanel(dir, callback) {
             const panel = document.getElementById('panel');
-            // exit
+            if (panel.classList.contains('minimized')) {
+                callback();
+                return;
+            }
             panel.style.transition = 'opacity 120ms ease, transform 120ms ease';
             const exitMap = {
                 left:  'translateY(-50%) translateX(-18px)',
@@ -559,7 +562,9 @@ export default function SemanticSphere({ files = [], edges = [] }: SemanticSpher
                     requestAnimationFrame(() => {
                         panel.style.transition = 'opacity 160ms ease, transform 160ms ease';
                         panel.style.opacity = '1';
-                        panel.style.transform = 'translateY(-50%)';
+                        panel.style.transform = panel.classList.contains('minimized')
+                            ? 'translateY(calc(-50% + 520px))'
+                            : 'translateY(-50%)';
                     });
                 });
             }, 130);
