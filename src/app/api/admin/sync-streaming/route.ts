@@ -16,7 +16,7 @@ export async function GET(req: Request) {
   // 1. Fetch movies that don't have streaming_providers set yet.
   // We limit to 5 per request to avoid Vercel Serverless Function 10s timeout.
   const { data: movies, error: fetchError } = await supabase
-    .from('movies')
+    .from('films')
     .select('id, title, year')
     .is('streaming_providers', null)
     .limit(5);
@@ -77,7 +77,7 @@ export async function GET(req: Request) {
 
       // 3. Update Supabase
       const { error: updateError } = await supabase
-        .from('movies')
+        .from('films')
         .update({ streaming_providers: providersArray })
         .eq('id', movie.id);
 
