@@ -1077,8 +1077,13 @@ export default function SemanticSphere({ files = [], edges = [] }: SemanticSpher
                                 <>
                                     <div className="p-section" style={{ marginTop: '16px' }}>Guarda ora su</div>
                                     <div className="p-streaming-list">
-                                        {selectedFilm.streaming_providers.map((p: string) => (
-                                            <div key={p} className="p-streaming-badge">{p.replace(' video', ' Video').replace('disney', 'Disney+')}</div>
+                                        {selectedFilm.streaming_providers.map((p: any) => (
+                                            <a key={`${p.name}-${p.type}`} href={p.link} target="_blank" rel="noreferrer" className="p-streaming-badge">
+                                                <span className="p-streaming-name">{p.name}</span>
+                                                {p.type !== 'subscription' && (
+                                                    <span className="p-streaming-price">{p.price ? ` (${p.price})` : ` (${p.type === 'buy' ? 'Acquisto' : 'Noleggio'})`}</span>
+                                                )}
+                                            </a>
                                         ))}
                                     </div>
                                 </>

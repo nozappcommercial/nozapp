@@ -13,12 +13,12 @@ export async function GET(req: Request) {
   const supabase = await createClient();
 
   // 1. Fetch movies that don't have streaming_providers set yet.
-  // We limit to 5 per request to avoid Vercel Serverless Function 10s timeout.
+  // Since you are running this locally, we can increase the limit to process up to 100 movies at once.
   const { data: movies, error: fetchError } = await supabase
     .from('films')
     .select('id, title, year')
     .is('streaming_providers', null)
-    .limit(5);
+    .limit(100);
 
   if (fetchError) {
     return NextResponse.json({ error: fetchError.message }, { status: 500 });
@@ -51,28 +51,40 @@ export async function GET(req: Request) {
 
       const result = await response.json();
       
-      let providersMap = new Set<string>();
+      let providersMap = new Map<string, any>();
 
-      // Extract streaming info for Italy ('it'). We just grab the service names (e.g. 'netflix', 'prime').
-      // The exact path depends on the API version, but typically it returns a list of matching shows.
+      // Extract streaming info for Italy ('it').
       // We check the first match that roughly matches the year.
       if (result && result.length > 0) {
         const bestMatch = result.find((item: any) => Math.abs(item.releaseYear - parseInt(movie.year)) <= 2) || result[0];
         
         if (bestMatch && bestMatch.streamingInfo && bestMatch.streamingInfo.it) {
-            // It could be an array of objects or just an array depending on the plan.
             const itProviders = bestMatch.streamingInfo.it;
             for (const p of itProviders) {
                if (p.service && p.service.name) {
                  // The API returns p.service as an object { id: "netflix", name: "Netflix" }
                  const name = p.service.name;
-                 providersMap.add(name);
+                 const type = p.type; // 'subscription', 'rent', 'buy', 'free', 'addon'
+                 const link = p.link;
+                 const price = p.price?.formatted; // e.g. "3.99 EUR"
+
+                 // We use a Map keyed by service name to avoid duplicates 
+                 // (e.g. if it's available for both rent and buy on Prime, we could store 'rent/buy' or just the lowest price).
+                 // For simplicity, if we already saw it as subscription, we keep that. Otherwise we overwrite.
+                 if (!providersMap.has(name) || type === 'subscription') {
+                     providersMap.set(name, {
+                         name,
+                         type,
+                         price: type === 'subscription' ? undefined : price,
+                         link
+                     });
+                 }
                }
             }
         }
       }
 
-      const providersArray = Array.from(providersMap);
+      const providersArray = Array.from(providersMap.values());
 
       // 3. Update Supabase
       const { error: updateError } = await supabase
