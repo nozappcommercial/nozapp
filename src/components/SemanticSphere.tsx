@@ -562,9 +562,8 @@ export default function SemanticSphere({ files = [], edges = [] }: SemanticSpher
                     requestAnimationFrame(() => {
                         panel.style.transition = 'opacity 160ms ease, transform 160ms ease';
                         panel.style.opacity = '1';
-                        panel.style.transform = panel.classList.contains('minimized')
-                            ? 'translateY(calc(-50% + 520px))'
-                            : 'translateY(-50%)';
+                        panel.style.transition = '';
+                        panel.style.transform = '';
                     });
                 });
             }, 130);
