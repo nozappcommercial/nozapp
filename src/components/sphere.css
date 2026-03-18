@@ -309,7 +309,7 @@ body.dragging {
     right: 40px;
     width: 380px;
     height: 560px;
-    transform: translateY(120vh) scale(.97);
+    transform: translateY(120vh);
     background: transparent;
     border: 2px solid transparent;
     opacity: 1;
@@ -632,48 +632,23 @@ body.dragging {
     margin-bottom: 0;
 }
 
-.panel-title-meta {
-    flex: 1;
-    display: flex;
-    align-items: baseline;
-    flex-wrap: wrap;
-    gap: 0;
-    min-width: 0;
-}
-
-.panel-title-meta .poster-film-title {
+.poster-film-title {
+    font-family: 'Cormorant Garamond', serif;
     font-size: 26px;
+    font-weight: 400;
+    color: var(--text);
     margin-bottom: 0;
+    letter-spacing: -0.02em;
+    line-height: 1.1;
+    flex: 1;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
 }
 
-.panel-title-separator {
-    font-family: 'Fragment Mono', monospace;
-    font-size: 12px;
-    color: var(--text);
-    opacity: 0.35;
-    margin: 0 8px;
-}
-
-.poster-film-meta-inline {
-    font-family: 'Fragment Mono', monospace;
-    font-size: 10px;
-    color: var(--text);
-    opacity: 0.65;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    white-space: nowrap;
-}
 
 
 
-#panel.exiting {
-    opacity: 0;
-    transform: translateY(calc(-50% + 520px));
-    pointer-events: none;
-}
 
 #panel.minimized {
     transform: translateY(calc(-50% + 520px));

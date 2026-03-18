@@ -48,9 +48,7 @@ export default function SemanticSphere({ files = [], edges = [] }: SemanticSpher
     // UI State for the movie detail panel
     const [selectedFilm, setSelectedFilm] = React.useState<FilmNode | null>(null);
     const [selectedEdges, setSelectedEdges] = React.useState<any[]>([]);
-    const [panelVisible, setPanelVisible] = React.useState(false);
     const [panelMinimized, setPanelMinimized] = React.useState(false);
-    const [panelExiting, setPanelExiting] = React.useState(false);
     const panelMinimizedRef = React.useRef(false);
 
     useEffect(() => {
@@ -578,9 +576,6 @@ export default function SemanticSphere({ files = [], edges = [] }: SemanticSpher
             });
             setSelectedFilm(film);
             setSelectedEdges(edgeData);
-            if (!panelMinimizedRef.current) {
-                setPanelVisible(true);
-            }
 
             // Hide vertical header to not overlap with panel
             const headerVertical = document.querySelector('header[class*="headerVertical"]');
@@ -591,7 +586,6 @@ export default function SemanticSphere({ files = [], edges = [] }: SemanticSpher
 
         function closePanel() {
             setPanelMinimized(false);
-            setPanelVisible(false);
             setSelectedFilm(null);
             document.getElementById('nav-controls')?.classList.remove('visible');
             document.getElementById('breadcrumb')?.classList.remove('visible');
@@ -1036,8 +1030,7 @@ export default function SemanticSphere({ files = [], edges = [] }: SemanticSpher
                 <div 
                     id="panel" 
                     className={[
-                        panelVisible ? 'visible' : '',
-                        panelExiting ? 'exiting' : '',
+                        'visible',
                         panelMinimized ? 'minimized' : '',
                         ['panel-shell-pillar', 'panel-shell-primary', 'panel-shell-secondary'][selectedFilm.shell]
                     ].filter(Boolean).join(' ')}
@@ -1053,27 +1046,15 @@ export default function SemanticSphere({ files = [], edges = [] }: SemanticSpher
                     {/* Frosted Glass Content Overlay */}
                     <div className="panel-glass-content">
                         <div className="panel-top-row">
-                            <div className="panel-title-meta">
-                                <span className="poster-film-title" id="poster-title">{selectedFilm.title}</span>
-                                <span className="panel-title-separator">·</span>
-                                <span className="poster-film-meta-inline" id="poster-meta">
-                                    {selectedFilm.dir}
-                                    <span style={{ opacity: .35, margin: '0 6px' }}>|</span>
-                                    {selectedFilm.year}
-                                </span>
-                            </div>
-                            <button id="panel-minimize" onClick={() => {
-                                if (panelMinimized) {
-                                    setPanelMinimized(false);
-                                } else {
-                                    setPanelExiting(true);
-                                    setTimeout(() => {
-                                        setPanelExiting(false);
-                                        setPanelMinimized(true);
-                                    }, 350);
-                                }
-                            }}>{panelMinimized ? '↑' : '↓'}</button>
-                            <button id="panel-close" onClick={() => { setPanelMinimized(false); setPanelVisible(false); setSelectedFilm(null); window.dispatchEvent(new Event('closeSpherePanel')); }}>×</button>
+                            <div className="poster-film-title" id="poster-title">{selectedFilm.title}</div>
+                            <button id="panel-minimize" onClick={() => setPanelMinimized(prev => !prev)}>{panelMinimized ? '↑' : '↓'}</button>
+                            <button id="panel-close" onClick={() => { setPanelMinimized(false); setSelectedFilm(null); window.dispatchEvent(new Event('closeSpherePanel')); }}>×</button>
+                        </div>
+                        
+                        <div className="poster-film-meta" id="poster-meta" style={{ marginTop: '-10px', marginBottom: '20px' }}>
+                            <span style={{ opacity: .7, fontFamily: 'Fragment Mono, monospace', letterSpacing: '1px', textTransform: 'uppercase', fontSize: '10px' }}>{selectedFilm.dir}</span>
+                            <span style={{ opacity: .35, margin: '0 8px' }}>|</span>
+                            <span style={{ opacity: .6, fontFamily: 'Fragment Mono, monospace', letterSpacing: '1px' }}>{selectedFilm.year}</span>
                         </div>
                         
                         <div className="pg-header">
