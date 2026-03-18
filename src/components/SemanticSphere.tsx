@@ -1033,37 +1033,14 @@ export default function SemanticSphere({ files = [], edges = [] }: SemanticSpher
             </div>
 
             {/* Info Panel -> React State */}
-            {selectedFilm && panelMinimized && (
-                <div id="panel-dock" className="panel-dock-visible" style={{ position: 'absolute' }}>
-                    <button className="dock-expand-btn" onClick={() => setPanelMinimized(false)}>↑</button>
-                    <span className="dock-title">{selectedFilm.title}</span>
-                    <div className="dock-actions">
-                        {(['seen', 'liked', 'ignored'] as InteractionType[]).map((type) => {
-                            const btnLabel = { seen: 'Visto', liked: 'Mi Piace', ignored: 'Ignora' }[type];
-                            const isActive = nodeInteractions[selectedFilm.id] === type;
-                            return (
-                                <button
-                                    key={type}
-                                    className={`dock-feedback-btn ${isActive ? 'active' : ''}`}
-                                    onClick={() => handleInteraction(selectedFilm.id, type)}
-                                >
-                                    {btnLabel}
-                                </button>
-                            );
-                        })}
-                    </div>
-                    <button className="dock-close-btn" onClick={() => {
-                        setPanelMinimized(false);
-                        setSelectedFilm(null);
-                        window.dispatchEvent(new Event('closeSpherePanel'));
-                    }}>×</button>
-                </div>
-            )}
-
             {selectedFilm && (
                 <div 
                     id="panel" 
-                    className={`${panelVisible && !panelMinimized ? 'visible' : ''} ${panelExiting ? 'exiting' : ''}`} 
+                    className={[
+                        panelVisible ? 'visible' : '',
+                        panelExiting ? 'exiting' : '',
+                        panelMinimized ? 'minimized' : ''
+                    ].filter(Boolean).join(' ')}
                     style={{ position: 'absolute' }}
                 >
                     {/* Full Card Poster Background */}
@@ -1075,14 +1052,21 @@ export default function SemanticSphere({ files = [], edges = [] }: SemanticSpher
                     
                     {/* Frosted Glass Content Overlay */}
                     <div className="panel-glass-content">
-                        <button id="panel-minimize" onClick={() => {
-                            setPanelExiting(true);
-                            setTimeout(() => {
-                                setPanelExiting(false);
-                                setPanelMinimized(true);
-                            }, 350);
-                        }}>↓</button>
-                        <button id="panel-close" onClick={() => { setPanelMinimized(false); setPanelVisible(false); setSelectedFilm(null); window.dispatchEvent(new Event('closeSpherePanel')); }}>×</button>
+                        <div className="panel-top-row">
+                            <div className="poster-film-title" id="poster-title">{selectedFilm.title}</div>
+                            <button id="panel-minimize" onClick={() => {
+                                if (panelMinimized) {
+                                    setPanelMinimized(false);
+                                } else {
+                                    setPanelExiting(true);
+                                    setTimeout(() => {
+                                        setPanelExiting(false);
+                                        setPanelMinimized(true);
+                                    }, 350);
+                                }
+                            }}>{panelMinimized ? '↑' : '↓'}</button>
+                            <button id="panel-close" onClick={() => { setPanelMinimized(false); setPanelVisible(false); setSelectedFilm(null); window.dispatchEvent(new Event('closeSpherePanel')); }}>×</button>
+                        </div>
                         
                         <div className="pg-header">
                             <div className="p-badge-container">
@@ -1090,7 +1074,6 @@ export default function SemanticSphere({ files = [], edges = [] }: SemanticSpher
                                     {['Pilastro del gusto', 'Affinità diretta', 'Scoperta laterale'][selectedFilm.shell]}
                                 </div>
                             </div>
-                            <div className="poster-film-title" id="poster-title">{selectedFilm.title}</div>
                             <div className="poster-film-meta" id="poster-meta">
                                 <span style={{ opacity: .7, fontFamily: 'Fragment Mono, monospace', letterSpacing: '1px', textTransform: 'uppercase', fontSize: '10px' }}>{selectedFilm.dir}</span>
                                 <span style={{ opacity: .4, margin: '0 8px' }}>|</span>
