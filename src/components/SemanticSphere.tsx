@@ -180,34 +180,32 @@ export default function SemanticSphere({ files = [], edges = [] }: SemanticSpher
                 targetCameraZ = zTargets[shell];
 
                 FILMS.forEach((f, i) => {
-                    const isVisible = f.shell === shell;
                     const isCurrentShell = f.shell === shell;
 
-                    // Show only nodes on the active shell; connected nodes from other shells revealed on click
-                    let shouldShow = isVisible;
+                    // Show current shell nodes PLUS nodes from previous shells (as muted cores)
+                    // Shell 2 nodes are special: only shown if connected to selection.
+                    let shouldShow = f.shell <= shell;
+                    
                     if (shell === 2 && f.shell === 2) {
                         if (navContext) {
-                            // Only show if connected to navContext.current
                             const conns = connectedTo(navContext.current, EDGES);
                             if (!conns.has(i)) shouldShow = false;
                         } else {
-                            // If no focused node, show none or all? Let's show all for now, or maybe none.
-                            // Rules: "Mostrare solo i nodi Shell 2 collegati al film selezionato in Shell 1."
-                            // If none selected, don't show Shell 2 nodes.
                             shouldShow = false;
                         }
                     }
 
-                    const targetOp = shouldShow ? NCFG[f.shell].glow : 0;
-                    const targetBaseOp = shouldShow ? 1 : 0; // for nodeMeshes
+                    const targetOp = NCFG[f.shell].glow;
+                    const targetBaseOp = 1;
 
                     if (shouldShow) {
                         const baseDelay = isCurrentShell ? f.shell * 300 : 0;
                         const individualDelay = isCurrentShell ? i * 5 : 0;
                         const delay = baseDelay + individualDelay;
-                        // Active shell gets glow and full base opacity. Non-active shells (previously visible) lose glow, keeping only a muted core.
+                        
+                        // Current shell gets glow; previous shells (f.shell < shell) stay as muted cores (opacity 0.15)
                         const finalGlow = isCurrentShell ? targetOp : 0;
-                        const finalBase = isCurrentShell ? targetBaseOp : 0.15; // Set to 0.15 for a muted core
+                        const finalBase = isCurrentShell ? targetBaseOp : 0.15;
 
                         addTween(glowMeshes[i].material, 'opacity', finalGlow, 600, delay);
                         addTween(nodeMeshes[i].material, 'opacity', finalBase, 600, delay);
@@ -378,7 +376,7 @@ export default function SemanticSphere({ files = [], edges = [] }: SemanticSpher
                 } else if (sel !== null) {
                     const active = navContext && navContext.visible.has(f.id);
                     // Selected node is ALWAYS visible regardless of depth/behind
-                    if (f.id === sel) {
+                    if (index === sel) { // Fixed: removed database ID mismatch
                         op = 1;
                     } else {
                         op = active && !behind ? 0.75 : 0;
@@ -663,6 +661,8 @@ export default function SemanticSphere({ files = [], edges = [] }: SemanticSpher
          * Differentiates between dragging (rotation) and clicking (selection).
          */
         window.addEventListener('mousedown', e => {
+            // Ignore events that don't originate from the 3D canvas (e.g., feedback buttons)
+            if ((e.target as HTMLElement).tagName !== 'CANVAS') return;
             isDown = true; isDragging = false;
             lastXY = { x: e.clientX, y: e.clientY }; vel = { x: 0, y: 0 };
             document.body.classList.add('dragging');
@@ -706,7 +706,8 @@ export default function SemanticSphere({ files = [], edges = [] }: SemanticSpher
                     }
                 } else {
                     // Clicking background closes the panel
-                    if (navContext) closePanel();
+                    // Fixed: ensure we are clicking on the canvas, not UI elements
+                    if ((e.target as HTMLElement).tagName === 'CANVAS' && navContext) closePanel();
                 }
             }
         });
@@ -908,9 +909,9 @@ export default function SemanticSphere({ files = [], edges = [] }: SemanticSpher
 
             // 5. Visual "Breathe" / Shimmer Effects
             if (!navContext && !hoveredId) {
-                // Pulse pillars (shell 0) to make them look alive
+                // Pulse pillars (shell 0) only if they are the active shell
                 FILMS.forEach((f, i) => {
-                    if (f.shell === 0) {
+                    if (f.shell === 0 && activeShellRef.current === 0) {
                         glowMeshes[i].material.opacity = NCFG[0].glow * (1 + Math.sin(t * 2 + i * 1.4) * .35);
                     }
                 });
@@ -1014,81 +1015,72 @@ export default function SemanticSphere({ files = [], edges = [] }: SemanticSpher
             {/* Info Panel -> React State */}
             {selectedFilm && (
                 <div id="panel" className="visible" style={{ position: 'absolute' }}>
-                    <button id="panel-close" onClick={() => { setSelectedFilm(null); window.dispatchEvent(new Event('closeSpherePanel')); }}>×</button>
-                    <div id="panel-poster">
-                        <img id="poster-img"
-                            src={selectedFilm.poster_url || '/placeholder.jpg'}
-                            style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', zIndex: 0 }}
-                            alt=""
-                        />
-                        <div className="poster-bg" id="poster-bg"></div>
-                        <div className="poster-overlay"></div>
-                        <div className="poster-content">
-                            <div className="poster-eyebrow" id="poster-eyebrow"></div>
+                    {/* Full Card Poster Background */}
+                    <img id="panel-poster-full"
+                        src={selectedFilm.poster_url || '/placeholder.jpg'}
+                        alt=""
+                        style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', zIndex: 0 }}
+                    />
+                    
+                    {/* Frosted Glass Content Overlay */}
+                    <div className="panel-glass-content">
+                        <button id="panel-close" onClick={() => { setSelectedFilm(null); window.dispatchEvent(new Event('closeSpherePanel')); }}>×</button>
+                        
+                        <div className="pg-header">
+                            <div className="p-badge-container">
+                                <div className={`p-badge p-badge-${['pillar', 'primary', 'secondary'][selectedFilm.shell]}`}>
+                                    {['Pilastro del gusto', 'Affinità diretta', 'Scoperta laterale'][selectedFilm.shell]}
+                                </div>
+                            </div>
                             <div className="poster-film-title" id="poster-title">{selectedFilm.title}</div>
                             <div className="poster-film-meta" id="poster-meta">
-                                <span style={{ opacity: .6, fontFamily: 'Fragment_Mono', letterSpacing: '1px', textTransform: 'uppercase', fontSize: '10px' }}>{selectedFilm.dir}</span>
-                                <span style={{ opacity: .3, margin: '0 8px' }}>|</span>
-                                <span style={{ opacity: .5, fontFamily: 'Fragment_Mono', letterSpacing: '1px' }}>{selectedFilm.year}</span>
+                                <span style={{ opacity: .7, fontFamily: 'Fragment Mono, monospace', letterSpacing: '1px', textTransform: 'uppercase', fontSize: '10px' }}>{selectedFilm.dir}</span>
+                                <span style={{ opacity: .4, margin: '0 8px' }}>|</span>
+                                <span style={{ opacity: .6, fontFamily: 'Fragment Mono, monospace', letterSpacing: '1px' }}>{selectedFilm.year}</span>
                             </div>
                         </div>
-                    </div>
-                    <div className="panel-body">
-                        <div id="p-badge">
-                            <div className={`p-badge p-badge-${['pillar', 'primary', 'secondary'][selectedFilm.shell]}`}>
-                                {['Pilastro del gusto', 'Affinità diretta', 'Scoperta laterale'][selectedFilm.shell]}
+
+                        <div className="pg-body">
+                            <div className="p-section">Temi editoriali</div>
+                            <div className="p-tags" id="p-tags">
+                                {selectedFilm.tags.map((t: string) => <div key={t} className="p-tag">{t}</div>)}
                             </div>
-                        </div>
-                        <div className="p-section">Temi editoriali</div>
-                        <div className="p-tags" id="p-tags">
-                            {selectedFilm.tags.map((t: string) => <div key={t} className="p-tag">{t}</div>)}
-                        </div>
-                        {selectedEdges.length > 0 && (
-                            <>
-                                <div className="p-section" id="conn-section-label">Connessioni editoriali</div>
-                                <div className="p-conns" id="p-conns">
-                                    {selectedEdges.map((e: any) => (
-                                        <div key={e.id} className="p-conn">
-                                            <div className="p-conn-dot" style={{ background: ['var(--ember)', 'var(--gold)', 'var(--cold)'][e.film.shell] }}></div>
-                                            <span>{e.film.title}</span>
-                                            <span className="p-conn-type">· {e.type}</span>
-                                        </div>
-                                    ))}
-                                </div>
-                            </>
-                        )}
-                        {/* Tasti Feedback (Persistenti) */}
-                        <div className="p-feedback-actions" style={{ marginTop: '16px', paddingTop: '16px', borderTop: '1px solid rgba(181, 140, 42, 0.1)', display: 'flex', gap: '8px', justifyContent: 'center' }}>
-                            {[
-                                { type: 'seen' as InteractionType, label: 'Visto', title: 'L\'ho visto' },
-                                { type: 'liked' as InteractionType, label: 'Mi Piace', title: 'Mi è piaciuto' },
-                                { type: 'ignored' as InteractionType, label: 'Ignora', title: 'Non mi interessa' }
-                            ].map((btn) => {
-                                const isActive = selectedFilm && nodeInteractions[selectedFilm.id] === btn.type;
-                                return (
-                                    <button 
-                                        key={btn.type}
-                                        className={`feedback-btn ${isActive ? 'active' : ''}`}
-                                        title={btn.title} 
-                                        onClick={() => selectedFilm && handleInteraction(selectedFilm.id, btn.type)}
-                                        style={{ 
-                                            flex: 1, 
-                                            padding: '8px 0', 
-                                            borderRadius: '8px', 
-                                            border: isActive ? '1px solid var(--gold)' : '1px solid rgba(181, 140, 42, 0.3)', 
-                                            background: isActive ? 'rgba(181, 140, 42, 0.2)' : 'rgba(255, 255, 255, 0.5)', 
-                                            fontFamily: 'Fragment Mono, monospace', 
-                                            fontSize: '9px', 
-                                            textTransform: 'uppercase', 
-                                            cursor: 'pointer', 
-                                            transition: 'all 0.2s', 
-                                            color: isActive ? 'var(--gold)' : 'var(--text)' 
-                                        }}
-                                    >
-                                        {btn.label}
-                                    </button>
-                                );
-                            })}
+                            
+                            {selectedEdges.length > 0 && (
+                                <>
+                                    <div className="p-section">Connessioni editoriali</div>
+                                    <div className="p-conns">
+                                        {selectedEdges.map((e: any) => (
+                                            <div key={e.id} className="p-conn">
+                                                <div className="p-conn-dot" style={{ background: ['var(--ember)', 'var(--gold)', 'var(--cold)'][e.film.shell] }}></div>
+                                                <span>{e.film.title}</span>
+                                                <span className="p-conn-type">· {e.type}</span>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </>
+                            )}
+                            
+                            {/* Actions */}
+                            <div className="p-feedback-actions">
+                                {[
+                                    { type: 'seen' as InteractionType, label: 'Visto', title: 'L\'ho visto' },
+                                    { type: 'liked' as InteractionType, label: 'Mi Piace', title: 'Mi è piaciuto' },
+                                    { type: 'ignored' as InteractionType, label: 'Ignora', title: 'Non mi interessa' }
+                                ].map((btn) => {
+                                    const isActive = selectedFilm && nodeInteractions[selectedFilm.id] === btn.type;
+                                    return (
+                                        <button 
+                                            key={btn.type}
+                                            className={`feedback-btn ${isActive ? 'active' : ''}`}
+                                            title={btn.title} 
+                                            onClick={() => selectedFilm && handleInteraction(selectedFilm.id, btn.type)}
+                                        >
+                                            {btn.label}
+                                        </button>
+                                    );
+                                })}
+                            </div>
                         </div>
                     </div>
                 </div>

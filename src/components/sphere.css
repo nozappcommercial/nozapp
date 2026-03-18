@@ -289,88 +289,97 @@ body.dragging {
 
 
 /* ═══════════════════════════════════════════════════════════
-   MOVIE INFO PANEL (Right-Side Detail View)
+   MOVIE INFO PANEL (Full-Poster Glassmorphism Redesign)
    ═══════════════════════════════════════════════════════════ */
 #panel {
-    position: absolute;
-    right: 24px;
-    bottom: 24px;
-    z-index: 10;
-    width: 320px;
-    background: var(--surface);
-    border: 1px solid rgba(181, 140, 42, .2);
-    backdrop-filter: blur(20px);
+    position: fixed;
+    top: 50%;
+    right: 40px;
+    width: 380px;
+    height: 560px;
+    transform: translateY(-50%) translateX(20px);
+    background: transparent;
+    border: 1px solid rgba(181, 140, 42, 0.15);
     opacity: 0;
-    transform: translateY(12px) scale(.97);
-    transition: opacity .3s ease, transform .3s ease;
+    transition: opacity .4s cubic-bezier(0.2, 0, 0.2, 1), transform .4s cubic-bezier(0.2, 0, 0.2, 1);
     pointer-events: none;
-    border-radius: 16px;
+    border-radius: 32px;
     overflow: hidden;
+    z-index: 1000;
+    box-shadow: 0 25px 60px rgba(0, 0, 0, 0.2);
 }
 
 #panel.visible {
     opacity: 1;
-    transform: none;
+    transform: translateY(-50%);
     pointer-events: auto
+}
+
+#panel-poster-full {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    z-index: 0;
+}
+
+.panel-glass-content {
+    position: relative;
+    z-index: 1;
+    height: 100%;
+    width: 100%;
+    background: rgba(255, 255, 255, 0.18);
+    backdrop-filter: blur(28px) saturate(180%);
+    -webkit-backdrop-filter: blur(28px) saturate(180%);
+    display: flex;
+    flex-direction: column;
+    padding: 30px;
 }
 
 #panel-close {
     position: absolute;
-    top: 12px;
-    right: 12px;
-    width: 28px;
-    height: 28px;
+    top: 18px;
+    right: 18px;
+    width: 32px;
+    height: 32px;
     border-radius: 50%;
-    background: rgba(255, 255, 255, 0.3);
-    backdrop-filter: blur(8px);
-    border: 1px solid rgba(255, 255, 255, 0.5);
+    background: rgba(255, 255, 255, 0.4);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.6);
     cursor: pointer;
     color: var(--text);
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 14px;
+    font-size: 16px;
     font-family: 'Fragment Mono', monospace;
     transition: all .2s;
     z-index: 20;
 }
 
-/* Poster Section inside Panel */
-#panel-poster {
-    width: 100%;
-    height: 160px;
-    position: relative;
-    overflow: hidden;
-    display: flex;
-    align-items: flex-end;
+#panel-close:hover {
+    background: rgba(255, 255, 255, 0.6);
+    transform: scale(1.1);
 }
 
-.poster-overlay {
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(to top, rgba(252, 252, 246, 1) 0%, rgba(252, 252, 246, .2) 60%, transparent 100%)
+.pg-header {
+    margin-bottom: 24px;
+    margin-top: 15px;
 }
 
-.poster-film-title {
-    font-family: 'Cormorant Garamond', serif;
-    font-size: 22px;
-    font-weight: 400;
-    color: var(--text);
-    line-height: 1.1;
-    margin-bottom: 2px
+.p-badge-container {
+    margin-bottom: 15px;
 }
-
-/* Panel Meta & Details */
-.panel-body { padding: 14px 18px 18px }
 
 .p-badge {
     display: inline-block;
-    margin-bottom: 10px;
     font-family: 'Fragment Mono', monospace;
     font-size: 8px;
     letter-spacing: .2em;
     text-transform: uppercase;
-    padding: 2px 8px
+    padding: 4px 12px;
+    border-radius: 6px;
 }
 
 .p-badge-pillar {
@@ -391,14 +400,118 @@ body.dragging {
     color: var(--cold)
 }
 
+.poster-film-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 32px;
+    font-weight: 400;
+    color: var(--text);
+    line-height: 1.05;
+    margin-bottom: 8px;
+    letter-spacing: -0.02em;
+}
+
+.poster-film-meta {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.pg-body {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+    scrollbar-width: none;
+}
+.pg-body::-webkit-scrollbar { display: none; }
+
+.p-section {
+    font-family: 'Fragment Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--text);
+    opacity: 0.55;
+    margin: 20px 0 10px;
+}
+
+.p-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
 .p-tag {
     font-family: 'Fragment Mono', monospace;
-    font-size: 8px;
-    letter-spacing: .08em;
-    padding: 2px 7px;
-    border: 1px solid rgba(181, 140, 42, .18);
-    color: var(--gold);
-    background: rgba(181, 140, 42, .05)
+    font-size: 10px;
+    padding: 6px 14px;
+    border: 1px solid rgba(22, 10, 12, 0.12);
+    color: var(--text);
+    background: rgba(255, 255, 255, 0.35);
+    border-radius: 10px;
+    backdrop-filter: blur(4px);
+}
+
+.p-conns {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.p-conn {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 16px;
+    color: var(--text);
+}
+
+.p-conn-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+}
+
+.p-conn-type {
+    opacity: 0.5;
+    font-family: 'Fragment Mono', monospace;
+    font-size: 9px;
+    margin-left: auto;
+}
+
+.p-feedback-actions {
+    margin-top: auto;
+    padding-top: 30px;
+    display: flex;
+    gap: 10px;
+}
+
+.feedback-btn {
+    flex: 1;
+    height: 50px;
+    border-radius: 16px;
+    border: 1px solid rgba(22, 10, 12, 0.12);
+    background: rgba(255, 255, 255, 0.45);
+    font-family: 'Fragment Mono', monospace;
+    font-size: 9.5px;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    color: var(--text);
+}
+
+.feedback-btn:hover {
+    background: rgba(255, 255, 255, 0.8);
+    border-color: rgba(22, 10, 12, 0.3);
+    transform: translateY(-2px);
+}
+
+.feedback-btn.active {
+    background: var(--gold);
+    color: white;
+    border-color: var(--gold);
+    box-shadow: 0 10px 30px rgba(181, 140, 42, 0.4);
 }
 
 /* ═══════════════════════════════════════════════════════════
@@ -423,14 +536,21 @@ body.dragging {
     .hints { display: none }
     
     #panel {
-        right: 10px; left: 10px; bottom: 10px;
-        width: calc(100% - 20px);
-        max-height: 50vh;
-        overflow-y: auto;
+        right: 15px; left: 15px; bottom: 0; top: auto;
+        width: auto;
+        height: 70vh;
+        max-height: 85vh;
+        transform: translateY(20px);
+        border-radius: 32px 32px 0 0;
     }
-    
-    #panel-poster { height: 120px }
 
+    #panel.visible {
+        transform: none;
+    }
+
+    .panel-glass-content { padding: 30px 24px }
+    .poster-film-title { font-size: 28px }
+    
     .shells-legend {
         bottom: 80px;
         left: 20px;

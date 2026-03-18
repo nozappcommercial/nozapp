@@ -1,6 +1,39 @@
+"use client";
+
+import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 
+/**
+ * EDITORIAL SECTION
+ * -----------------
+ * Displays curated articles/editorials with a scroll-reveal animation.
+ * Uses IntersectionObserver to trigger animations when the section enters the viewport.
+ */
 export default function EditorialSection() {
+    const [isVisible, setIsVisible] = useState(false);
+    const sectionRef = useRef<HTMLElement>(null);
+
+    // INTERSECTION OBSERVER
+    // ---------------------
+    // Detects when the user scrolls to this section and triggers the 'reveal' state.
+    useEffect(() => {
+        const observer = new IntersectionObserver(
+            ([entry]) => {
+                if (entry.isIntersecting) {
+                    setIsVisible(true);
+                    observer.unobserve(entry.target); // Trigger once
+                }
+            },
+            { threshold: 0.15 } // Trigger when 15% of the section is visible
+        );
+
+        if (sectionRef.current) {
+            observer.observe(sectionRef.current);
+        }
+
+        return () => observer.disconnect();
+    }, []);
+
     const articles = [
         {
             id: 1,
@@ -9,7 +42,7 @@ export default function EditorialSection() {
             excerpt: "Da Solaris a Stalker, un'esplorazione profonda dei pilastri del cinema russo e del modo in cui la percezione del tempo modella la psiche dei protagonisti...",
             authorName: "Nome Cognome",
             authorRole: "Redattore Capo",
-            authorAvatar: "data:image/gif;base64,R0lGODlhAQABAIAAAMLCwgAAACH5BAAAAAAALAAAAAABAAEAAAICRAEAOw==", // 1x1 gray pixel placeholder
+            authorAvatar: "data:image/gif;base64,R0lGODlhAQABAIAAAMLCwgAAACH5BAAAAAAALAAAAAABAAEAAAICRAEAOw==",
             coverImage: "https://images.unsplash.com/photo-1440404653325-ab127d49abc1?auto=format&fit=crop&q=80&w=800&h=400"
         },
         {
@@ -19,15 +52,20 @@ export default function EditorialSection() {
             excerpt: "Analisi dell'evoluzione stilistica partendo dal capolavoro Blade Runner fino ad arrivare alle luci al neon disperate nelle opere metropolitane di Nicolas Winding Refn...",
             authorName: "Nome Cognome",
             authorRole: "Critica Cinematografica",
-            authorAvatar: "data:image/gif;base64,R0lGODlhAQABAIAAAMLCwgAAACH5BAAAAAAALAAAAAABAAEAAAICRAEAOw==", // 1x1 gray pixel placeholder
+            authorAvatar: "data:image/gif;base64,R0lGODlhAQABAIAAAMLCwgAAACH5BAAAAAAALAAAAAABAAEAAAICRAEAOw==",
             coverImage: "https://images.unsplash.com/photo-1536440136628-849c177e76a1?auto=format&fit=crop&q=80&w=800&h=400"
         }
     ];
 
     return (
-        <section id="redazione" className="bg-[var(--bg)] text-[var(--text)] w-full py-24 px-8 md:px-16" style={{ fontFamily: "'Cormorant Garamond', serif" }}>
+        <section 
+            id="redazione" 
+            ref={sectionRef}
+            className="bg-[var(--bg)] text-[var(--text)] w-full py-24 px-8 md:px-16" 
+            style={{ fontFamily: "'Cormorant Garamond', serif" }}
+        >
             <div className="max-w-6xl mx-auto">
-                <header className="mb-16 border-b border-[var(--gold-dim)] pb-8">
+                <header className={`mb-16 border-b border-[var(--gold-dim)] pb-8 transition-all duration-1000 transform ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}>
                     <h2 className="text-4xl md:text-5xl font-light mb-4">Consigli della <em className="text-[var(--gold)] italic">Redazione</em></h2>
                     <p className="font-['Fragment_Mono'] text-[10px] tracking-widest uppercase opacity-60">
                         Editoriali curati · Approfondimenti analitici
@@ -35,8 +73,12 @@ export default function EditorialSection() {
                 </header>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
-                    {articles.map((article) => (
-                        <article key={article.id} className="group cursor-pointer flex flex-col transition-all duration-300 hover:-translate-y-2">
+                    {articles.map((article, index) => (
+                        <article 
+                            key={article.id} 
+                            style={{ transitionDelay: `${index * 200}ms` }} // Staggered delay logic
+                            className={`group cursor-pointer flex flex-col transition-all duration-1000 transform hover:-translate-y-2 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-12'}`}
+                        >
                             {/* Cover Image */}
                             <div className="relative w-full aspect-[16/9] mb-6 overflow-hidden rounded-sm bg-black/5">
                                 <Image
@@ -89,3 +131,4 @@ export default function EditorialSection() {
         </section>
     );
 }
+
