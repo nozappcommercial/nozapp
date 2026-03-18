@@ -1044,7 +1044,7 @@ export default function SemanticSphere({ files = [], edges = [] }: SemanticSpher
                     <img id="panel-poster-full"
                         src={selectedFilm.poster_url || '/placeholder.jpg'}
                         alt=""
-                        style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', zIndex: 0, borderRadius: '32px' }}
+                        style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', zIndex: 0 }}
                     />
                     
                     {/* Frosted Glass Content Overlay */}
