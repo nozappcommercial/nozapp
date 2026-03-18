@@ -309,11 +309,11 @@ body.dragging {
     right: 40px;
     width: 380px;
     height: 560px;
-    transform: translateY(-50%) translateX(20px);
+    transform: translateY(120vh) scale(.97);
     background: transparent;
-    border: 1px solid rgba(181, 140, 42, 0.15);
-    opacity: 0;
-    transition: opacity .4s cubic-bezier(0.2, 0, 0.2, 1), transform .4s cubic-bezier(0.2, 0, 0.2, 1);
+    border: 2px solid transparent;
+    opacity: 1;
+    transition: transform 0.42s cubic-bezier(0.2, 0, 0.2, 1);
     pointer-events: none;
     border-radius: 32px;
     overflow: hidden;
@@ -322,7 +322,6 @@ body.dragging {
 }
 
 #panel.visible {
-    opacity: 1;
     transform: translateY(-50%);
     pointer-events: auto
 }
@@ -633,19 +632,56 @@ body.dragging {
     margin-bottom: 0;
 }
 
+.panel-title-meta {
+    flex: 1;
+    display: flex;
+    align-items: baseline;
+    flex-wrap: wrap;
+    gap: 0;
+    min-width: 0;
+}
+
+.panel-title-meta .poster-film-title {
+    font-size: 26px;
+    margin-bottom: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.panel-title-separator {
+    font-family: 'Fragment Mono', monospace;
+    font-size: 12px;
+    color: var(--text);
+    opacity: 0.35;
+    margin: 0 8px;
+}
+
+.poster-film-meta-inline {
+    font-family: 'Fragment Mono', monospace;
+    font-size: 10px;
+    color: var(--text);
+    opacity: 0.65;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    white-space: nowrap;
+}
+
 
 
 #panel.exiting {
     opacity: 0;
-    transform: translateY(calc(-50% + 490px));
-    transition: opacity 0.32s cubic-bezier(0.4, 0, 1, 1),
-                transform 0.35s cubic-bezier(0.4, 0, 1, 1);
+    transform: translateY(calc(-50% + 520px));
     pointer-events: none;
 }
 
 #panel.minimized {
-    transform: translateY(calc(-50% + 490px));
+    transform: translateY(calc(-50% + 520px));
     transition: transform 0.38s cubic-bezier(0.2, 0, 0.2, 1);
     pointer-events: auto;
     overflow: hidden;
 }
+
+#panel.panel-shell-pillar   { border-color: var(--ember); }
+#panel.panel-shell-primary  { border-color: var(--gold); }
+#panel.panel-shell-secondary { border-color: var(--cold); }

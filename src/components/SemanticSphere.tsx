@@ -579,8 +579,7 @@ export default function SemanticSphere({ files = [], edges = [] }: SemanticSpher
             setSelectedFilm(film);
             setSelectedEdges(edgeData);
             if (!panelMinimizedRef.current) {
-                setPanelVisible(false);
-                requestAnimationFrame(() => requestAnimationFrame(() => setPanelVisible(true)));
+                setPanelVisible(true);
             }
 
             // Hide vertical header to not overlap with panel
@@ -591,8 +590,8 @@ export default function SemanticSphere({ files = [], edges = [] }: SemanticSpher
         }
 
         function closePanel() {
-            setPanelVisible(false);
             setPanelMinimized(false);
+            setPanelVisible(false);
             setSelectedFilm(null);
             document.getElementById('nav-controls')?.classList.remove('visible');
             document.getElementById('breadcrumb')?.classList.remove('visible');
@@ -1039,7 +1038,8 @@ export default function SemanticSphere({ files = [], edges = [] }: SemanticSpher
                     className={[
                         panelVisible ? 'visible' : '',
                         panelExiting ? 'exiting' : '',
-                        panelMinimized ? 'minimized' : ''
+                        panelMinimized ? 'minimized' : '',
+                        ['panel-shell-pillar', 'panel-shell-primary', 'panel-shell-secondary'][selectedFilm.shell]
                     ].filter(Boolean).join(' ')}
                     style={{ position: 'absolute' }}
                 >
@@ -1053,7 +1053,15 @@ export default function SemanticSphere({ files = [], edges = [] }: SemanticSpher
                     {/* Frosted Glass Content Overlay */}
                     <div className="panel-glass-content">
                         <div className="panel-top-row">
-                            <div className="poster-film-title" id="poster-title">{selectedFilm.title}</div>
+                            <div className="panel-title-meta">
+                                <span className="poster-film-title" id="poster-title">{selectedFilm.title}</span>
+                                <span className="panel-title-separator">·</span>
+                                <span className="poster-film-meta-inline" id="poster-meta">
+                                    {selectedFilm.dir}
+                                    <span style={{ opacity: .35, margin: '0 6px' }}>|</span>
+                                    {selectedFilm.year}
+                                </span>
+                            </div>
                             <button id="panel-minimize" onClick={() => {
                                 if (panelMinimized) {
                                     setPanelMinimized(false);
@@ -1069,16 +1077,6 @@ export default function SemanticSphere({ files = [], edges = [] }: SemanticSpher
                         </div>
                         
                         <div className="pg-header">
-                            <div className="p-badge-container">
-                                <div className={`p-badge p-badge-${['pillar', 'primary', 'secondary'][selectedFilm.shell]}`}>
-                                    {['Pilastro del gusto', 'Affinità diretta', 'Scoperta laterale'][selectedFilm.shell]}
-                                </div>
-                            </div>
-                            <div className="poster-film-meta" id="poster-meta">
-                                <span style={{ opacity: .7, fontFamily: 'Fragment Mono, monospace', letterSpacing: '1px', textTransform: 'uppercase', fontSize: '10px' }}>{selectedFilm.dir}</span>
-                                <span style={{ opacity: .4, margin: '0 8px' }}>|</span>
-                                <span style={{ opacity: .6, fontFamily: 'Fragment Mono, monospace', letterSpacing: '1px' }}>{selectedFilm.year}</span>
-                            </div>
                         </div>
 
                         <div className="pg-body">
