@@ -1,14 +1,13 @@
 import { createClient } from "@/lib/supabase/server";
 import { NextResponse } from "next/server";
 
-const RAPIDAPI_KEY = process.env.RAPIDAPI_KEY;
 const RAPIDAPI_URL = "https://streaming-availability.p.rapidapi.com/shows/search/title";
 
 export async function GET(req: Request) {
-  // Admin only or secret-protected route ideally.
-  // For now, we protect it with the RAPIDAPI_KEY existence.
+  const RAPIDAPI_KEY = process.env.RAPIDAPI_KEY;
+
   if (!RAPIDAPI_KEY) {
-    return NextResponse.json({ error: "Missing RAPIDAPI_KEY in .env.local" }, { status: 500 });
+    return NextResponse.json({ error: "Manca la 'RAPIDAPI_KEY' nel file .env (assicurati di aver salvato il file e riavviato npm run dev)" }, { status: 500 });
   }
 
   const supabase = await createClient();
@@ -64,9 +63,9 @@ export async function GET(req: Request) {
             // It could be an array of objects or just an array depending on the plan.
             const itProviders = bestMatch.streamingInfo.it;
             for (const p of itProviders) {
-               if (p.service) {
-                 // Clean up names for UI (e.g. 'prime' -> 'Prime Video')
-                 const name = p.service.toLowerCase();
+               if (p.service && p.service.name) {
+                 // The API returns p.service as an object { id: "netflix", name: "Netflix" }
+                 const name = p.service.name;
                  providersMap.add(name);
                }
             }
