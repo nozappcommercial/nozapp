@@ -739,6 +739,7 @@ body.dragging {
     height: 30px;
     z-index: 5;
     pointer-events: none;
+    transform: translateY(-50%);
 }
 
 .ticket-tear-line {
@@ -786,7 +787,7 @@ body.dragging {
     font-family: 'Fragment Mono', monospace;
     font-size: 8px;
     color: var(--text);
-    opacity: 0.35;
+    opacity: 0.5; /* increased contrast */
     letter-spacing: 0.2em;
     white-space: nowrap;
 }
@@ -799,9 +800,9 @@ body.dragging {
     font-size: 10px;
     font-weight: 700;
     color: var(--ember);
-    opacity: 0.15;
+    opacity: 0.35; /* increased contrast */
     padding: 4px 10px;
-    border: 1.5px solid var(--ember);
+    border: 2px solid var(--ember);
     border-radius: 4px;
     transform: rotate(15deg);
     text-transform: uppercase;
