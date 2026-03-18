@@ -316,7 +316,7 @@ body.dragging {
     transition: transform 0.42s cubic-bezier(0.2, 0, 0.2, 1);
     pointer-events: none;
     border-radius: 32px;
-    overflow: hidden;
+    overflow: visible;
     z-index: 1000;
     box-shadow: 0 25px 60px rgba(0, 0, 0, 0.2);
 }
@@ -685,7 +685,7 @@ body.dragging {
     transform: translateY(calc(-50% + 620px));
     transition: transform 0.38s cubic-bezier(0.2, 0, 0.2, 1);
     pointer-events: auto;
-    overflow: hidden;
+    overflow: visible;
 }
 
 #panel.panel-shell-pillar {
@@ -706,13 +706,13 @@ body.dragging {
     position: relative;
     display: flex;
     align-items: center;
-    margin: 24px 0 0;
+    margin: 32px -30px 0; /* reach panel edges (padding is 30px) */
     height: 24px;
 }
 
 .ticket-tear-line {
     flex: 1;
-    border-top: 2px dashed rgba(22, 10, 12, 0.18);
+    border-top: 2px dashed rgba(22, 10, 12, 0.25);
     margin: 0 12px;
 }
 
@@ -721,12 +721,13 @@ body.dragging {
     width: 24px;
     height: 24px;
     border-radius: 50%;
-    background: rgb(240, 236, 224);
+    background: rgb(240, 236, 224); /* parchment canvas background */
     top: 50%;
     transform: translateY(-50%);
     z-index: 10;
     flex-shrink: 0;
+    box-shadow: inset 0 0 4px rgba(0,0,0,0.05); /* subtle depth */
 }
 
-.ticket-notch-left  { left:  -30px; }
-.ticket-notch-right { right: -30px; }
+.ticket-notch-left  { left:  -14px; } /* centered on the left edge */
+.ticket-notch-right { right: -14px; } /* centered on the right edge */
