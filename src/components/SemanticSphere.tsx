@@ -1076,7 +1076,7 @@ export default function SemanticSphere({ files = [], edges = [] }: SemanticSpher
                             
                             {selectedFilm.streaming_providers && selectedFilm.streaming_providers.length > 0 && (
                                 <>
-                                    <div className="p-section" style={{ marginTop: '16px' }}>Guarda ora su</div>
+                                    <div className="p-section">Guarda ora su</div>
                                     <div className="p-streaming-list">
                                         {selectedFilm.streaming_providers.map((p: any) => (
                                             <a key={`${p.name}-${p.type}`} href={p.link} target="_blank" rel="noreferrer" className="p-streaming-badge">

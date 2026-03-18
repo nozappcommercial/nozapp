@@ -473,23 +473,23 @@ body.dragging {
     text-transform: uppercase;
     color: var(--text);
     opacity: 0.72;
-    margin: 20px 0 10px;
+    margin: 12px 0 6px;
 }
 
 .p-tags {
     display: flex;
     flex-wrap: wrap;
-    gap: 8px;
-    margin-bottom: 24px;
+    gap: 6px;
+    margin-bottom: 12px;
 }
 
 .p-tag {
     background: rgba(255, 255, 255, 0.1);
     border: 1px solid rgba(255, 255, 255, 0.15);
-    padding: 6px 14px;
+    padding: 4px 12px;
     border-radius: 16px;
     font-family: 'Fragment Mono', monospace;
-    font-size: 11px;
+    font-size: 10px;
     color: var(--text);
     backdrop-filter: blur(4px);
     -webkit-backdrop-filter: blur(4px);
@@ -498,18 +498,18 @@ body.dragging {
 .p-streaming-list {
     display: flex;
     flex-wrap: wrap;
-    gap: 8px;
-    margin-top: 8px;
-    margin-bottom: 24px;
+    gap: 6px;
+    margin-top: 4px;
+    margin-bottom: 12px;
 }
 
 .p-streaming-badge {
     background: rgba(255, 255, 255, 0.12);
     border: 1px solid rgba(255, 255, 255, 0.25);
-    padding: 5px 12px;
+    padding: 4px 10px;
     border-radius: 12px;
     font-family: 'Fragment Mono', monospace;
-    font-size: 10px;
+    font-size: 9px;
     font-weight: 700;
     color: var(--text);
     text-transform: capitalize;
