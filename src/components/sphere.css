@@ -496,7 +496,7 @@ body.dragging {
 
 .p-feedback-actions {
     margin-top: auto;
-    padding-top: 30px;
+    padding-top: 0;
     display: flex;
     gap: 10px;
 }
@@ -706,7 +706,7 @@ body.dragging {
     position: relative;
     display: flex;
     align-items: center;
-    margin: 24px 0 0;
+    margin: 12px 0 14px;
     height: 24px;
 }
 

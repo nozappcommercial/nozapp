@@ -1085,31 +1085,32 @@ export default function SemanticSphere({ files = [], edges = [] }: SemanticSpher
                                 </>
                             )}
                             
-                            {/* Actions */}
-                            <div className="ticket-tear">
-                                <div className="ticket-notch ticket-notch-left" />
-                                <div className="ticket-tear-line" />
-                                <div className="ticket-notch ticket-notch-right" />
-                            </div>
-                            <div className="p-feedback-actions">
-                                {[
-                                    { type: 'seen' as InteractionType, label: 'Visto', title: 'L\'ho visto' },
-                                    { type: 'liked' as InteractionType, label: 'Mi Piace', title: 'Mi è piaciuto' },
-                                    { type: 'ignored' as InteractionType, label: 'Ignora', title: 'Non mi interessa' }
-                                ].map((btn) => {
-                                    const isActive = selectedFilm && nodeInteractions[selectedFilm.id] === btn.type;
-                                    return (
-                                        <button 
-                                            key={btn.type}
-                                            className={`feedback-btn ${isActive ? 'active' : ''}`}
-                                            title={btn.title} 
-                                            onClick={() => selectedFilm && handleInteraction(selectedFilm.id, btn.type)}
-                                        >
-                                            {btn.label}
-                                        </button>
-                                    );
-                                })}
-                            </div>
+                        </div>
+
+                        {/* Actions */}
+                        <div className="ticket-tear">
+                            <div className="ticket-notch ticket-notch-left" />
+                            <div className="ticket-tear-line" />
+                            <div className="ticket-notch ticket-notch-right" />
+                        </div>
+                        <div className="p-feedback-actions">
+                            {[
+                                { type: 'seen' as InteractionType, label: 'Visto', title: 'L\'ho visto' },
+                                { type: 'liked' as InteractionType, label: 'Mi Piace', title: 'Mi è piaciuto' },
+                                { type: 'ignored' as InteractionType, label: 'Ignora', title: 'Non mi interessa' }
+                            ].map((btn) => {
+                                const isActive = selectedFilm && nodeInteractions[selectedFilm.id] === btn.type;
+                                return (
+                                    <button 
+                                        key={btn.type}
+                                        className={`feedback-btn ${isActive ? 'active' : ''}`}
+                                        title={btn.title} 
+                                        onClick={() => selectedFilm && handleInteraction(selectedFilm.id, btn.type)}
+                                    >
+                                        {btn.label}
+                                    </button>
+                                );
+                            })}
                         </div>
                     </div>
                 </div>
