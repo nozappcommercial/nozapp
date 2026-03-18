@@ -1073,6 +1073,17 @@ export default function SemanticSphere({ files = [], edges = [] }: SemanticSpher
                                 {selectedFilm.tags.map((t: string) => <div key={t} className="p-tag">{t}</div>)}
                             </div>
                             
+                            {selectedFilm.streaming_providers && selectedFilm.streaming_providers.length > 0 && (
+                                <>
+                                    <div className="p-section" style={{ marginTop: '16px' }}>Guarda ora su</div>
+                                    <div className="p-streaming-list">
+                                        {selectedFilm.streaming_providers.map((p: string) => (
+                                            <div key={p} className="p-streaming-badge">{p.replace(' video', ' Video').replace('disney', 'Disney+')}</div>
+                                        ))}
+                                    </div>
+                                </>
+                            )}
+                            
                             {selectedEdges.length > 0 && (
                                 <>
                                     <div className="p-section">Connessioni editoriali</div>
