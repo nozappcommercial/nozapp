@@ -1079,14 +1079,23 @@ export default function SemanticSphere({ files = [], edges = [], userSubscriptio
                                 <>
                                     <div className="p-section">Guarda ora su</div>
                                     <div className="p-streaming-list">
-                                        {selectedFilm.streaming_providers.map((p: any) => (
-                                            <a key={`${p.name}-${p.type}`} href={p.link} target="_blank" rel="noreferrer" className="p-streaming-badge">
-                                                <span className="p-streaming-name">{p.name}</span>
-                                                {p.type !== 'subscription' && (
-                                                    <span className="p-streaming-price">{p.price ? ` (${p.price})` : ` (${p.type === 'buy' ? 'Acquisto' : 'Noleggio'})`}</span>
-                                                )}
-                                            </a>
-                                        ))}
+                                        {selectedFilm.streaming_providers.map((p: any) => {
+                                            const isSubbed = userSubscriptions.includes(p.name);
+                                            return (
+                                                <a 
+                                                    key={`${p.name}-${p.type}`} 
+                                                    href={p.link} 
+                                                    target="_blank" 
+                                                    rel="noreferrer" 
+                                                    className={`p-streaming-badge ${isSubbed ? 'subscribed' : ''}`}
+                                                >
+                                                    <span className="p-streaming-name">{p.name}</span>
+                                                    {p.type !== 'subscription' && (
+                                                        <span className="p-streaming-price">{p.price ? ` (${p.price})` : ` (${p.type === 'buy' ? 'Acquisto' : 'Noleggio'})`}</span>
+                                                    )}
+                                                </a>
+                                            );
+                                        })}
                                     </div>
                                 </>
                             )}

@@ -521,12 +521,12 @@ body.dragging {
 }
 
 .p-streaming-badge.subscribed {
-    background: rgba(34, 197, 94, 0.15); /* Premium Green (Apple/Spotify-ish) */
-    border-color: rgba(34, 197, 94, 0.5);
-    color: #4ade80; /* Brighter green for contrast */
-    box-shadow: 0 0 12px rgba(34, 197, 94, 0.35), inset 0 0 4px rgba(34, 197, 94, 0.05);
+    background: rgba(34, 197, 94, 0.22); 
+    border-color: rgba(34, 197, 94, 0.8);
+    color: #064e3b; /* Deep emerald green for readability */
+    box-shadow: 0 0 14px rgba(34, 197, 94, 0.3), inset 0 0 4px rgba(255, 255, 255, 0.1);
     font-weight: 800;
-    text-shadow: 0 0 8px rgba(34, 197, 94, 0.4);
+    text-shadow: 0 0 4px rgba(34, 197, 94, 0.1);
 }
 
 .p-streaming-badge:hover {
