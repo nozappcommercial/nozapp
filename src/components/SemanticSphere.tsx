@@ -40,9 +40,10 @@ export interface FilmEdge {
 interface SemanticSphereProps {
     files?: FilmNode[];
     edges?: FilmEdge[];
+    userSubscriptions?: string[];
 }
 
-export default function SemanticSphere({ files = [], edges = [] }: SemanticSphereProps) {
+export default function SemanticSphere({ files = [], edges = [], userSubscriptions = [] }: SemanticSphereProps) {
     const containerRef = useRef<HTMLDivElement>(null);
     const mounted = useRef(false);
     

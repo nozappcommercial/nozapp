@@ -8,7 +8,22 @@ const FONTS_URL = "https://fonts.googleapis.com/css2?family=Cormorant+Garamond:i
 const MAX_PILLARS = 6;
 
 type Reaction = "loved" | "disliked" | "seen" | "unseen";
-type Phase = "welcome" | "step" | "confirm" | "done";
+type Phase = "welcome" | "step" | "confirm" | "streaming" | "done";
+
+const STREAMING_PLATFORMS = [
+  { id: "Netflix", name: "Netflix" },
+  { id: "Prime Video", name: "Prime Video" },
+  { id: "Disney+", name: "Disney+" },
+  { id: "Apple TV", name: "Apple TV" },
+  { id: "Now", name: "Now" },
+  { id: "Paramount+", name: "Paramount+" },
+  { id: "HBO Max", name: "HBO Max" },
+  { id: "Mubi", name: "Mubi" },
+  { id: "Crunchyroll", name: "Crunchyroll" },
+  { id: "Discovery+", name: "Discovery+" },
+  { id: "Infinity", name: "Infinity" },
+  { id: "RaiPlay", name: "RaiPlay" }
+];
 
 interface OnboardingFlowProps {
   films: OnboardingFilm[];
@@ -41,6 +56,7 @@ export default function OnboardingFlow({ films }: OnboardingFlowProps) {
   const [filmIndex, setFilmIndex] = useState(0);
   const [reactions, setReactions] = useState<Record<number, Reaction>>({});
   const [pillars, setPillars] = useState<OnboardingFilm[]>([]);
+  const [subscriptions, setSubscriptions] = useState<string[]>([]);
   const [cardAnim, setCardAnim] = useState("idle");
   const [stepDone, setStepDone] = useState(false);
   const [replacingPillar, setReplacingPillar] = useState<number | null>(null);
@@ -181,7 +197,7 @@ export default function OnboardingFlow({ films }: OnboardingFlowProps) {
           rank: i + 1,
         })),
         reactions, // Use the raw object {id: reaction}
-
+        streaming_subscriptions: subscriptions,
         timestamp: new Date().toISOString(),
       };
 
@@ -542,10 +558,10 @@ export default function OnboardingFlow({ films }: OnboardingFlowProps) {
 
                   <div className="ob-pyr-foot">
                     <div className="ob-pyr-count">
-                      {pillars.length} {pillars.length === 1 ? "pilastro" : "pilastri"} · pronto per la sfera
+                      {pillars.length} {pillars.length === 1 ? "pilastro" : "pilastri"} selezionati
                     </div>
-                    <button className="ob-btn-p" onClick={handleConfirm} disabled={saving}>
-                      {saving ? "Salvataggio..." : "Entra nella Sfera →"}
+                    <button className="ob-btn-p" onClick={() => pageTransition(() => setPhase("streaming"))}>
+                      Prosegui →
                     </button>
                   </div>
                 </div>
@@ -589,6 +605,48 @@ export default function OnboardingFlow({ films }: OnboardingFlowProps) {
             </div>
           );
         })()}
+
+        {/* ═══ STREAMING SUBSCRIPTIONS ═══ */}
+        {phase === "streaming" && (
+          <div className="ob-streaming-shell">
+            <div className="ob-welcome">
+              <div className="ob-eyebrow">Ultimo passo</div>
+              <h2 className="ob-w-title" style={{ fontSize: "clamp(36px, 8vw, 64px)", marginBottom: "20px" }}>Quali <em>abbonamenti</em><br />hai attivi?</h2>
+              <p className="ob-w-sub">Così potremo illuminare i film già disponibili<br />sulle tue piattaforme.</p>
+              
+              <div className="ob-streaming-grid">
+                {STREAMING_PLATFORMS.map(platform => {
+                  const isSelected = subscriptions.includes(platform.id);
+                  return (
+                    <button
+                      key={platform.id}
+                      className={`ob-streaming-btn ${isSelected ? 'active' : ''}`}
+                      onClick={() => {
+                        if (isSelected) {
+                          setSubscriptions(prev => prev.filter(id => id !== platform.id));
+                        } else {
+                          setSubscriptions(prev => [...prev, platform.id]);
+                        }
+                      }}
+                    >
+                      <div className="ob-streaming-check">{isSelected ? "✓" : "+"}</div>
+                      {platform.name}
+                    </button>
+                  );
+                })}
+              </div>
+
+              <div className="ob-streaming-foot" style={{ marginTop: "40px", display: "flex", flexDirection: "column", alignItems: "center", gap: "16px" }}>
+                <button className="ob-btn-p" onClick={handleConfirm} disabled={saving}>
+                  {saving ? "Creando la tua Sfera..." : "Entra nella Sfera →"}
+                </button>
+                <div style={{ fontFamily: "var(--ob-mono)", fontSize: "9px", letterSpacing: "0.1em", opacity: 0.5, textTransform: "uppercase" }}>
+                  I bottoni "Guarda ora su" si illumineranno per farti sapere quando un film è incluso.
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* ═══ DONE ═══ */}
         {phase === "done" && (
@@ -797,6 +855,65 @@ const ONBOARDING_CSS = `
   letter-spacing: 0.2em; text-transform: uppercase;
   color: var(--ob-ink-faint); margin: 0;
 }
+
+/* ── STREAMING PHASE ── */
+.ob-streaming-grid {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 12px;
+  max-width: 600px;
+  margin: 20px auto 0;
+}
+
+.ob-streaming-btn {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 20px;
+  background: transparent;
+  border: 1px solid var(--ob-cream-dark);
+  border-radius: 20px;
+  font-family: var(--ob-sans);
+  font-size: 14px;
+  color: var(--ob-ink-light);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  user-select: none;
+}
+
+.ob-streaming-btn:hover {
+  border-color: var(--ob-ink-faint);
+  background: rgba(0,0,0,0.02);
+}
+
+.ob-streaming-btn.active {
+  background: var(--ob-ink);
+  color: var(--ob-cream);
+  border-color: var(--ob-ink);
+}
+
+.ob-streaming-check {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  border: 1px solid currentColor;
+  font-size: 10px;
+  font-family: var(--ob-mono);
+  opacity: 0.5;
+  transition: opacity 0.2s;
+}
+
+.ob-streaming-btn.active .ob-streaming-check {
+  opacity: 1;
+  border-color: transparent;
+  background: var(--ob-gold);
+  color: var(--ob-ink);
+}
+
 
 .ob-card-wrap {
   display: flex; flex-direction: column;

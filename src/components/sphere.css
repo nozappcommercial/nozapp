@@ -517,7 +517,15 @@ body.dragging {
     backdrop-filter: blur(6px);
     -webkit-backdrop-filter: blur(6px);
     text-decoration: none;
-    transition: background 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
+    transition: background 0.2s ease, border-color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease, color 0.2s ease;
+}
+
+.p-streaming-badge.subscribed {
+    background: rgba(184, 137, 90, 0.2); /* Gold faint */
+    border-color: rgba(184, 137, 90, 0.6);
+    color: var(--gold);
+    box-shadow: 0 0 10px rgba(184, 137, 90, 0.3), inset 0 0 5px rgba(184, 137, 90, 0.1);
+    font-weight: 800;
 }
 
 .p-streaming-badge:hover {

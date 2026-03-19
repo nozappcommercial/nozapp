@@ -32,9 +32,18 @@ interface FilmWithRelations {
 export async function getPersonalizedGraph() {
     const supabase = await createClient();
 
-    // 1. AUTHENTICATION
+    // 1. AUTHENTICATION & PROFILE SETTINGS
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) throw new Error("Unauthorized");
+    
+    // Fetch streaming subscriptions
+    const { data: userProfile } = await supabase
+        .from('users')
+        .select('streaming_subscriptions')
+        .eq('id', user.id)
+        .single();
+    
+    const userSubscriptions: string[] = userProfile?.streaming_subscriptions || [];
 
     // 2. FETCH USER INTERACTIONS (Feedback)
     // We load seen/liked/ignored status upfront to color nodes correctly.
@@ -220,6 +229,6 @@ export async function getPersonalizedGraph() {
         }
     }
 
-    return { nodes, edges };
+    return { nodes, edges, subscriptions: userSubscriptions };
 }
 

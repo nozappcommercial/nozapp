@@ -8,6 +8,7 @@ const OnboardingSchema = z.object({
         rank: z.number().int().min(1)
     })).min(1),
     reactions: z.record(z.string(), z.any()).optional(),
+    streaming_subscriptions: z.array(z.string()).optional(),
     timestamp: z.string().optional()
 });
 
@@ -51,7 +52,7 @@ export async function POST(request: Request) {
             return NextResponse.json({ error: "Invalid payload", details: parsed.error.format() }, { status: 400 });
         }
 
-        const { pillars, reactions, timestamp } = parsed.data;
+        const { pillars, reactions, streaming_subscriptions, timestamp } = parsed.data;
 
         // 2. Delete old pillars and insert new ones
         console.log(`[Onboarding] Saving ${pillars.length} pillars for user ${user.id}`);
@@ -108,7 +109,8 @@ export async function POST(request: Request) {
             .from("users")
             .upsert({ 
                 id: user.id, 
-                onboarding_complete: true 
+                onboarding_complete: true,
+                streaming_subscriptions: streaming_subscriptions || []
             }, { onConflict: "id" })
             .select());
 
