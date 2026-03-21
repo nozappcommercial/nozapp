@@ -1,7 +1,10 @@
 "use client";
 import React, { useEffect, useState, useCallback } from 'react';
-import { getProfileData, type ProfileData } from '@/lib/actions/profile_actions';
+import { getProfileData, type ProfileData, type PillarFilm } from '@/lib/actions/profile_actions';
 import { createClient } from '@/lib/supabase/client';
+import ProfilePillars from './ProfilePillars';
+import ProfileStreaming from './ProfileStreaming';
+import ProfileLovedFilms from './ProfileLovedFilms';
 import './profile.css';
 
 /**
@@ -9,6 +12,8 @@ import './profile.css';
  * ─────────────
  * Client component that renders the user profile panel as an overlay
  * on top of the Semantic Sphere. Fetches data via server actions.
+ * Integrates sub-components: ProfilePillars (P1), ProfileStreaming (P2),
+ * ProfileLovedFilms (P3).
  */
 
 interface ProfileModalProps {
@@ -32,6 +37,13 @@ export default function ProfileModal({ isOpen, onClose }: ProfileModalProps) {
                 .finally(() => setLoading(false));
         }
     }, [isOpen, data]);
+
+    // Reset state on open
+    useEffect(() => {
+        if (isOpen) {
+            setShowConfirm(false);
+        }
+    }, [isOpen]);
 
     // Escape key handler
     const handleKeyDown = useCallback((e: KeyboardEvent) => {
@@ -88,6 +100,16 @@ export default function ProfileModal({ isOpen, onClose }: ProfileModalProps) {
         window.location.href = '/onboarding';
     };
 
+    // Pillars reorder callback (optimistic update in data state)
+    const handlePillarReorder = useCallback((newPillars: PillarFilm[]) => {
+        setData(prev => prev ? { ...prev, pillars: newPillars } : prev);
+    }, []);
+
+    // Streaming services change callback (optimistic update)
+    const handleStreamingChange = useCallback((services: string[]) => {
+        setData(prev => prev ? { ...prev, streamingServices: services } : prev);
+    }, []);
+
     return (
         <>
             {/* BACKDROP */}
@@ -119,7 +141,7 @@ export default function ProfileModal({ isOpen, onClose }: ProfileModalProps) {
                 ) : (
                     <>
                         <div className="prf-scroll">
-                            {/* IDENTITY */}
+                            {/* ─── IDENTITY ───────────────────────────── */}
                             <div className="prf-identity">
                                 <div className="prf-avatar">{getInitials(data.email)}</div>
                                 <div className="prf-id-info">
@@ -128,37 +150,16 @@ export default function ProfileModal({ isOpen, onClose }: ProfileModalProps) {
                                 </div>
                             </div>
 
-                            {/* PILASTRI — placeholder for P1 */}
+                            {/* ─── PILASTRI (P1) ──────────────────────── */}
                             <div className="prf-section prf-anim-1">
                                 <div className="prf-section-label">I tuoi pilastri</div>
                             </div>
-                            <div className="prf-pillars-grid prf-anim-1">
-                                {data.pillars.map((p, i) => (
-                                    <div key={p.id} className="prf-pillar-card">
-                                        <div className={`prf-pillar-rank ${i === 0 ? 'vertex' : ''}`}>
-                                            {i === 0 ? '▲ vertice' : `n° ${i + 1}`}
-                                        </div>
-                                        <div className="prf-pillar-poster">
-                                            <div
-                                                className="prf-pillar-poster-bg"
-                                                style={{
-                                                    background: p.poster_url
-                                                        ? `url(${p.poster_url}) center/cover`
-                                                        : `linear-gradient(155deg, #0d1b35 0%, #1a3a6b 55%, #0d1b35 100%)`
-                                                }}
-                                            >
-                                                {!p.poster_url && (
-                                                    <span className="prf-pillar-poster-title">{p.title}</span>
-                                                )}
-                                            </div>
-                                        </div>
-                                        <div className="prf-pillar-name">{p.title}</div>
-                                        <div className="prf-pillar-meta">{p.director} · {p.year}</div>
-                                    </div>
-                                ))}
-                            </div>
+                            <ProfilePillars
+                                pillars={data.pillars}
+                                onReorder={handlePillarReorder}
+                            />
 
-                            {/* STATS */}
+                            {/* ─── STATISTICHE (P2) ────────────────────── */}
                             <div className="prf-section prf-anim-2">
                                 <div className="prf-section-label">La tua sfera</div>
                             </div>
@@ -175,33 +176,20 @@ export default function ProfileModal({ isOpen, onClose }: ProfileModalProps) {
                                 </div>
                             </div>
 
-                            {/* STREAMING — placeholder chips, P2 will add toggle logic */}
+                            {/* ─── STREAMING (P2) ──────────────────────── */}
                             <div className="prf-section prf-anim-3">
                                 <div className="prf-section-label">I tuoi servizi streaming</div>
                             </div>
-                            <div className="prf-stream-hint prf-anim-3">
-                                Seleziona i servizi a cui sei abbonato
-                            </div>
-                            <div className="prf-streaming-grid prf-anim-3">
-                                {/* Will be replaced by ProfileStreaming component in P2 */}
-                            </div>
+                            <ProfileStreaming
+                                activeServices={data.streamingServices}
+                                onChange={handleStreamingChange}
+                            />
 
-                            {/* LOVED FILMS — placeholder, P3 will add carousel */}
-                            {data.lovedFilms.length > 0 && (
-                                <>
-                                    <div className="prf-section prf-anim-4">
-                                        <div className="prf-section-label">Altri film amati</div>
-                                    </div>
-                                    <div className="prf-loved-wrap prf-anim-4">
-                                        <div className="prf-loved-carousel">
-                                            {/* Will be replaced by ProfileLovedFilms in P3 */}
-                                        </div>
-                                    </div>
-                                </>
-                            )}
+                            {/* ─── FILM AMATI (P3) ─────────────────────── */}
+                            <ProfileLovedFilms films={data.lovedFilms} />
                         </div>
 
-                        {/* FOOTER */}
+                        {/* ─── FOOTER ───────────────────────────────── */}
                         <div className="prf-footer">
                             <button className="prf-btn-redo" onClick={() => setShowConfirm(true)}>
                                 Rifai l&apos;onboarding
