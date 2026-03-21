@@ -10,10 +10,10 @@ import './profile.css';
 /**
  * PROFILE MODAL
  * ─────────────
- * Client component that renders the user profile panel as an overlay
- * on top of the Semantic Sphere. Fetches data via server actions.
- * Integrates sub-components: ProfilePillars (P1), ProfileStreaming (P2),
- * ProfileLovedFilms (P3).
+ * Two-column layout that shows all profile content on a single screen.
+ * Left column: Pillars grid (3×2 with FLIP swap)
+ * Right column: Stats + Streaming + Loved Films
+ * On mobile: stacks vertically with scroll.
  */
 
 interface ProfileModalProps {
@@ -40,19 +40,13 @@ export default function ProfileModal({ isOpen, onClose }: ProfileModalProps) {
 
     // Reset state on open
     useEffect(() => {
-        if (isOpen) {
-            setShowConfirm(false);
-        }
+        if (isOpen) setShowConfirm(false);
     }, [isOpen]);
 
     // Escape key handler
     const handleKeyDown = useCallback((e: KeyboardEvent) => {
         if (e.key === 'Escape') {
-            if (showConfirm) {
-                setShowConfirm(false);
-            } else {
-                onClose();
-            }
+            showConfirm ? setShowConfirm(false) : onClose();
         }
     }, [onClose, showConfirm]);
 
@@ -63,7 +57,6 @@ export default function ProfileModal({ isOpen, onClose }: ProfileModalProps) {
         }
     }, [isOpen, handleKeyDown]);
 
-    // Format member since date
     const formatMemberSince = (iso: string): string => {
         const d = new Date(iso);
         const months = ['gennaio', 'febbraio', 'marzo', 'aprile', 'maggio', 'giugno',
@@ -71,17 +64,13 @@ export default function ProfileModal({ isOpen, onClose }: ProfileModalProps) {
         return `Membro da ${months[d.getMonth()]} ${d.getFullYear()}`;
     };
 
-    // Get initials from email
     const getInitials = (email: string): string => {
         const name = email.split('@')[0];
         const parts = name.split(/[._-]/);
-        if (parts.length >= 2) {
-            return (parts[0][0] + parts[1][0]).toUpperCase();
-        }
+        if (parts.length >= 2) return (parts[0][0] + parts[1][0]).toUpperCase();
         return name.slice(0, 2).toUpperCase();
     };
 
-    // Logout handler
     const handleLogout = async () => {
         if (isLoggingOut) return;
         setIsLoggingOut(true);
@@ -95,17 +84,12 @@ export default function ProfileModal({ isOpen, onClose }: ProfileModalProps) {
         }
     };
 
-    // Redo onboarding
-    const handleRedoOnboarding = () => {
-        window.location.href = '/onboarding';
-    };
+    const handleRedoOnboarding = () => { window.location.href = '/onboarding'; };
 
-    // Pillars reorder callback (optimistic update in data state)
     const handlePillarReorder = useCallback((newPillars: PillarFilm[]) => {
         setData(prev => prev ? { ...prev, pillars: newPillars } : prev);
     }, []);
 
-    // Streaming services change callback (optimistic update)
     const handleStreamingChange = useCallback((services: string[]) => {
         setData(prev => prev ? { ...prev, streamingServices: services } : prev);
     }, []);
@@ -113,10 +97,7 @@ export default function ProfileModal({ isOpen, onClose }: ProfileModalProps) {
     return (
         <>
             {/* BACKDROP */}
-            <div
-                className={`prf-backdrop ${isOpen ? 'open' : ''}`}
-                onClick={onClose}
-            />
+            <div className={`prf-backdrop ${isOpen ? 'open' : ''}`} onClick={onClose} />
 
             {/* MODAL */}
             <div className={`prf-modal ${isOpen ? 'open' : ''}`}>
@@ -140,56 +121,62 @@ export default function ProfileModal({ isOpen, onClose }: ProfileModalProps) {
                     </div>
                 ) : (
                     <>
-                        <div className="prf-scroll">
-                            {/* ─── IDENTITY ───────────────────────────── */}
-                            <div className="prf-identity">
-                                <div className="prf-avatar">{getInitials(data.email)}</div>
-                                <div className="prf-id-info">
-                                    <div className="prf-id-email">{data.email}</div>
-                                    <div className="prf-id-since">{formatMemberSince(data.memberSince)}</div>
-                                </div>
+                        {/* ─── IDENTITY (top bar, full width) ─── */}
+                        <div className="prf-identity">
+                            <div className="prf-avatar">{getInitials(data.email)}</div>
+                            <div className="prf-id-info">
+                                <div className="prf-id-email">{data.email}</div>
+                                <div className="prf-id-since">{formatMemberSince(data.memberSince)}</div>
                             </div>
-
-                            {/* ─── PILASTRI (P1) ──────────────────────── */}
-                            <div className="prf-section prf-anim-1">
-                                <div className="prf-section-label">I tuoi pilastri</div>
-                            </div>
-                            <ProfilePillars
-                                pillars={data.pillars}
-                                onReorder={handlePillarReorder}
-                            />
-
-                            {/* ─── STATISTICHE (P2) ────────────────────── */}
-                            <div className="prf-section prf-anim-2">
-                                <div className="prf-section-label">La tua sfera</div>
-                            </div>
-                            <div className="prf-stats prf-anim-2">
-                                <div className="prf-stat">
-                                    <div className="prf-stat-num">{data.sphereStats.affinita}</div>
-                                    <div className="prf-stat-label">Affinità</div>
-                                    <div className="prf-stat-desc">Shell 1</div>
-                                </div>
-                                <div className="prf-stat">
-                                    <div className="prf-stat-num">{data.sphereStats.scoperta}</div>
-                                    <div className="prf-stat-label">Scoperta</div>
-                                    <div className="prf-stat-desc">Shell 2</div>
-                                </div>
-                            </div>
-
-                            {/* ─── STREAMING (P2) ──────────────────────── */}
-                            <div className="prf-section prf-anim-3">
-                                <div className="prf-section-label">I tuoi servizi streaming</div>
-                            </div>
-                            <ProfileStreaming
-                                activeServices={data.streamingServices}
-                                onChange={handleStreamingChange}
-                            />
-
-                            {/* ─── FILM AMATI (P3) ─────────────────────── */}
-                            <ProfileLovedFilms films={data.lovedFilms} />
                         </div>
 
-                        {/* ─── FOOTER ───────────────────────────────── */}
+                        {/* ─── TWO-COLUMN BODY ─── */}
+                        <div className="prf-body">
+                            {/* LEFT COLUMN: Pillars */}
+                            <div className="prf-col-left prf-anim-1">
+                                <div className="prf-section">
+                                    <div className="prf-section-label">I tuoi pilastri</div>
+                                </div>
+                                <ProfilePillars
+                                    pillars={data.pillars}
+                                    onReorder={handlePillarReorder}
+                                />
+                            </div>
+
+                            {/* RIGHT COLUMN: Stats + Streaming + Loved */}
+                            <div className="prf-col-right">
+                                {/* Stats */}
+                                <div className="prf-section prf-anim-2">
+                                    <div className="prf-section-label">La tua sfera</div>
+                                </div>
+                                <div className="prf-stats prf-anim-2">
+                                    <div className="prf-stat">
+                                        <div className="prf-stat-num">{data.sphereStats.affinita}</div>
+                                        <div className="prf-stat-label">Affinità</div>
+                                        <div className="prf-stat-desc">Shell 1</div>
+                                    </div>
+                                    <div className="prf-stat">
+                                        <div className="prf-stat-num">{data.sphereStats.scoperta}</div>
+                                        <div className="prf-stat-label">Scoperta</div>
+                                        <div className="prf-stat-desc">Shell 2</div>
+                                    </div>
+                                </div>
+
+                                {/* Streaming */}
+                                <div className="prf-section prf-anim-3">
+                                    <div className="prf-section-label">I tuoi servizi streaming</div>
+                                </div>
+                                <ProfileStreaming
+                                    activeServices={data.streamingServices}
+                                    onChange={handleStreamingChange}
+                                />
+
+                                {/* Loved Films */}
+                                <ProfileLovedFilms films={data.lovedFilms} />
+                            </div>
+                        </div>
+
+                        {/* ─── FOOTER (bottom bar, full width) ─── */}
                         <div className="prf-footer">
                             <button className="prf-btn-redo" onClick={() => setShowConfirm(true)}>
                                 Rifai l&apos;onboarding
