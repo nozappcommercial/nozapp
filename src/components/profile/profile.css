@@ -49,25 +49,33 @@
     backdrop-filter: blur(20px) saturate(0.7);
     -webkit-backdrop-filter: blur(20px) saturate(0.7);
     z-index: 100; opacity: 0; pointer-events: none;
-    transition: opacity 0.4s ease;
+    transition: opacity 0.5s cubic-bezier(0.22, 1, 0.36, 1);
 }
 .prf-backdrop.open { opacity: 1; pointer-events: auto; }
 
 /* ─── MODAL CONTAINER ─────────────────────────────────────────── */
 .prf-modal {
     position: fixed; top: 50%; left: 50%;
-    transform: translate(-50%, calc(-50% + 22px));
+    transform: translate(-50%, calc(-50% + 28px)) scale(0.96);
     width: min(520px, calc(100vw - 32px));
     max-height: calc(100vh - 80px);
     background: var(--prf-surface);
     border: 1px solid var(--prf-gold-border);
-    box-shadow: 0 40px 100px rgba(0,0,0,0.2), 0 8px 24px rgba(0,0,0,0.1);
+    box-shadow: 0 40px 100px rgba(0,0,0,0.12), 0 8px 24px rgba(0,0,0,0.06);
     z-index: 110; opacity: 0; pointer-events: none;
-    transition: opacity 0.36s ease, transform 0.36s ease;
+    filter: blur(4px);
+    transition:
+        opacity 0.45s cubic-bezier(0.22, 1, 0.36, 1),
+        transform 0.5s cubic-bezier(0.22, 1, 0.36, 1),
+        filter 0.45s cubic-bezier(0.22, 1, 0.36, 1),
+        box-shadow 0.5s ease;
     display: flex; flex-direction: column; overflow: hidden;
 }
 .prf-modal.open {
-    opacity: 1; pointer-events: auto; transform: translate(-50%, -50%);
+    opacity: 1; pointer-events: auto;
+    transform: translate(-50%, -50%) scale(1);
+    filter: blur(0);
+    box-shadow: 0 40px 100px rgba(0,0,0,0.2), 0 8px 24px rgba(0,0,0,0.1);
 }
 
 /* Noise texture overlay */
@@ -445,24 +453,26 @@
 
 /* ─── ENTER ANIMATIONS ────────────────────────────────────────── */
 @keyframes prf-fadeUp {
-    from { opacity: 0; transform: translateY(10px); }
-    to   { opacity: 1; transform: none; }
+    from { opacity: 0; transform: translateY(14px); filter: blur(2px); }
+    to   { opacity: 1; transform: none; filter: blur(0); }
 }
-.prf-modal.open .prf-identity  { animation: prf-fadeUp 0.38s 0.06s ease both; }
-.prf-modal.open .prf-anim-1    { animation: prf-fadeUp 0.38s 0.12s ease both; }
-.prf-modal.open .prf-anim-2    { animation: prf-fadeUp 0.38s 0.18s ease both; }
-.prf-modal.open .prf-anim-3    { animation: prf-fadeUp 0.38s 0.24s ease both; }
-.prf-modal.open .prf-anim-4    { animation: prf-fadeUp 0.38s 0.30s ease both; }
-.prf-modal.open .prf-footer    { animation: prf-fadeUp 0.38s 0.34s ease both; }
+.prf-modal.open .prf-identity  { animation: prf-fadeUp 0.5s 0.10s cubic-bezier(0.22, 1, 0.36, 1) both; }
+.prf-modal.open .prf-anim-1    { animation: prf-fadeUp 0.5s 0.16s cubic-bezier(0.22, 1, 0.36, 1) both; }
+.prf-modal.open .prf-anim-2    { animation: prf-fadeUp 0.5s 0.22s cubic-bezier(0.22, 1, 0.36, 1) both; }
+.prf-modal.open .prf-anim-3    { animation: prf-fadeUp 0.5s 0.28s cubic-bezier(0.22, 1, 0.36, 1) both; }
+.prf-modal.open .prf-anim-4    { animation: prf-fadeUp 0.5s 0.34s cubic-bezier(0.22, 1, 0.36, 1) both; }
+.prf-modal.open .prf-footer    { animation: prf-fadeUp 0.5s 0.38s cubic-bezier(0.22, 1, 0.36, 1) both; }
 
 /* ─── MOBILE ──────────────────────────────────────────────────── */
 @media (max-width: 540px) {
     .prf-modal {
         top: auto; left: 0; right: 0; bottom: 0; width: 100%;
-        max-height: 90vh; transform: translateY(28px);
+        max-height: 90vh;
+        transform: translateY(40px) scale(1);
+        filter: blur(2px);
         border-left: none; border-right: none; border-bottom: none;
     }
-    .prf-modal.open { transform: translateY(0); }
+    .prf-modal.open { transform: translateY(0) scale(1); filter: blur(0); }
     .prf-identity, .prf-section, .prf-pillars-grid,
     .prf-save-flash, .prf-stats, .prf-stream-hint, .prf-streaming-grid,
     .prf-loved-wrap, .prf-footer { padding-left: 20px; padding-right: 20px; }
