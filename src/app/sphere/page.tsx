@@ -1,5 +1,5 @@
 import { getPersonalizedGraph } from "@/app/actions/graph";
-import SemanticSphere from "@/components/SemanticSphere";
+import SphereWithProfile from "@/components/profile/SphereWithProfile";
 import EditorialSection from "@/components/home/EditorialSection";
 import NowShowingCarousel from "@/components/home/NowShowingCarousel";
 import Footer from "@/components/layout/Footer";
@@ -45,7 +45,7 @@ export default async function Home() {
   return (
     <main className="w-full min-h-screen m-0 p-0 relative">
       <section id="sfera" className="relative w-full h-[100vh] overflow-hidden">
-        <SemanticSphere files={nodes} edges={cappedEdges} userSubscriptions={subscriptions} />
+        <SphereWithProfile nodes={nodes} edges={cappedEdges} subscriptions={subscriptions} />
       </section>
       <EditorialSection />
       <NowShowingCarousel movies={carouselMovies} />
