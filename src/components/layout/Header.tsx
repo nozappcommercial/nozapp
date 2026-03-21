@@ -5,7 +5,6 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { Home, Newspaper, Clapperboard, LogOut, User } from 'lucide-react';
 import { createClient } from '@/lib/supabase/client';
-import ProfileModal from '@/components/profile/ProfileModal';
 import styles from './Header.module.css';
 
 const NAV_ITEMS = [
@@ -23,10 +22,23 @@ export default function Header() {
     const navContainerRef = useRef<HTMLElement>(null);
     const headerRef = useRef<HTMLElement>(null);
     const pathname = usePathname();
-    const [isProfileOpen, setIsProfileOpen] = useState(false);
+    const [isLoggingOut, setIsLoggingOut] = useState(false);
 
     // Hide header on login and onboarding pages
     if (pathname === '/login' || pathname === '/onboarding') return null;
+
+    const handleLogout = async () => {
+        if (isLoggingOut) return;
+        setIsLoggingOut(true);
+        try {
+            const supabase = createClient();
+            await supabase.auth.signOut();
+            window.location.href = '/login';
+        } catch (error) {
+            console.error('Logout error:', error);
+            setIsLoggingOut(false);
+        }
+    };
 
     // Toggle this to test experimental vertical layout
     const isVerticalLayout = true;
@@ -242,12 +254,16 @@ export default function Header() {
             </nav>
 
             <div className={`${styles.headerActions} ${isVertical ? styles.verticalActions : ''}`}>
-                <button 
-                    className={styles.actionBtn} 
-                    title="Profilo"
-                    onClick={() => setIsProfileOpen(true)}
-                >
+                <button className={styles.actionBtn} title="Profilo" onClick={() => window.dispatchEvent(new Event('open-profile'))}>
                     <User size={14} strokeWidth={1.1} />
+                </button>
+                <button
+                    className={`${styles.actionBtn} ${isLoggingOut ? styles.loading : ''}`}
+                    title="Logout"
+                    onClick={handleLogout}
+                    disabled={isLoggingOut}
+                >
+                    <LogOut size={14} strokeWidth={1.1} />
                 </button>
             </div>
         </React.Fragment>
@@ -271,8 +287,6 @@ export default function Header() {
                     {renderContent(true)}
                 </header>
             )}
-
-            <ProfileModal isOpen={isProfileOpen} onClose={() => setIsProfileOpen(false)} />
         </>
     );
 }

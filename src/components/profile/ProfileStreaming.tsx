@@ -7,6 +7,9 @@ import { saveStreamingServices } from '@/lib/actions/profile_actions';
  * ─────────────────
  * 4-column grid of streaming service chips with toggle interaction.
  * Uses optimistic local state + debounced server save (800ms).
+ *
+ * The onChange callback is deferred via setTimeout to avoid the React
+ * "Cannot update a component while rendering a different component" error.
  */
 
 interface ProfileStreamingProps {
@@ -28,6 +31,10 @@ const STREAMING_SERVICES = [
 export default function ProfileStreaming({ activeServices: initialServices, onChange }: ProfileStreamingProps) {
     const [active, setActive] = useState<Set<string>>(new Set(initialServices));
     const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+    const onChangeRef = useRef(onChange);
+
+    // Keep ref in sync so the timeout always calls the latest onChange
+    useEffect(() => { onChangeRef.current = onChange; }, [onChange]);
 
     // Sync with parent when prop changes
     useEffect(() => {
@@ -42,8 +49,8 @@ export default function ProfileStreaming({ activeServices: initialServices, onCh
 
             const arr = Array.from(next);
 
-            // Notify parent immediately (optimistic)
-            onChange(arr);
+            // Defer the parent update to avoid setState-during-render
+            queueMicrotask(() => onChangeRef.current(arr));
 
             // Debounce the server call
             if (debounceRef.current) clearTimeout(debounceRef.current);
@@ -55,7 +62,7 @@ export default function ProfileStreaming({ activeServices: initialServices, onCh
 
             return next;
         });
-    }, [onChange]);
+    }, []);
 
     return (
         <>

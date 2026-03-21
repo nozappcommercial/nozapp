@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import SemanticSphere, { type FilmNode, type FilmEdge } from '@/components/SemanticSphere';
 import ProfileModal from '@/components/profile/ProfileModal';
 
@@ -7,8 +7,8 @@ import ProfileModal from '@/components/profile/ProfileModal';
  * SPHERE WITH PROFILE WRAPPER
  * ───────────────────────────
  * Client component that wraps SemanticSphere and ProfileModal.
- * Manages the isProfileOpen state and renders the profile trigger button.
- * The button is positioned in the top-right corner of the sphere viewport.
+ * Listens for the 'open-profile' custom event dispatched by the Header's User icon.
+ * When the modal is open, it locks body scroll to prevent the sphere from moving.
  */
 
 interface SphereWithProfileProps {
@@ -20,27 +20,26 @@ interface SphereWithProfileProps {
 export default function SphereWithProfile({ nodes, edges, subscriptions }: SphereWithProfileProps) {
     const [isProfileOpen, setIsProfileOpen] = useState(false);
 
+    // Listen for the global 'open-profile' event dispatched by the Header
+    useEffect(() => {
+        const handleOpen = () => setIsProfileOpen(true);
+        window.addEventListener('open-profile', handleOpen);
+        return () => window.removeEventListener('open-profile', handleOpen);
+    }, []);
+
+    // Lock body scroll when modal is open to prevent sphere interaction
+    useEffect(() => {
+        if (isProfileOpen) {
+            document.body.style.overflow = 'hidden';
+        } else {
+            document.body.style.overflow = '';
+        }
+        return () => { document.body.style.overflow = ''; };
+    }, [isProfileOpen]);
+
     return (
         <>
             <SemanticSphere files={nodes} edges={edges} userSubscriptions={subscriptions} />
-
-            {/* Profile trigger button — floats above sphere */}
-            <button
-                className="prf-btn-open"
-                style={{
-                    position: 'absolute',
-                    top: 28,
-                    right: 40,
-                    zIndex: 50,
-                }}
-                onClick={() => setIsProfileOpen(true)}
-            >
-                <div className="prf-btn-avatar-sm">
-                    {/* Initials will show once data loads; "PR" is just a placeholder */}
-                    PR
-                </div>
-                <span>Profilo</span>
-            </button>
 
             {/* Profile modal overlay */}
             <ProfileModal
