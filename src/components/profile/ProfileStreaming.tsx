@@ -1,15 +1,14 @@
 "use client";
 import React, { useState, useRef, useCallback, useEffect } from 'react';
+import Image from 'next/image';
 import { saveStreamingServices } from '@/lib/actions/profile_actions';
 
 /**
  * PROFILE STREAMING
  * ─────────────────
  * 4-column grid of streaming service chips with toggle interaction.
- * Uses optimistic local state + debounced server save (800ms).
- *
- * The onChange callback is deferred via setTimeout to avoid the React
- * "Cannot update a component while rendering a different component" error.
+ * Uses real platform logos from /public/logos/.
+ * Optimistic local state + debounced server save (800ms).
  */
 
 interface ProfileStreamingProps {
@@ -18,14 +17,14 @@ interface ProfileStreamingProps {
 }
 
 const STREAMING_SERVICES = [
-    { id: 'Netflix',     name: 'Netflix',     cls: 'prf-logo-netflix', text: 'N'     },
-    { id: 'Prime Video', name: 'Prime Video', cls: 'prf-logo-prime',   text: 'prime' },
-    { id: 'Disney+',     name: 'Disney+',     cls: 'prf-logo-disney',  text: 'D+'    },
-    { id: 'Apple TV+',   name: 'Apple TV+',   cls: 'prf-logo-apple',   text: '▶ TV'  },
-    { id: 'MUBI',        name: 'MUBI',        cls: 'prf-logo-mubi',    text: 'MUBI'  },
-    { id: 'HBO Max',     name: 'Max',         cls: 'prf-logo-max',     text: 'max'   },
-    { id: 'Sky',         name: 'Sky',         cls: 'prf-logo-sky',     text: 'Sky'   },
-    { id: 'RaiPlay',     name: 'RaiPlay',     cls: 'prf-logo-rai',     text: 'Rai'   },
+    { id: 'Netflix',     name: 'Netflix',     logo: '/logos/Netflix_2015_logo.svg' },
+    { id: 'Prime Video', name: 'Prime Video', logo: '/logos/Prime_Video_logo_(2024).svg' },
+    { id: 'Disney+',     name: 'Disney+',     logo: '/logos/Disney+_(black)_logo.svg' },
+    { id: 'Apple TV+',   name: 'Apple TV+',   logo: '/logos/Apple_TV_Plus_Logo.svg' },
+    { id: 'MUBI',        name: 'MUBI',        logo: '/logos/Mubi_logo.svg' },
+    { id: 'HBO Max',     name: 'Max',         logo: '/logos/HBO_Max_Logo_(October_2019_Print).svg' },
+    { id: 'Sky',         name: 'Sky',         logo: '/logos/Sky_Group_logo_2020.svg' },
+    { id: 'RaiPlay',     name: 'RaiPlay',     logo: '/logos/RaiPlay.svg' },
 ];
 
 export default function ProfileStreaming({ activeServices: initialServices, onChange }: ProfileStreamingProps) {
@@ -33,10 +32,8 @@ export default function ProfileStreaming({ activeServices: initialServices, onCh
     const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
     const onChangeRef = useRef(onChange);
 
-    // Keep ref in sync so the timeout always calls the latest onChange
     useEffect(() => { onChangeRef.current = onChange; }, [onChange]);
 
-    // Sync with parent when prop changes
     useEffect(() => {
         setActive(new Set(initialServices));
     }, [initialServices]);
@@ -48,11 +45,8 @@ export default function ProfileStreaming({ activeServices: initialServices, onCh
             else next.add(id);
 
             const arr = Array.from(next);
-
-            // Defer the parent update to avoid setState-during-render
             queueMicrotask(() => onChangeRef.current(arr));
 
-            // Debounce the server call
             if (debounceRef.current) clearTimeout(debounceRef.current);
             debounceRef.current = setTimeout(() => {
                 saveStreamingServices(arr).catch(err =>
@@ -76,7 +70,15 @@ export default function ProfileStreaming({ activeServices: initialServices, onCh
                         className={`prf-stream-chip ${active.has(s.id) ? 'active' : ''}`}
                         onClick={() => handleToggle(s.id)}
                     >
-                        <div className={`prf-stream-logo ${s.cls}`}>{s.text}</div>
+                        <div className="prf-stream-logo">
+                            <Image
+                                src={s.logo}
+                                alt={s.name}
+                                width={44}
+                                height={26}
+                                className="prf-stream-logo-img"
+                            />
+                        </div>
                         <div className="prf-stream-name">{s.name}</div>
                     </div>
                 ))}
