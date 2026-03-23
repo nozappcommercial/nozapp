@@ -170,7 +170,18 @@ export async function getProfileData(): Promise<ProfileData> {
 import { z } from "zod";
 
 const ReorderSchema = z.array(z.number().int().positive());
-const StreamingSchema = z.array(z.string().min(1).max(50));
+const StreamingSchema = z.array(
+    z.enum([
+        'Netflix',
+        'Prime Video',
+        'Disney+',
+        'Apple TV+',
+        'MUBI',
+        'HBO Max',
+        'Sky',
+        'RaiPlay'
+    ])
+);
 
 export async function reorderPillars(ids: number[]): Promise<void> {
     const parsed = ReorderSchema.safeParse(ids);
