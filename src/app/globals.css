@@ -11,6 +11,10 @@
 
 
 @layer base {
+  html,
+  body {
+    background-color: #F7F5EA;
+  }
   :root {
     --font-serif: var(--font-cormorant), 'Cormorant Garamond', Georgia, serif;
     --font-mono: var(--font-fragment), 'Fragment Mono', monospace;
