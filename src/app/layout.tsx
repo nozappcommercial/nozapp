@@ -1,5 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Cormorant_Garamond, Fragment_Mono } from "next/font/google";
+import { Analytics } from "@vercel/analytics/react";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 import "./globals.css";
 
 const cormorantGaramond = Cormorant_Garamond({
@@ -58,6 +60,8 @@ export default function RootLayout({
       >
         <Header />
         {children}
+        <Analytics />
+        <SpeedInsights />
       </body>
     </html>
   );
