@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Cormorant_Garamond, Fragment_Mono } from "next/font/google";
 import { Analytics } from "@vercel/analytics/react";
 import { SpeedInsights } from "@vercel/speed-insights/next";
+import SplashScreen from "@/components/ui/SplashScreen";
 import "./globals.css";
 
 const cormorantGaramond = Cormorant_Garamond({
@@ -58,6 +59,7 @@ export default function RootLayout({
       <body
         className={`${cormorantGaramond.variable} ${fragmentMono.variable} antialiased`}
       >
+        <SplashScreen />
         <Header />
         {children}
         <Analytics />
