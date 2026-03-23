@@ -697,8 +697,8 @@ const ONBOARDING_CSS = `
   --ob-gold:       #B8895A;
   --ob-gold-light: #D4A870;
   --ob-gold-faint: rgba(184,137,90,0.15);
-  --ob-serif:      'Cormorant Garamond', Georgia, serif;
-  --ob-mono:       'Courier Prime', monospace;
+  --ob-serif:      var(--font-serif);
+  --ob-mono:       var(--font-mono);
   --ob-r:          3px;
 }
 

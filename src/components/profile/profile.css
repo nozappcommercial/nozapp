@@ -16,8 +16,8 @@
     --prf-ink-mid:     rgba(22, 10, 12, 0.55);
     --prf-ink-faint:   rgba(22, 10, 12, 0.32);
     --prf-cream-dark:  #e4dbcc;
-    --prf-serif:       'Cormorant Garamond', Georgia, serif;
-    --prf-mono:        'Fragment Mono', monospace;
+    --prf-serif:       var(--font-serif);
+    --prf-mono:        var(--font-mono);
 }
 
 /* ─── OPEN BUTTON (in header) ─────────────────────────────────── */

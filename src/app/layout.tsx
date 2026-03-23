@@ -1,16 +1,19 @@
 import type { Metadata } from "next";
-import localFont from "next/font/local";
+import { Cormorant_Garamond, Fragment_Mono } from "next/font/google";
 import "./globals.css";
 
-const geistSans = localFont({
-  src: "./fonts/GeistVF.woff",
-  variable: "--font-geist-sans",
-  weight: "100 900",
+const cormorantGaramond = Cormorant_Garamond({
+  subsets: ["latin"],
+  weight: ["300", "400", "500", "600", "700"],
+  variable: "--font-cormorant",
+  display: "swap",
 });
-const geistMono = localFont({
-  src: "./fonts/GeistMonoVF.woff",
-  variable: "--font-geist-mono",
-  weight: "100 900",
+
+const fragmentMono = Fragment_Mono({
+  subsets: ["latin"],
+  weight: "400",
+  variable: "--font-fragment",
+  display: "swap",
 });
 
 export const metadata: Metadata = {
@@ -28,7 +31,7 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        className={`${cormorantGaramond.variable} ${fragmentMono.variable} antialiased`}
       >
         <Header />
         {children}

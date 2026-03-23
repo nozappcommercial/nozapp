@@ -5,7 +5,7 @@ import { createClient } from '@/lib/supabase/client';
 
 // CSS injected securely
 const styles = `
-@import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300..500;1,9..40,300..500&family=Playfair+Display:ital,wght@0,400..700;1,400..700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400..700;1,400..700&display=swap');
 
 :root {
   --bg: rgb(248, 248, 238);
@@ -28,7 +28,7 @@ const styles = `
   min-height: 100vh;
   width: 100%;
   background-color: rgb(247, 245, 234);
-  font-family: 'DM Sans', sans-serif;
+  font-family: var(--font-mono);
   color: var(--ink);
 }
 
@@ -90,7 +90,7 @@ const styles = `
 }
 
 .brand-tagline {
-  font-family: 'Playfair Display', serif;
+  font-family: var(--font-serif);
   font-style: italic;
   font-size: 28px;
   font-weight: 400;
@@ -334,7 +334,7 @@ const styles = `
   color: rgb(248, 248, 238);
   border: none;
   border-radius: 8px;
-  font-family: 'DM Sans', sans-serif;
+  font-family: var(--font-mono);
   font-weight: 500;
   font-size: 13px;
   text-transform: uppercase;
@@ -443,7 +443,7 @@ const styles = `
 }
 
 .reset-title {
-  font-family: 'Playfair Display', serif;
+  font-family: var(--font-serif);
   font-size: 24px;
   margin: 0 0 8px 0;
   color: var(--ink);
@@ -655,7 +655,7 @@ export default function AuthPage() {
 
             <div className="mobile-brand">
               <Logo src="/logo.png" />
-              <div style={{ fontFamily: "'Playfair Display', serif", fontStyle: 'italic', color: 'var(--ink)' }}>NoZapp</div>
+              <div style={{ fontFamily: "var(--font-serif)", fontStyle: 'italic', color: 'var(--ink)' }}>NoZapp</div>
             </div>
 
             {alert && (

@@ -12,6 +12,8 @@
 
 @layer base {
   :root {
+    --font-serif: var(--font-cormorant), 'Cormorant Garamond', Georgia, serif;
+    --font-mono: var(--font-fragment), 'Fragment Mono', monospace;
     --background: 0 0% 100%;
     --foreground: 0 0% 3.9%;
     --card: 0 0% 100%;
