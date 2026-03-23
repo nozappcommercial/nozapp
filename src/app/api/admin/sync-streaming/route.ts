@@ -5,6 +5,12 @@ const RAPIDAPI_URL = "https://streaming-availability.p.rapidapi.com/shows/search
 
 export async function GET(req: Request) {
   const RAPIDAPI_KEY = process.env.RAPIDAPI_KEY;
+  const CRON_SECRET = process.env.CRON_SECRET;
+
+  const authHeader = req.headers.get('authorization');
+  if (CRON_SECRET && authHeader !== `Bearer ${CRON_SECRET}`) {
+      return NextResponse.json({ error: "Unauthorized access" }, { status: 401 });
+  }
 
   if (!RAPIDAPI_KEY) {
     return NextResponse.json({ error: "Manca la 'RAPIDAPI_KEY' nel file .env (assicurati di aver salvato il file e riavviato npm run dev)" }, { status: 500 });

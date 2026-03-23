@@ -167,13 +167,21 @@ export async function getProfileData(): Promise<ProfileData> {
  * Bulk upsert pillar ranks based on new ordering.
  * ids[0] gets rank 1, ids[1] gets rank 2, etc.
  */
+import { z } from "zod";
+
+const ReorderSchema = z.array(z.number().int().positive());
+const StreamingSchema = z.array(z.string().min(1).max(50));
+
 export async function reorderPillars(ids: number[]): Promise<void> {
+    const parsed = ReorderSchema.safeParse(ids);
+    if (!parsed.success) throw new Error("Invalid input data");
+
     const supabase = await createClient();
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) throw new Error("Unauthorized");
 
     // Update each pillar's rank
-    const updates = ids.map((filmId, i) =>
+    const updates = parsed.data.map((filmId, i) =>
         supabase
             .from('user_pillars')
             .update({ rank: i + 1 })
@@ -189,13 +197,16 @@ export async function reorderPillars(ids: number[]): Promise<void> {
  * Replace the user's streaming subscriptions.
  */
 export async function saveStreamingServices(serviceIds: string[]): Promise<void> {
+    const parsed = StreamingSchema.safeParse(serviceIds);
+    if (!parsed.success) throw new Error("Invalid input data");
+
     const supabase = await createClient();
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) throw new Error("Unauthorized");
 
     const { error } = await supabase
         .from('users')
-        .update({ streaming_subscriptions: serviceIds })
+        .update({ streaming_subscriptions: parsed.data })
         .eq('id', user.id);
 
     if (error) throw error;
