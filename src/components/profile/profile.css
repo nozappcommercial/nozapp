@@ -184,7 +184,7 @@
 .prf-pillar-rank.vertex::after { background: var(--prf-ember-dim); }
 
 .prf-pillar-poster {
-    width: 100%; aspect-ratio: 2/3; border-radius: 2px;
+    width: 100%; aspect-ratio: 2/3; border-radius: 8px;
     overflow: hidden; position: relative; margin-bottom: 7px;
     box-shadow: 0 4px 16px rgba(0,0,0,0.1), 0 1px 4px rgba(0,0,0,0.06);
     transition: box-shadow 0.25s;
@@ -271,7 +271,7 @@
 .prf-stream-chip {
     display: flex; flex-direction: column; align-items: center; justify-content: center;
     gap: 7px; padding: 12px 6px;
-    border: 1.5px solid rgba(0,0,0,0.08); border-radius: 2px;
+    border: 1.5px solid rgba(0,0,0,0.08); border-radius: 12px;
     cursor: pointer; background: rgba(252,252,246,0.5);
     transition: border-color 0.2s, background 0.2s, transform 0.15s;
     position: relative;
@@ -284,7 +284,7 @@
     font-size: 8px; color: var(--prf-gold); font-family: var(--prf-mono);
 }
 .prf-stream-logo {
-    width: 36px; height: 22px; border-radius: 2px;
+    width: 36px; height: 22px; border-radius: 6px;
     display: flex; align-items: center; justify-content: center;
     font-family: var(--prf-mono); font-size: 10px; font-weight: bold;
     letter-spacing: -0.02em; line-height: 1;
@@ -413,6 +413,7 @@
     font-family: var(--prf-mono); font-size: 9px; letter-spacing: 0.2em; text-transform: uppercase;
     background: var(--prf-ink); color: rgba(252,252,246,1); border: none; padding: 11px 24px;
     cursor: pointer; transition: background 0.2s, transform 0.1s;
+    border-radius: 12px;
 }
 .prf-btn-logout:hover { background: var(--prf-ember); }
 .prf-btn-logout:active { transform: scale(0.97); }
@@ -448,12 +449,14 @@
     font-family: var(--prf-mono); font-size: 9px; letter-spacing: 0.2em; text-transform: uppercase;
     background: var(--prf-ember); color: #fff; border: none; padding: 10px 22px;
     cursor: pointer; transition: background 0.2s;
+    border-radius: 12px;
 }
 .prf-confirm-ok:hover { background: rgb(150,50,58); }
 .prf-confirm-cancel {
     font-family: var(--prf-mono); font-size: 9px; letter-spacing: 0.2em; text-transform: uppercase;
     background: none; color: var(--prf-ink-faint); border: 1px solid var(--prf-cream-dark);
     padding: 10px 22px; cursor: pointer; transition: border-color 0.2s, color 0.2s;
+    border-radius: 12px;
 }
 .prf-confirm-cancel:hover { border-color: var(--prf-ink-faint); color: var(--prf-ink); }
 

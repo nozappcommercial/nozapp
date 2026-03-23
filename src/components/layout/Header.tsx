@@ -258,7 +258,7 @@ export default function Header() {
                     <User size={14} strokeWidth={1.1} />
                 </button>
                 <button
-                    className={`${styles.actionBtn} ${isLoggingOut ? styles.loading : ''}`}
+                    className={`${styles.actionBtn} ${styles.actionBtnLogout} ${isLoggingOut ? styles.loading : ''}`}
                     title="Logout"
                     onClick={handleLogout}
                     disabled={isLoggingOut}

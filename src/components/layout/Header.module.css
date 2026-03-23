@@ -238,6 +238,17 @@
     opacity: 1;
 }
 
+.actionBtnLogout:hover {
+    background: rgba(220, 38, 38, 0.15) !important;
+    border-color: rgba(220, 38, 38, 0.4) !important;
+    box-shadow: 0 4px 12px rgba(220, 38, 38, 0.25) !important;
+}
+.actionBtnLogout:hover i,
+.actionBtnLogout:hover svg {
+    color: rgb(239, 68, 68) !important;
+    opacity: 1 !important;
+}
+
 .hiddenContent {
     opacity: 0 !important;
     pointer-events: none !important;
