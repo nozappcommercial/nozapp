@@ -25,7 +25,7 @@ const styles = `
   display: flex;
   justify-content: center;
   align-items: center;
-  min-height: 100vh;
+  min-height: 100dvh;
   width: 100%;
   background-color: rgb(247, 245, 234);
   font-family: var(--font-mono);
@@ -132,7 +132,7 @@ const styles = `
 .auth-right {
   width: 100%;
   max-width: 480px;
-  min-height: 100vh;
+  min-height: 100dvh;
   background-color: var(--paper);
   display: flex;
   flex-direction: column;
@@ -181,7 +181,7 @@ const styles = `
 .mobile-brand {
   display: none;
   text-align: center;
-  margin-bottom: 32px;
+  margin-bottom: 20px;
 }
 
 .view-anim {
@@ -195,7 +195,7 @@ const styles = `
   background: var(--bg2);
   border-radius: 100px;
   padding: 4px;
-  margin-bottom: 36px;
+  margin-bottom: 24px;
 }
 
 .tab {
@@ -234,7 +234,7 @@ const styles = `
 
 /* Form Styles */
 .input-group {
-  margin-bottom: 20px;
+  margin-bottom: 16px;
   position: relative;
 }
 
@@ -462,7 +462,12 @@ const styles = `
 }
 
 @media (max-width: 479px) {
-  .auth-form-wrapper { padding: 40px 24px; }
+  .auth-form-wrapper { padding: 24px 20px; }
+  .mobile-brand { margin-bottom: 16px; scale: 0.85; }
+  .tabs { margin-bottom: 20px; }
+  .input-group { margin-bottom: 12px; }
+  .oauth-divider { margin: 12px 0; }
+  .btn-submit { margin-top: 8px; }
 }
 `;
 
