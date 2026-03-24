@@ -25,7 +25,7 @@ interface ProfileModalProps {
 export default function ProfileModal({ isOpen, onClose }: ProfileModalProps) {
     const [data, setData] = useState<ProfileData | null>(null);
     const [loading, setLoading] = useState(false);
-    const [showConfirm, setShowConfirm] = useState(false);
+    const [showConfirm, setShowConfirm] = useState<'onboarding' | 'logout' | null>(null);
     const [isLoggingOut, setIsLoggingOut] = useState(false);
     const controls = useAnimation();
     const dragControls = useDragControls();
@@ -44,10 +44,12 @@ export default function ProfileModal({ isOpen, onClose }: ProfileModalProps) {
     // Reset state on open
     useEffect(() => {
         if (isOpen) {
-            setShowConfirm(false);
+            setShowConfirm(null);
+            window.dispatchEvent(new Event('hide-header'));
             controls.start({ y: 0, transition: { type: 'spring', damping: 25, stiffness: 200 } });
         } else {
             // Instantly reset position when standard close happens (e.g. wrapper click)
+            window.dispatchEvent(new Event('show-header'));
             controls.set({ y: 0 });
         }
     }, [isOpen, controls]);
@@ -55,7 +57,7 @@ export default function ProfileModal({ isOpen, onClose }: ProfileModalProps) {
     // Escape key handler
     const handleKeyDown = useCallback((e: KeyboardEvent) => {
         if (e.key === 'Escape') {
-            showConfirm ? setShowConfirm(false) : onClose();
+            showConfirm ? setShowConfirm(null) : onClose();
         }
     }, [onClose, showConfirm]);
 
@@ -80,7 +82,7 @@ export default function ProfileModal({ isOpen, onClose }: ProfileModalProps) {
         return name.slice(0, 2).toUpperCase();
     };
 
-    const handleLogout = async () => {
+    const confirmLogout = async () => {
         if (isLoggingOut) return;
         setIsLoggingOut(true);
         try {
@@ -91,6 +93,10 @@ export default function ProfileModal({ isOpen, onClose }: ProfileModalProps) {
             console.error('[Profile] Logout failed:', err);
             setIsLoggingOut(false);
         }
+    };
+
+    const handleLogout = () => {
+        setShowConfirm('logout');
     };
 
     const handleRedoOnboarding = () => { window.location.href = '/onboarding'; };
@@ -132,15 +138,29 @@ export default function ProfileModal({ isOpen, onClose }: ProfileModalProps) {
             >
                 <button className="prf-close" onClick={onClose}>×</button>
 
-                {/* Confirm redo overlay */}
-                <div className={`prf-confirm-overlay ${showConfirm ? 'visible' : ''}`}>
+                {/* Confirm redo onboarding overlay */}
+                <div className={`prf-confirm-overlay ${showConfirm === 'onboarding' ? 'visible' : ''}`}>
                     <div className="prf-confirm-title">Rifare l&apos;<em>onboarding</em>?</div>
                     <div className="prf-confirm-sub">
                         I tuoi pilastri attuali verranno sostituiti con i nuovi. L&apos;operazione non è reversibile.
                     </div>
                     <div className="prf-confirm-row">
-                        <button className="prf-confirm-cancel" onClick={() => setShowConfirm(false)}>Annulla</button>
+                        <button className="prf-confirm-cancel" onClick={() => setShowConfirm(null)}>Annulla</button>
                         <button className="prf-confirm-ok" onClick={handleRedoOnboarding}>Sì, ricomincia</button>
+                    </div>
+                </div>
+
+                {/* Confirm logout overlay */}
+                <div className={`prf-confirm-overlay ${showConfirm === 'logout' ? 'visible' : ''}`}>
+                    <div className="prf-confirm-title">Vuoi uscire?</div>
+                    <div className="prf-confirm-sub">
+                        Dovrai effettuare nuovamente l&apos;accesso per entrare nella Sfera Semantica.
+                    </div>
+                    <div className="prf-confirm-row">
+                        <button className="prf-confirm-cancel" onClick={() => setShowConfirm(null)}>Annulla</button>
+                        <button className="prf-confirm-ok" onClick={confirmLogout} disabled={isLoggingOut}>
+                            {isLoggingOut ? 'Uscita...' : 'Sì, esci'}
+                        </button>
                     </div>
                 </div>
 
@@ -211,7 +231,7 @@ export default function ProfileModal({ isOpen, onClose }: ProfileModalProps) {
 
                         {/* ─── FOOTER (bottom bar, full width) ─── */}
                         <div className="prf-footer">
-                            <button className="prf-btn-redo" onClick={() => setShowConfirm(true)}>
+                            <button className="prf-btn-redo" onClick={() => setShowConfirm('onboarding')}>
                                 Rifai l&apos;onboarding
                             </button>
                             <button

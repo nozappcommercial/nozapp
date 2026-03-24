@@ -16,19 +16,23 @@ const SplashScreen: React.FC = () => {
             setShouldRender(true);
 
             // Start fade out after 1.5s
-        const fadeTimeout = setTimeout(() => {
-            setIsVisible(false);
-        }, 1800);
+            const fadeTimeout = setTimeout(() => {
+                setIsVisible(false);
+            }, 1800);
 
-        // Remove from DOM after transition completes (0.5s after fade starts)
-        const removeTimeout = setTimeout(() => {
-            setShouldRender(false);
-        }, 2300);
+            // Remove from DOM after transition completes (0.5s after fade starts)
+            const removeTimeout = setTimeout(() => {
+                setShouldRender(false);
+            }, 2300);
 
             return () => {
                 clearTimeout(fadeTimeout);
                 clearTimeout(removeTimeout);
             };
+        } else {
+            // Immediately hide on any other route (e.g., /login after logout)
+            setIsVisible(false);
+            setShouldRender(false);
         }
     }, [pathname]);
 

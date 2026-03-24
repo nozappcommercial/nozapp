@@ -17,15 +17,28 @@ export default function Header() {
     const [activeSection, setActiveSection] = useState('sfera');
     const [hoveredSection, setHoveredSection] = useState<string | null>(null);
     const [isCollapsed, setIsCollapsed] = useState(true);
+    const [isHiddenByModal, setIsHiddenByModal] = useState(false);
     const [bubbleStyle, setBubbleStyle] = useState<{ left?: number, width?: number, top?: number, height?: number, opacity: number }>({ left: 0, width: 0, top: 0, height: 0, opacity: 0 });
+
+    useEffect(() => {
+        const hide = () => setIsHiddenByModal(true);
+        const show = () => setIsHiddenByModal(false);
+        window.addEventListener('hide-header', hide);
+        window.addEventListener('show-header', show);
+        return () => {
+            window.removeEventListener('hide-header', hide);
+            window.removeEventListener('show-header', show);
+        };
+    }, []);
+
     const navItemsRef = useRef<{ [key: string]: HTMLAnchorElement | null }>({});
     const navContainerRef = useRef<HTMLElement>(null);
     const headerRef = useRef<HTMLElement>(null);
     const pathname = usePathname();
     const [isLoggingOut, setIsLoggingOut] = useState(false);
 
-    // Hide header on login and onboarding pages
-    if (pathname === '/login' || pathname === '/onboarding') return null;
+    // Hide header on login and onboarding pages or when profile modal is open
+    if (pathname === '/login' || pathname === '/onboarding' || isHiddenByModal) return null;
 
     const handleLogout = async () => {
         if (isLoggingOut) return;
