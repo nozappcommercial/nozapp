@@ -692,7 +692,7 @@ body.dragging {
     }
     
     #panel.minimized {
-        transform: translate(-50%, calc(-50% + 180px)) !important;
+        transform: translate(-50%, calc(-50% + 580px)) !important;
     }
 
     .panel-glass-content {

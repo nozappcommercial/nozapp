@@ -100,6 +100,18 @@ export default function SemanticSphere({ files = [], edges = [], userSubscriptio
         }
     };
 
+    // Global Header visibility toggle
+    useEffect(() => {
+        if (selectedFilm) {
+            window.dispatchEvent(new CustomEvent('hide-header'));
+        } else {
+            window.dispatchEvent(new CustomEvent('show-header'));
+        }
+        return () => {
+            window.dispatchEvent(new CustomEvent('show-header'));
+        };
+    }, [selectedFilm]);
+
     // State for the currently active shell (0, 1, or 2)
     const [activeShell, setActiveShell] = React.useState<ShellLevel>(0);
     // Ref to keep track of the active shell inside the Three.js animation loop
