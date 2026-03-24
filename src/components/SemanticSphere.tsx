@@ -750,12 +750,13 @@ export default function SemanticSphere({ files = [], edges = [], userSubscriptio
         window.addEventListener('touchstart', e => {
             if ((e.target as HTMLElement).tagName === 'CANVAS') {
                 e.preventDefault();
+                if (e.touches.length === 1) {
+                    const t = e.touches[0];
+                    isDown = true; isDragging = false;
+                    lastXY = { x: t.clientX, y: t.clientY }; vel = { x: 0, y: 0 };
+                }
             }
-            if (e.touches.length === 1) {
-                const t = e.touches[0];
-                isDown = true; isDragging = false;
-                lastXY = { x: t.clientX, y: t.clientY }; vel = { x: 0, y: 0 };
-            } else if (e.touches.length === 2) {
+            if (e.touches.length === 2) {
                 const t1 = e.touches[0];
                 const t2 = e.touches[1];
                 initialPinchDistance = Math.hypot(t2.clientX - t1.clientX, t2.clientY - t1.clientY);
