@@ -666,23 +666,25 @@ body.dragging {
     }
 
     #panel {
-        left: 50%;
-        top: 50%;
-        bottom: auto;
-        right: auto;
-        width: 380px;
-        height: 570px;
-        max-height: none;
-        transform: translate(-50%, 150vh) scale(0.9);
+        left: 50% !important;
+        top: 50% !important;
+        bottom: auto !important;
+        right: auto !important;
+        position: fixed !important;
+        width: min(380px, 92vw) !important;
+        height: auto !important;
+        aspect-ratio: 380 / 570;
+        max-height: 85vh !important;
+        transform: translate(-50%, 120vh) !important;
         border-radius: 0; /* Mask is preserved */
     }
 
     #panel.visible {
-        transform: translate(-50%, -50%) scale(calc(100vw / 400));
+        transform: translate(-50%, -50%) !important;
     }
     
     #panel.minimized {
-        transform: translate(-50%, calc(-50% + 220px)) scale(calc(100vw / 400)) !important;
+        transform: translate(-50%, calc(-50% + 180px)) !important;
     }
 
     .panel-glass-content {
