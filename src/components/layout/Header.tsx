@@ -37,8 +37,8 @@ export default function Header() {
     const pathname = usePathname();
     const [isLoggingOut, setIsLoggingOut] = useState(false);
 
-    // Hide header on login and onboarding pages or when profile modal is open
-    if (pathname === '/login' || pathname === '/onboarding' || isHiddenByModal) return null;
+    // Hide header entirely on login and onboarding pages
+    if (pathname === '/login' || pathname === '/onboarding') return null;
 
     const handleLogout = async () => {
         if (isLoggingOut) return;
@@ -287,7 +287,7 @@ export default function Header() {
             {/* Primary Header (Horizontal, bottom-centered) */}
             {!isVerticalLayout && (
                 <header 
-                    className={`${styles.headerWrapper} ${styles.headerHorizontal} ${isCollapsed ? styles.headerCollapsed : ''}`} 
+                    className={`${styles.headerWrapper} ${styles.headerHorizontal} ${isCollapsed ? styles.headerCollapsed : ''} ${isHiddenByModal ? styles.headerHidden : ''}`} 
                     ref={headerRef}
                 >
                     {renderContent(false)}
@@ -296,7 +296,10 @@ export default function Header() {
 
             {/* Alternative Vertical Header */}
             {isVerticalLayout && (
-                <header className={`${styles.headerWrapper} ${styles.headerVertical}`} ref={headerRef}>
+                <header 
+                    className={`${styles.headerWrapper} ${styles.headerVertical} ${isHiddenByModal ? styles.headerHidden : ''}`} 
+                    ref={headerRef}
+                >
                     {renderContent(true)}
                 </header>
             )}

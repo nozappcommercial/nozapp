@@ -258,3 +258,13 @@
     padding: 0 !important;
     transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
 }
+
+.headerHidden {
+    opacity: 0 !important;
+    pointer-events: none !important;
+    transform: translate(-50%, 100px) !important;
+}
+
+.headerVertical.headerHidden {
+    transform: translate(100px, -50%) !important;
+}
