@@ -326,6 +326,10 @@ body.dragging {
     z-index: 1000;
     filter: drop-shadow(0 25px 50px rgba(0, 0, 0, 0.3));
 
+    /* Slide Animation Variables */
+    --panel-slide-x: 20px;
+    --panel-slide-y: 15px;
+
     /* Cinema Ticket Mask */
     -webkit-mask-image: 
         radial-gradient(circle at 0 0, transparent 14px, black 15px),
@@ -677,6 +681,10 @@ body.dragging {
         max-height: 85vh !important;
         transform: translate(-50%, 120vh) !important;
         border-radius: 0; /* Mask is preserved */
+
+        /* Mobile Slide Offsets */
+        --panel-slide-x: 100vw;
+        --panel-slide-y: 20px;
     }
 
     #panel.visible {
@@ -703,7 +711,7 @@ body.dragging {
     }
 
     .shell-navigator-container {
-        /* Reset any conflicting styles from mobile-only-header-nav if needed */
+        pointer-events: none;
     }
 }
 

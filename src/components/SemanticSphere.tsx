@@ -568,35 +568,39 @@ export default function SemanticSphere({ files = [], edges = [], userSubscriptio
                 callback();
                 return;
             }
-            panel.style.transition = 'opacity 120ms ease, transform 120ms ease';
+
+            // Use CSS variables for responsive offsets (subtle on desktop, full-width on mobile)
             const exitMap = {
-                left:  'translateY(-50%) translateX(-18px)',
-                right: 'translateY(-50%) translateX(18px)',
-                up:    'translateY(calc(-50% - 14px))',
-                down:  'translateY(calc(-50% + 14px))'
+                left:  'translate(-50%, -50%) translateX(calc(-1 * var(--panel-slide-x)))',
+                right: 'translate(-50%, -50%) translateX(var(--panel-slide-x))',
+                up:    'translate(-50%, -50%) translateY(calc(-1 * var(--panel-slide-y)))',
+                down:  'translate(-50%, -50%) translateY(var(--panel-slide-y))'
             };
             const enterMap = {
-                left:  'translateY(-50%) translateX(18px)',
-                right: 'translateY(-50%) translateX(-18px)',
-                up:    'translateY(calc(-50% + 14px))',
-                down:  'translateY(calc(-50% - 14px))'
+                left:  'translate(-50%, -50%) translateX(var(--panel-slide-x))',
+                right: 'translate(-50%, -50%) translateX(calc(-1 * var(--panel-slide-x)))',
+                up:    'translate(-50%, -50%) translateY(var(--panel-slide-y))',
+                down:  'translate(-50%, -50%) translateY(calc(-1 * var(--panel-slide-y)))'
             };
+
+            panel.style.transition = 'opacity 0.2s ease, transform 0.2s cubic-bezier(0.2, 0, 0.2, 1)';
             panel.style.opacity = '0';
             panel.style.transform = exitMap[dir];
+            
             setTimeout(() => {
                 callback(); // updates content
                 panel.style.transition = 'none';
                 panel.style.opacity = '0';
                 panel.style.transform = enterMap[dir];
+                
                 requestAnimationFrame(() => {
                     requestAnimationFrame(() => {
-                        panel.style.transition = 'opacity 160ms ease, transform 160ms ease';
+                        panel.style.transition = 'opacity 0.3s ease, transform 0.35s cubic-bezier(0.2, 0, 0.2, 1)';
                         panel.style.opacity = '1';
-                        panel.style.transition = '';
-                        panel.style.transform = '';
+                        panel.style.transform = ''; // returns to CSS-defined center/state
                     });
                 });
-            }, 130);
+            }, 200);
         }
 
         // PANEL VISIBILITY
@@ -765,7 +769,9 @@ export default function SemanticSphere({ files = [], edges = [], userSubscriptio
                 if (!isDragging) {
                     const t = e.changedTouches[0];
                     const hit = getHit(t.clientX, t.clientY);
+                    
                     if (hit !== null) {
+                        // ... navigation logic ...
                         if (navContext && navContext.visible.has(hit) && hit !== navContext.current) {
                             if (navContext.children.includes(hit)) {
                                 const { current, children, stack } = navContext;
@@ -787,7 +793,10 @@ export default function SemanticSphere({ files = [], edges = [], userSubscriptio
                             applyNavContext(buildNavContext(hit, null, sibs, sibs.indexOf(hit), [], FILMS, EDGES));
                         }
                     } else if (navContext) {
-                        closePanel();
+                        // FIX: Ensure we only close if clicking the CANVAS, not UI elements like minimize/close buttons
+                        if ((e.target as HTMLElement).tagName === 'CANVAS') {
+                            closePanel();
+                        }
                     }
                 }
             }
