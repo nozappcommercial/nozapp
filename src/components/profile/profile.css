@@ -492,6 +492,7 @@
         filter: blur(2px);
         border-left: none; border-right: none; border-bottom: none;
         border-radius: 28px 28px 0 0;
+        padding-bottom: 80px; /* Space for the floating navbar */
     }
     .prf-modal.open { transform: translateY(0) scale(1); filter: blur(0); }
     .prf-body {

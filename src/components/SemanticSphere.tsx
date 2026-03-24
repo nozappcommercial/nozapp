@@ -252,6 +252,12 @@ export default function SemanticSphere({ files = [], edges = [], userSubscriptio
         renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
         renderer.setSize(W(), H());
         renderer.setClearColor(0x000000, 0);
+        
+        // Disable touch actions on canvas to prevent browser scrolling/bouncing
+        canvas.style.touchAction = 'none';
+        canvas.style.userSelect = 'none';
+        canvas.style.webkitUserSelect = 'none';
+        canvas.style.webkitTouchCallout = 'none';
 
         const scene = new THREE.Scene();
         scene.fog = new THREE.FogExp2(0xc8b89a, .004);
@@ -365,50 +371,63 @@ export default function SemanticSphere({ files = [], edges = [], userSubscriptio
          */
         function updateLabels(hov: number | null, sel: number | null) {
             const tmp = new THREE.Vector3();
+            const currentShell = activeShellRef.current;
+            
             FILMS.forEach((f, index) => {
                 const el = labelRefs.current[index];
                 const lt = titleRefs.current[index];
                 if (!el || !lt) return;
+                
+                // PERFORMANCE: Only process labels for the active shell or if selected
+                const isCurrentShell = f.shell === currentShell;
+                if (!isCurrentShell && f.id !== sel) {
+                    if (el.style.opacity !== "0") el.style.opacity = "0";
+                    return;
+                }
+
                 const p = positions[index].clone().applyEuler(group.rotation);
                 tmp.copy(p).project(camera);
-                el.style.left = (tmp.x * .5 + .5) * W() + 'px';
-                el.style.top = (-.5 * tmp.y + .5) * H() + 'px';
+                
+                const behind = tmp.z > 1;
+                if (behind) {
+                    if (el.style.opacity !== "0") el.style.opacity = "0";
+                    return;
+                }
 
-                // Hide labels in the header area (top 100px)
-                const yPos = (-.5 * tmp.y + .5) * H();
-                const isOverHeader = yPos < 100;
+                const screenX = (tmp.x * .5 + .5) * W();
+                const screenY = (-.5 * tmp.y + .5) * H();
+                
+                // Hide labels in the header area (top 120px)
+                const isOverHeader = screenY < 120;
+                if (isOverHeader && f.id !== sel) {
+                    if (el.style.opacity !== "0") el.style.opacity = "0";
+                    return;
+                }
 
-                // Adjust label offset: use smaller multiplier for smaller nodes
+                el.style.left = screenX + 'px';
+                el.style.top = screenY + 'px';
+
+                // Adjust label offset
                 const offset = NCFG[f.shell].size * 100 + 8;
                 el.style.transform = `translate(-50%,calc(-50% - ${offset}px))`;
-                // Only show labels for the shell we are currently viewing
-                const isCurrentShell = f.shell === activeShellRef.current;
 
-                const behind = tmp.z > 1;
                 let op = 0;
-                // Hide labels if we're hovering over the header
-                // OR if the node does not belong to the currently active shell (we only want the muted core visible)
-                if (isOverHeader || !isCurrentShell) { 
-                    op = 0;
-                } else if (sel !== null) {
+                if (sel !== null) {
                     const active = navContext && navContext.visible.has(f.id);
-                    // Selected node is ALWAYS visible regardless of depth/behind
-                    if (index === sel) { // Fixed: removed database ID mismatch
+                    if (index === sel || f.id === sel) {
                         op = 1;
                     } else {
-                        op = active && !behind ? 0.75 : 0;
+                        op = active ? 0.75 : 0;
                     }
                 } else if (hov !== null) {
                     op = (f.id === hov) ? 1 : (connectedTo(hov, EDGES).has(f.id) ? 0.7 : 0.05);
                 } else {
                     op = .22;
                 }
-                el.style.opacity = behind ? "0" : op.toString();
-                if (f.id === sel) {
-                    lt.classList.add('active');
-                } else {
-                    lt.classList.remove('active');
-                }
+                
+                el.style.opacity = op.toString();
+                if (f.id === sel) lt.classList.add('active');
+                else lt.classList.remove('active');
             });
         }
 
@@ -725,6 +744,9 @@ export default function SemanticSphere({ files = [], edges = [], userSubscriptio
         let scrollLocked = false;
         
         window.addEventListener('touchstart', e => {
+            if ((e.target as HTMLElement).tagName === 'CANVAS') {
+                e.preventDefault();
+            }
             if (e.touches.length === 1) {
                 const t = e.touches[0];
                 isDown = true; isDragging = false;
@@ -772,6 +794,9 @@ export default function SemanticSphere({ files = [], edges = [], userSubscriptio
         });
 
         window.addEventListener('touchmove', e => {
+            if ((e.target as HTMLElement).tagName === 'CANVAS') {
+                e.preventDefault();
+            }
             if (e.touches.length === 2) {
                 // Handle pinch to zoom to switch shells
                 const t1 = e.touches[0];
@@ -985,6 +1010,17 @@ export default function SemanticSphere({ files = [], edges = [], userSubscriptio
                     <div className="sh-logo">SFERA <em>SEMANTICA</em></div>
                     <div className="sh-hint">SCROLL · cambia shell</div>
                 </div>
+
+                {/* Mobile version of the navigator (Top Right) */}
+                <div className="mobile-only-header-nav">
+                    <ShellNavigator 
+                        activeShell={activeShell} 
+                        onShellChange={setActiveShell} 
+                        isAnimating={isAnimating}
+                        variant="compact"
+                    />
+                </div>
+
                 <div className="hints">
                     TRASCINA · ruota &nbsp;·&nbsp; SCROLL · zoom<br />
                     CLICK · seleziona nodo<br />
@@ -994,7 +1030,7 @@ export default function SemanticSphere({ files = [], edges = [], userSubscriptio
 
 
 
-            <div style={{ position: 'absolute', left: 28, top: '50%', transform: 'translateY(-50%)', zIndex: 10, display: 'flex', flexDirection: 'column', gap: 8, transformOrigin: 'left center' }}>
+            <div className="desktop-only-floating-nav" style={{ position: 'absolute', left: 28, top: '50%', transform: 'translateY(-50%)', zIndex: 10, display: 'flex', flexDirection: 'column', gap: 8, transformOrigin: 'left center' }}>
                 <div style={{ transform: 'scale(0.82)', transformOrigin: 'left center' }}>
                     <ShellNavigator
                         activeShell={activeShell}

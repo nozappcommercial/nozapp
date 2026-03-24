@@ -181,6 +181,14 @@ body.dragging {
     opacity: 0.6;
 }
 
+.mobile-only-header-nav {
+    display: none;
+}
+
+.desktop-only-floating-nav {
+    display: block;
+}
+
 /* ═══════════════════════════════════════════════════════════
    SHELL LEGEND (Bottom Left)
    ═══════════════════════════════════════════════════════════ */
@@ -623,16 +631,38 @@ body.dragging {
 @media (max-width: 768px) {
     .sphere-header {
         padding: 20px;
-        flex-direction: column;
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
         gap: 8px;
+        width: 100%;
+    }
+
+    .sh-left {
+        flex: 1;
     }
 
     .sh-logo {
-        font-size: 22px
+        font-size: 20px;
+        white-space: nowrap;
+    }
+
+    .sh-hint {
+        font-size: 8px;
     }
 
     .hints {
-        display: none
+        display: none;
+    }
+
+    .mobile-only-header-nav {
+        display: flex;
+        align-items: center;
+        pointer-events: auto;
+    }
+
+    .desktop-only-floating-nav {
+        display: none !important;
     }
 
     #panel {
@@ -671,8 +701,7 @@ body.dragging {
     }
 
     .shell-navigator-container {
-        left: 15px !important;
-        gap: 8px !important;
+        /* Reset any conflicting styles from mobile-only-header-nav if needed */
     }
 }
 
