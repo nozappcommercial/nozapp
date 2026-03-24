@@ -1,60 +1,40 @@
-# Analisi del Dataset Letterboxd
+# Dataset e Pipeline Dati
 
-> Questo file descrive il dataset utilizzato dal sistema dopo aver analizzato tutti i file CSV presenti nella cartella `/dataset`. Il dataset utilizza `id` (relativi ai film) come chiave primaria per collegare le varie entità tabellari.
+Il patrimonio informativo di NoZapp si basa su un dataset esteso di circa 900.000 film, originariamente derivato da Kaggle.
 
-## Struttura dei File CSV
+## Struttura del Dataset CSV
 
-### 1. `movies.csv` (Dimensione: ~254 MB)
-È la tabella principale del dataset che contiene le informazioni di base sui film.
-- **`id`**: (Es. `1000001`) Identificativo univoco del film (utilizzato come foreign key in tutti gli altri file).
-- **`name`**: (Es. `Barbie`) Titolo del film.
-- **`date`**: (Es. `2023`) Anno di uscita.
-- **`tagline`**: (Es. `She's everything. He's just Ken.`) Frase di lancio del film.
-- **`description`**: Sinossi o descrizione del film.
-- **`minute`**: (Es. `114`) Durata in minuti.
-- **`rating`**: (Es. `3.86`) Voto medio (presumibilmente su scala 5).
+Il file principale è `dataset/movies.csv`.
 
-### 2. `actors.csv` (Dimensione: ~195 MB)
-Associa gli attori ai film e definisce il ruolo interpretato.
-- **`id`**: Riferimento al film.
-- **`name`**: (Es. `Margot Robbie`) Nome dell'attore/attrice.
-- **`role`**: (Es. `Barbie`) Nome del personaggio o ruolo.
+| Colonna | Tipo | Descrizione |
+| :--- | :--- | :--- |
+| `id` | Integer | Identificativo univoco del film. |
+| `name` | String | Titolo originale in inglese. |
+| `year` | Integer | Anno di uscita. |
+| `director` | String | Nome del regista principale. |
+| `title_it` | String | (Aggiunto) Titolo ufficiale in italiano. |
+| `poster_url` | String | Link all'immagine del poster (estratto da TMDB/Letterboxd). |
 
-### 3. `themes.csv` (Dimensione: ~5 MB)
-Associa tag tematici ai film. Probabilmente questi temi saranno molto utili per calcolare gli `editorial_edges` e i `user_pillars`.
-- **`id`**: Riferimento al film.
-- **`theme`**: (Es. `Humanity and the world around us`, `Crude humor and satire`) Tema trattato.
+## Pipeline di Arricchimento
 
-### 4. `genres.csv` (Dimensione: ~17 MB)
-Definisce il genere o i generi di ogni film.
-- **`id`**: Riferimento al film.
-- **`genre`**: (Es. `Comedy`, `Adventure`, `Thriller`) Genere.
+Per rendere l'app fruibile al pubblico italiano, è stata implementata una pipeline di traduzione e arricchimento.
 
-### 5. `countries.csv` (Dimensione: ~10 MB)
-Nazioni di produzione del film.
-- **`id`**: Riferimento al film.
-- **`country`**: (Es. `UK`, `USA`, `South Korea`) Nazione.
+### Traduzione Titoli (Wikidata)
+*   **Script**: `scripts/title-it.py`
+*   **Processo**:
+    1. Legge il titolo inglese (`name`).
+    2. Interroga **Wikidata** via SPARQL cercando il label in italiano (`@it`).
+    3. Se trovato, lo salva nella colonna `title_it`.
+    4. Utilizza una **cache locale** (`wikidata_cache.json`) per saltare i titoli già elaborati.
 
-### 6. `languages.csv` (Dimensione: ~28 MB)
-Lingue parlate o associate al film, con specificato il tipo.
-- **`id`**: Riferimento al film.
-- **`type`**: (Es. `Primary language`, `Spoken language`) Ruolo della lingua.
-- **`language`**: (Es. `English`, `Korean`) Lingua effettiva.
+### Lookup TMDB (Opzionale)
+*   Utilizzato per recuperare sinossi e immagini dove mancanti nel dataset originale.
+*   Gestito tramite gli script in `scripts/title-conversion/`.
 
-### 7. `studios.csv` (Dimensione: ~18 MB)
-Studi di produzione o distribuzione.
-- **`id`**: Riferimento al film.
-- **`studio`**: (Es. `LuckyChap Entertainment`, `Heyday Films`) Nome dello studio.
+## Strumenti di Ispezione
 
-### 8. `posters.csv` (Dimensione: ~94 MB)
-Link alle immagini di copertina (poster) resizzate da Letterboxd.
-- **`id`**: Riferimento al film.
-- **`link`**: URL dell'immagine (Es. `https://a.ltrbxd.com/resized/...-crop.jpg`).
+*   **VisiData**: Utilizzato durante lo sviluppo per esplorare velocemente i CSV giganti da terminale senza caricare interamente i file in memoria RAM.
+*   **Supabase Dashboard**: Per la gestione e la validazione finale dei dati importati.
 
 ---
-
-## Considerazioni per l'implementazione
-
-1. **Relazione Entità-Relazione**: Il database è fortemente relazionale, con la tabella `movies` (film) che fa da nodo centrale. L'importazione dovrà mantenere questa integrità (possibilmente traducendo gli ID di Letterboxd in UUID, oppure mantenendo gli ID nativi interi come chiave primaria o secondaria unica).
-2. **Volumetria Dati**: Alcuni file sono molto pesanti (`movies.csv` è quasi 254 MB, `actors.csv` è quasi 195 MB). Questo significa che il seed script **dovrà necessariamente utilizzare degli Stream** (es. `csv-parser` o modulo `readline`) per leggere i file ed eseguire insert a lotti (batching/bulk insert), per non saturare la memoria (OOM).
-3. **Temi e Generi per grafo**: I file `themes.csv` e `genres.csv` forniranno un'ottima base sintetica (mock, o reale se supportata) per la generazione algoritmica dei collegamenti "similiari" o "contrastanti" della sfera semantica.
+[← Torna all'indice](./index.md)
