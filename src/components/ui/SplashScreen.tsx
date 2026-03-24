@@ -61,6 +61,7 @@ const SplashScreen: React.FC = () => {
                     src="/logo.png" 
                     alt="NoZapp Logo" 
                     fill
+                    sizes="100px"
                     priority
                     style={{ objectFit: 'contain' }}
                 />
