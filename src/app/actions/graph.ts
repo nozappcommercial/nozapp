@@ -3,6 +3,7 @@
 import { createClient } from "@/lib/supabase/server";
 import { FilmNode, FilmEdge } from "@/components/SemanticSphere";
 import { checkRateLimit } from "@/lib/rate-limit";
+import { logSecurityEvent } from "@/lib/logger";
 
 const SHELL_POSTER_COLORS = [
     ["#0d1b35", "#1a3a6b", "#2d5a8e"], // Shell 0
@@ -31,6 +32,7 @@ interface FilmWithRelations {
  * - Shell 2: Secondary connections linked to Shell 1.
  */
 export async function getPersonalizedGraph() {
+    try {
     const supabase = await createClient();
 
     // 1. AUTHENTICATION & PROFILE SETTINGS
@@ -38,8 +40,14 @@ export async function getPersonalizedGraph() {
     if (!user) throw new Error("Unauthorized");
 
     // 2. RATE LIMITING (Flood Protection)
-    const { success } = await checkRateLimit(user.id, 'graph');
+    const { success, limit, remaining, reset } = await checkRateLimit(user.id, 'graph');
     if (!success && process.env.NODE_ENV === 'production') {
+        await logSecurityEvent('rate_limit_block', {
+            userId: user.id,
+            path: 'action:getPersonalizedGraph',
+            level: 'warn',
+            metadata: { limitType: 'graph', limit, remaining, reset }
+        });
         throw new Error("Troppe richieste di generazione. Per favore attendi un momento.");
     }
     
@@ -237,5 +245,13 @@ export async function getPersonalizedGraph() {
     }
 
     return { nodes, edges, subscriptions: userSubscriptions };
+} catch (err) {
+    await logSecurityEvent('api_error', {
+        path: 'action:getPersonalizedGraph',
+        level: 'error',
+        metadata: { error: err instanceof Error ? err.message : 'Unknown error' }
+    });
+    throw err;
+}
 }
 

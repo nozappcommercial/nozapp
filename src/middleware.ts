@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { updateSession } from '@/lib/supabase/middleware';
 import { checkRateLimit } from '@/lib/rate-limit';
+import { logSecurityEvent } from '@/lib/logger';
 
 /**
  * Global Middleware
@@ -35,7 +36,13 @@ export async function middleware(request: NextRequest) {
     // Block aggressive bots to save resources and prevent scraping.
     const isBot = BANNED_BOT_USER_AGENTS.some(bot => userAgent.includes(bot));
     if (isBot && (pathname.startsWith('/api') || pathname.startsWith('/login'))) {
-        console.warn(`[Middleware] Blocking suspected bot/crawler: ${userAgent} (IP: ${ip})`);
+        await logSecurityEvent('bot_detection', { 
+            ip, 
+            path: pathname, 
+            userAgent, 
+            level: 'warn',
+            metadata: { botType: 'crawler' }
+        });
         return new NextResponse('Bot Access Forbidden', { status: 403 });
     }
 
@@ -50,7 +57,13 @@ export async function middleware(request: NextRequest) {
         const { success, limit, remaining, reset } = await checkRateLimit(ip, type);
 
         if (!success) {
-            console.error(`[RateLimit] Limit exceeded for IP: ${ip} on path: ${pathname}`);
+            await logSecurityEvent('rate_limit_block', { 
+                ip, 
+                path: pathname, 
+                userAgent, 
+                level: 'warn',
+                metadata: { limitType: type, limit, remaining }
+            });
             return new NextResponse('Too many requests. Please try again later.', { 
                 status: 429,
                 headers: {

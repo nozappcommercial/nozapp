@@ -1,7 +1,9 @@
-import { createClient, createAdminClient } from "@/lib/supabase/server";
+import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import { checkRateLimit } from "@/lib/rate-limit";
+import { logSecurityEvent } from "@/lib/logger";
 
 const OnboardingSchema = z.object({
     pillars: z.array(z.object({
@@ -18,8 +20,14 @@ export async function POST(request: Request) {
     
     // 1. RATE LIMITING (Flood Protection)
     const ip = request.headers.get('x-real-ip') || 'anon';
-    const { success } = await checkRateLimit(ip, 'api');
+    const { success, limit, remaining, reset } = await checkRateLimit(ip, 'api');
     if (!success && process.env.NODE_ENV === 'production') {
+        await logSecurityEvent('rate_limit_block', {
+            ip,
+            path: '/api/onboarding/complete',
+            level: 'warn',
+            metadata: { limit, remaining, reset }
+        });
         return NextResponse.json({ error: "Too many requests. Please slow down." }, { status: 429 });
     }
 
@@ -48,6 +56,11 @@ export async function POST(request: Request) {
     // Check auth
     const { data: { user }, error: authError } = await supabase.auth.getUser();
     if (authError || !user) {
+        await logSecurityEvent('auth_failure', {
+            ip,
+            path: '/api/onboarding/complete',
+            metadata: { error: authError?.message || 'No user session' }
+        });
         return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
     }
 
@@ -133,6 +146,12 @@ export async function POST(request: Request) {
 
         return NextResponse.json({ success: true });
     } catch (err) {
+        await logSecurityEvent('api_error', {
+            ip,
+            path: '/api/onboarding/complete',
+            level: 'error',
+            metadata: { error: err instanceof Error ? err.message : 'Unknown error' }
+        });
         console.error("Onboarding complete error:", err);
         return NextResponse.json({ error: "Internal server error" }, { status: 500 });
     }

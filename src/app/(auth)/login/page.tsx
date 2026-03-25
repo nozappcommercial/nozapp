@@ -2,6 +2,7 @@
 
 import React, { useState, FormEvent, useEffect } from 'react';
 import { createClient } from '@/lib/supabase/client';
+import { logSecurityEvent } from '@/lib/logger';
 
 // CSS injected securely
 const styles = `
@@ -649,7 +650,11 @@ export default function AuthPage() {
 
     e.preventDefault();
     if (honeypot) {
-      console.warn('[Auth] Bot detected via honeypot.');
+      await logSecurityEvent('honeypot_hit', { 
+        level: 'warn', 
+        path: '/login', 
+        metadata: { field: 'website_url', value: honeypot } 
+      });
       setAlert({ type: 'error', message: 'Richiesta non valida.' });
       return;
     }
@@ -702,8 +707,18 @@ export default function AuthPage() {
         }
       }
     } catch (err: unknown) {
-      console.error("Auth error:", err);
       const isRateLimit = err instanceof Error && err.message.includes('429');
+      
+      await logSecurityEvent('auth_failure', {
+        level: isRateLimit ? 'warn' : 'info',
+        path: '/login',
+        metadata: { 
+          view, 
+          email: email.split('@')[0] + '@***', // Masked email for privacy
+          error: err instanceof Error ? err.message : 'Unknown error' 
+        }
+      });
+
       setAlert({ 
         type: 'error', 
         message: isRateLimit 
