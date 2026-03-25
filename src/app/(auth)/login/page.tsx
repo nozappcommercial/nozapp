@@ -579,7 +579,7 @@ function Logo({ src, light = false }: { src?: string; light?: boolean }) {
 }
 
 export default function AuthPage() {
-  const [view, setView] = useState<'login' | 'register' | 'reset'>('login');
+  const [view, setView] = useState<'login' | 'register' | 'reset' | 'update-password'>('login');
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -599,6 +599,12 @@ export default function AuthPage() {
     setErrors({});
     setAlert(null);
   }, [view]);
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const v = params.get('view');
+    if (v === 'update-password') setView('update-password');
+  }, []);
 
   const validate = () => {
     const newErrors: Record<string, string> = {};
@@ -659,7 +665,8 @@ export default function AuthPage() {
           email,
           password,
           options: {
-            data: { display_name: username }
+            data: { display_name: username },
+            emailRedirectTo: `${window.location.origin}/auth/callback`
           }
         });
         if (error) {
@@ -676,6 +683,16 @@ export default function AuthPage() {
         } else {
           setAlert({ type: 'success', message: 'Se l\'email esiste, ti abbiamo inviato un link di reset.' });
           setEmail('');
+        }
+      } else if (view === 'update-password') {
+        const { error } = await supabase.auth.updateUser({ password });
+        if (error) {
+          setAlert({ type: 'error', message: error.message });
+        } else {
+          setAlert({ type: 'success', message: 'Password aggiornata con successo!' });
+          setTimeout(() => {
+            window.location.href = '/sphere';
+          }, 1500);
         }
       }
     } catch (err: unknown) {
@@ -726,6 +743,37 @@ export default function AuthPage() {
                   <button type="submit" className={`btn-submit ${loading ? 'rolling' : ''}`} disabled={loading}>
                     <div className="film-strip" />
                     <span className="btn-text">Invia link di reset</span>
+                  </button>
+                </form>
+              </div>
+            ) : view === 'update-password' ? (
+              <div className="view-anim" key="update-password">
+                <h1 className="reset-title">Nuova Password</h1>
+                <p className="reset-desc">Scegli una nuova password sicura per il tuo account.</p>
+                <form onSubmit={handleSubmit}>
+                  <div className="input-group" style={{ animationDelay: '0ms' }}>
+                    <label className="input-label">Nuova Password</label>
+                    <div className="password-wrapper">
+                      <input type={showPassword ? 'text' : 'password'} className={`input-field ${errors.password ? 'has-error' : ''}`} value={password} onChange={e => setPassword(e.target.value)} disabled={loading} placeholder="••••••••" />
+                      <button type="button" tabIndex={-1} className="password-toggle" onClick={() => setShowPassword(!showPassword)}>
+                        <EyeIcon off={showPassword} />
+                      </button>
+                    </div>
+                    {errors.password && <span className="field-error">{errors.password}</span>}
+                  </div>
+                  <div className="input-group" style={{ animationDelay: '100ms' }}>
+                    <label className="input-label">Conferma Password</label>
+                    <div className="password-wrapper">
+                      <input type={showConfirmPassword ? 'text' : 'password'} className={`input-field ${errors.confirmPassword ? 'has-error' : ''}`} value={confirmPassword} onChange={e => setConfirmPassword(e.target.value)} disabled={loading} placeholder="••••••••" />
+                      <button type="button" tabIndex={-1} className="password-toggle" onClick={() => setShowConfirmPassword(!showConfirmPassword)}>
+                        <EyeIcon off={showConfirmPassword} />
+                      </button>
+                    </div>
+                    {errors.confirmPassword && <span className="field-error">{errors.confirmPassword}</span>}
+                  </div>
+                  <button type="submit" className={`btn-submit ${loading ? 'rolling' : ''}`} disabled={loading}>
+                    <div className="film-strip" />
+                    <span className="btn-text">Aggiorna Password</span>
                   </button>
                 </form>
               </div>

@@ -3,6 +3,7 @@ import { Cormorant_Garamond, Fragment_Mono } from "next/font/google";
 import { Analytics } from "@vercel/analytics/react";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import SplashScreen from "@/components/ui/SplashScreen";
+import AuthHandler from "@/components/auth/AuthHandler";
 import "./globals.css";
 
 const cormorantGaramond = Cormorant_Garamond({
@@ -61,6 +62,7 @@ export default function RootLayout({
         className={`${cormorantGaramond.variable} ${fragmentMono.variable} antialiased`}
       >
         <SplashScreen />
+        <AuthHandler />
         <Header />
         {children}
         <Analytics />
