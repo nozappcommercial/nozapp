@@ -585,6 +585,7 @@ export default function AuthPage() {
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [username, setUsername] = useState('');
+  const [honeypot, setHoneypot] = useState(''); // Anti-bot field
 
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
@@ -647,6 +648,11 @@ export default function AuthPage() {
   const handleSubmit = async (e: FormEvent) => {
 
     e.preventDefault();
+    if (honeypot) {
+      console.warn('[Auth] Bot detected via honeypot.');
+      setAlert({ type: 'error', message: 'Richiesta non valida.' });
+      return;
+    }
     setAlert(null);
     if (!validate()) return;
 
@@ -696,7 +702,14 @@ export default function AuthPage() {
         }
       }
     } catch (err: unknown) {
-      setAlert({ type: 'error', message: err instanceof Error ? err.message : 'Si è verificato un errore imprevisto.' });
+      console.error("Auth error:", err);
+      const isRateLimit = err instanceof Error && err.message.includes('429');
+      setAlert({ 
+        type: 'error', 
+        message: isRateLimit 
+          ? 'Troppe richieste. Per favore attendi un momento prima di riprovare.' 
+          : (err instanceof Error ? err.message : 'Si è verificato un errore imprevisto.') 
+      });
     } finally {
       setLoading(false);
     }
@@ -739,6 +752,10 @@ export default function AuthPage() {
                     <label className="input-label">Email</label>
                     <input autoFocus type="email" className={`input-field ${errors.email ? 'has-error' : ''}`} value={email} onChange={e => setEmail(e.target.value)} disabled={loading} placeholder="nome@esempio.com" />
                     {errors.email && <span className="field-error">{errors.email}</span>}
+                  </div>
+                  {/* Honeypot field - Hidden from users */}
+                  <div style={{ position: 'absolute', opacity: 0, zIndex: -1, pointerEvents: 'none' }}>
+                    <input type="text" name="website_url" value={honeypot} onChange={e => setHoneypot(e.target.value)} tabIndex={-1} autoComplete="off" />
                   </div>
                   <button type="submit" className={`btn-submit ${loading ? 'rolling' : ''}`} disabled={loading}>
                     <div className="film-strip" />

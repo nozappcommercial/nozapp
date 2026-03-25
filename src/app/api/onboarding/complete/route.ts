@@ -1,6 +1,7 @@
 import { createClient, createAdminClient } from "@/lib/supabase/server";
 import { NextResponse } from "next/server";
 import { z } from "zod";
+import { checkRateLimit } from "@/lib/rate-limit";
 
 const OnboardingSchema = z.object({
     pillars: z.array(z.object({
@@ -14,6 +15,13 @@ const OnboardingSchema = z.object({
 
 export async function POST(request: Request) {
     const supabase = await createClient();
+    
+    // 1. RATE LIMITING (Flood Protection)
+    const ip = request.headers.get('x-real-ip') || 'anon';
+    const { success } = await checkRateLimit(ip, 'api');
+    if (!success && process.env.NODE_ENV === 'production') {
+        return NextResponse.json({ error: "Too many requests. Please slow down." }, { status: 429 });
+    }
 
     // Helper for network retries (e.g., UND_ERR_CONNECT_TIMEOUT)
     const fetchWithRetry = async <T>(operation: () => Promise<{ data: T | null, error: any }>, retries = 3, delayMs = 1500) => {

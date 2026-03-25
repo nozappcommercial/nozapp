@@ -2,6 +2,7 @@
 
 import { createClient } from "@/lib/supabase/server";
 import { FilmNode, FilmEdge } from "@/components/SemanticSphere";
+import { checkRateLimit } from "@/lib/rate-limit";
 
 const SHELL_POSTER_COLORS = [
     ["#0d1b35", "#1a3a6b", "#2d5a8e"], // Shell 0
@@ -35,6 +36,12 @@ export async function getPersonalizedGraph() {
     // 1. AUTHENTICATION & PROFILE SETTINGS
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) throw new Error("Unauthorized");
+
+    // 2. RATE LIMITING (Flood Protection)
+    const { success } = await checkRateLimit(user.id, 'graph');
+    if (!success && process.env.NODE_ENV === 'production') {
+        throw new Error("Troppe richieste di generazione. Per favore attendi un momento.");
+    }
     
     // Fetch streaming subscriptions
     const { data: userProfile } = await supabase
