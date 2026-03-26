@@ -30,6 +30,8 @@ status: active## [19:30] [tipo: feature]
 **Side effects**: Nessuno.
 ## [20:31] [tipo: refactor]
 **File toccati**:
+- `src/app/actions/editorial.ts` — Aggiornato `getArticleBySlug` per permettere agli admin di visualizzare articoli in bozza o programmati (bypass filtri pubblicazione).
+- `src/components/layout/Header.tsx` — Nascosto l'header principale nelle rotte che iniziano con `/admin` per pulizia estetica del pannello di controllo.
 - `supabase/migrations/20260326000000_editorial_schema.sql` — Sostituito `role` con `is_admin` nelle policy RLS e aggiunte istruzioni `DROP POLICY IF EXISTS` e `DROP TRIGGER IF EXISTS` per rendere la migrazione idempotente.
 - `src/lib/supabase/middleware.ts` — Aggiornato il controllo d'accesso per le rotte `/admin` utilizzando il booleano `is_admin`.
 - `src/app/actions/editorial.ts` — Aggiornato l'helper `checkAdmin` per verificare `is_admin === true`.

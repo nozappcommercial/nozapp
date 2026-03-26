@@ -38,8 +38,8 @@ export default function Header() {
     const pathname = usePathname();
     const [isLoggingOut, setIsLoggingOut] = useState(false);
 
-    // Hide header entirely on login and onboarding pages
-    if (pathname === '/login' || pathname === '/onboarding') return null;
+    // Hide header entirely on login, onboarding and admin pages
+    if (pathname === '/login' || pathname === '/onboarding' || pathname?.startsWith('/admin')) return null;
 
     const handleLogout = async () => {
         if (isLoggingOut) return;

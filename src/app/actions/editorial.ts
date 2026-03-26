@@ -167,20 +167,40 @@ export async function getArticleBySlug(slug: string) {
     const supabase = await createClient();
     const now = new Date().toISOString();
 
-    const { data, error } = await supabase
+    // First, check if the current user is an admin
+    const { data: { user } } = await supabase.auth.getUser();
+    let isAdmin = false;
+    if (user) {
+        const { data: profile } = await supabase
+            .from('users')
+            .select('is_admin')
+            .eq('id', user.id)
+            .single();
+        isAdmin = !!profile?.is_admin;
+    }
+
+    let query = supabase
         .from('articles')
         .select(`
             *,
             author:users(display_name)
         `)
-        .eq('slug', slug)
-        .eq('status', 'published')
-        .lte('published_at', now)
-        .or(`expires_at.is.null,expires_at.gt.${now}`)
-        .single();
+        .eq('slug', slug);
+
+    // If NOT admin, apply publication filters
+    if (!isAdmin) {
+        query = query
+            .eq('status', 'published')
+            .lte('published_at', now)
+            .or(`expires_at.is.null,expires_at.gt.${now}`);
+    }
+
+    const { data, error } = await query.single();
 
     if (error) {
-        console.error('Error fetching article by slug:', error);
+        if (error.code !== 'PGRST116') { // Ignore "no rows found" console error
+            console.error('Error fetching article by slug:', error);
+        }
         return null;
     }
 
