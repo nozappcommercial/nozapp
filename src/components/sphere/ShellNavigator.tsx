@@ -25,6 +25,7 @@ export default function ShellNavigator({
     variant = 'default',
     orientation = 'horizontal'
 }: ShellNavigatorProps) {
+    const [hoveredLevel, setHoveredLevel] = React.useState<ShellLevel | null>(null);
     const isCompact = variant === 'compact';
     const isVertical = orientation === 'vertical';
 
@@ -48,19 +49,25 @@ export default function ShellNavigator({
         >
             {SHELLS.map(({ level, label, color, colorRgb }) => {
                 const isActive = activeShell === level;
+                const isHovered = hoveredLevel === level;
+                const isShown = !isCompact && (isActive || isHovered);
+
                 return (
                     <button
                         key={level}
                         onClick={() => { if (!isAnimating) onShellChange?.(level); }}
+                        onMouseEnter={() => setHoveredLevel(level)}
+                        onMouseLeave={() => setHoveredLevel(null)}
                         style={{
                             display: 'flex',
                             alignItems: 'center',
-                            justifyContent: 'center',
-                            gap: isCompact ? 0 : 8,
+                            justifyContent: isShown ? 'flex-start' : 'center',
+                            gap: isShown ? 8 : 0,
                             height: isCompact ? '32px' : '36px',
-                            width: isCompact ? '32px' : 'auto',
-                            padding: isCompact ? '0' : '0 11px',
-                            borderRadius: '50%',
+                            minWidth: isCompact ? '32px' : '36px',
+                            width: isShown ? 'auto' : (isCompact ? '32px' : '36px'),
+                            padding: isCompact ? '0' : (isShown ? '0 12px' : '0'),
+                            borderRadius: isShown ? '18px' : '50%',
                             border: isCompact ? 'none' : `1.5px solid rgba(${colorRgb}, ${isActive ? '0.5' : '0.15'})`,
                             background: isCompact 
                                 ? 'transparent' 
@@ -71,6 +78,7 @@ export default function ShellNavigator({
                             whiteSpace: 'nowrap',
                             outline: 'none',
                             transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                            overflow: 'hidden'
                         }}
                     >
                         <span
@@ -94,10 +102,12 @@ export default function ShellNavigator({
                                     fontSize: '10px',
                                     letterSpacing: '1.5px',
                                     color: color,
-                                    opacity: isActive ? 1 : 0.6,
-                                    transition: 'opacity 0.3s ease',
+                                    opacity: isShown ? 1 : 0,
+                                    maxWidth: isShown ? '100px' : '0',
+                                    transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
                                     pointerEvents: 'none',
                                     userSelect: 'none',
+                                    overflow: 'hidden'
                                 }}
                             >
                                 {label}
