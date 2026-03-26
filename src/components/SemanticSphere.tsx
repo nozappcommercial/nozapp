@@ -54,8 +54,10 @@ export default function SemanticSphere({ files = [], edges = [], userSubscriptio
     const [panelMinimized, setPanelMinimized] = React.useState(false);
     const panelMinimizedRef = React.useRef(false);
     
-    // Swipe handling refs
+    // Interactive Swipe Refs
+    const panelRef = React.useRef<HTMLDivElement>(null);
     const panelTouchStartX = React.useRef(0);
+    const isSwiping = React.useRef(false);
 
     // Keep track of the last selected film to allow CSS exit animations
     useEffect(() => {
@@ -1087,6 +1089,7 @@ export default function SemanticSphere({ files = [], edges = [], userSubscriptio
             {lastFilm && (
                 <div 
                     id="panel" 
+                    ref={panelRef}
                     className={[
                         selectedFilm ? 'visible' : '',
                         panelMinimized ? 'minimized' : '',
@@ -1096,12 +1099,40 @@ export default function SemanticSphere({ files = [], edges = [], userSubscriptio
                     style={{ position: 'absolute' }}
                     onTouchStart={(e) => {
                         panelTouchStartX.current = e.touches[0].clientX;
+                        isSwiping.current = true;
+                        if (panelRef.current) {
+                            panelRef.current.style.transition = 'none';
+                        }
+                    }}
+                    onTouchMove={(e) => {
+                        if (!isSwiping.current || !panelRef.current || panelMinimized) return;
+                        const currentX = e.touches[0].clientX;
+                        const deltaX = currentX - panelTouchStartX.current;
+                        
+                        // Limit vertical movement to avoid interference
+                        const rotate = deltaX * 0.05;
+                        panelRef.current.style.transform = `translate(-50%, -50%) translateX(${deltaX}px) rotate(${rotate}deg)`;
                     }}
                     onTouchEnd={(e) => {
+                        if (!isSwiping.current || !panelRef.current) return;
+                        isSwiping.current = false;
                         const deltaX = e.changedTouches[0].clientX - panelTouchStartX.current;
-                        if (Math.abs(deltaX) > 50) {
+                        
+                        // Restore transition for smooth snap or exit
+                        panelRef.current.style.transition = 'transform 0.4s cubic-bezier(0.2, 0, 0.2, 1), opacity 0.4s ease';
+
+                        if (Math.abs(deltaX) > 100) {
+                            // Trigger navigation based on direction
                             if (deltaX > 0) document.getElementById('btn-right')?.click();
                             else document.getElementById('btn-left')?.click();
+                            
+                            // Exit animation handled by state change, but clear inline transform
+                            setTimeout(() => {
+                                if (panelRef.current) panelRef.current.style.transform = '';
+                            }, 50);
+                        } else {
+                            // Snap back to center
+                            panelRef.current.style.transform = '';
                         }
                     }}
                 >
