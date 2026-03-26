@@ -55,16 +55,26 @@ export default function NowShowingCarousel({ movies = [] }: NowShowingCarouselPr
         const handleMouseEnter = () => { isHovering = true; };
         const handleMouseLeave = () => {
             isHovering = false;
-            scrollPos = el.scrollLeft;
+            if (el) scrollPos = el.scrollLeft;
+        };
+
+        const handleTouchStart = () => { isHovering = true; };
+        const handleTouchEnd = () => {
+            isHovering = false;
+            if (el) scrollPos = el.scrollLeft;
         };
 
         el.addEventListener("mouseenter", handleMouseEnter);
         el.addEventListener("mouseleave", handleMouseLeave);
+        el.addEventListener("touchstart", handleTouchStart, { passive: true });
+        el.addEventListener("touchend", handleTouchEnd, { passive: true });
 
         return () => {
             cancelAnimationFrame(animationId);
             el.removeEventListener("mouseenter", handleMouseEnter);
             el.removeEventListener("mouseleave", handleMouseLeave);
+            el.removeEventListener("touchstart", handleTouchStart);
+            el.removeEventListener("touchend", handleTouchEnd);
         };
     }, [movies]);
 
