@@ -20,6 +20,14 @@ status: active## [19:30] [tipo: feature]
 **Problema di partenza**: Le pillole "Pilastri, Affinità, Scoperta" su desktop erano troppo vicine al bordo sinistro e non risultavano correttamente centrate in altezza.
 **Soluzione applicata**: Individuato un conflitto di posizionamento (`fixed` interno che ignorava il contenitore `absolute` centrato). Aumentato il margine e pulito il codice CSS inline.
 **Side effects**: Nessuno.
+## [20:25] [tipo: bug-fix]
+**File toccati**:
+- `src/components/profile/profile.css` — Rifatto il sistema di centratura (flex-container), aumentato z-index (2600) per coprire l'header e allineato breakpoint a 768px.
+- `src/components/profile/ProfileModal.tsx` — Inserito wrapper di centratura e implementata animazione d'ingresso/uscita fluida con Framer Motion (rimuovendo conflitti con i transform CSS).
+
+**Problema di partenza**: Il riquadro profilo si apriva in posizione errata (non centrato) e non copriva correttamente l'header su desktop.
+**Soluzione applicata**: Separato il posizionamento (CSS Flex) dall'animazione (Framer Motion). Aumentata la gerarchia visiva tramite z-index e reso il movimento più premium.
+**Side effects**: Nessuno.
 
 ---
 

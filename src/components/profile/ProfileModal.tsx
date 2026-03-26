@@ -46,11 +46,13 @@ export default function ProfileModal({ isOpen, onClose }: ProfileModalProps) {
         if (isOpen) {
             setShowConfirm(null);
             window.dispatchEvent(new Event('hide-header'));
-            controls.start({ y: 0, transition: { type: 'spring', damping: 25, stiffness: 200 } });
+            // Start from bottom and fade in
+            controls.set({ y: '30%', opacity: 0 });
+            controls.start({ y: 0, opacity: 1, transition: { type: 'spring', damping: 25, stiffness: 200 } });
         } else {
-            // Instantly reset position when standard close happens (e.g. wrapper click)
             window.dispatchEvent(new Event('show-header'));
-            controls.set({ y: 0 });
+            // Fade out and move down slightly
+            controls.start({ y: '20%', opacity: 0, transition: { duration: 0.2 } });
         }
     }, [isOpen, controls]);
 
@@ -125,18 +127,19 @@ export default function ProfileModal({ isOpen, onClose }: ProfileModalProps) {
             {/* BACKDROP */}
             <div className={`prf-backdrop ${isOpen ? 'open' : ''}`} onClick={onClose} />
 
-            {/* MODAL */}
-            <motion.div 
-                className={`prf-modal ${isOpen ? 'open' : ''}`}
-                drag="y"
-                dragControls={dragControls}
-                dragListener={false}
-                dragConstraints={{ top: 0, bottom: 0 }}
-                dragElastic={0.2}
-                onDragEnd={handleDragEnd}
-                animate={controls}
-            >
-                <button className="prf-close" onClick={onClose}>×</button>
+            {/* MODAL WRAPPER (Centered via Flex) */}
+            <div className={`prf-modal-container ${isOpen ? 'open' : ''}`}>
+                <motion.div 
+                    className={`prf-modal ${isOpen ? 'open' : ''}`}
+                    drag="y"
+                    dragControls={dragControls}
+                    dragListener={false}
+                    dragConstraints={{ top: 0, bottom: 0 }}
+                    dragElastic={0.2}
+                    onDragEnd={handleDragEnd}
+                    animate={controls}
+                >
+                    <button className="prf-close" onClick={onClose}>×</button>
 
                 {/* Confirm redo onboarding overlay */}
                 <div className={`prf-confirm-overlay ${showConfirm === 'onboarding' ? 'visible' : ''}`}>
@@ -244,7 +247,8 @@ export default function ProfileModal({ isOpen, onClose }: ProfileModalProps) {
                         </div>
                     </>
                 )}
-            </motion.div>
-        </>
-    );
-}
+                    </motion.div>
+                </div>
+            </>
+        );
+    }
