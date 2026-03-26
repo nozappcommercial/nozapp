@@ -14,11 +14,11 @@ async function checkAdmin() {
 
     const { data: profile } = await supabase
         .from('users')
-        .select('role')
+        .select('is_admin')
         .eq('id', user.id)
         .single();
 
-    return profile?.role === 'admin';
+    return !!profile?.is_admin;
 }
 
 const ArticleSchema = z.object({

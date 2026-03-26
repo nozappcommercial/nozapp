@@ -73,7 +73,7 @@ export async function updateSession(request: NextRequest) {
     if (user) {
         const { data: profile, error: profileError } = await supabase
             .from('users')
-            .select('onboarding_complete, role')
+            .select('onboarding_complete, is_admin')
             .eq('id', user.id)
             .single();
 
@@ -82,9 +82,9 @@ export async function updateSession(request: NextRequest) {
         }
 
         const onboardingComplete = (profile as any)?.onboarding_complete ?? false;
-        const role = (profile as any)?.role ?? 'user';
+        const isAdmin = (profile as any)?.is_admin ?? false;
         
-        console.log(`[Middleware] User: ${user.email} (${user.id}), role: ${role}, onboarding_complete: ${onboardingComplete}, path: ${path}`);
+        console.log(`[Middleware] User: ${user.email} (${user.id}), isAdmin: ${isAdmin}, onboarding_complete: ${onboardingComplete}, path: ${path}`);
 
         // If it's an API route, don't redirect, just let the request through
         if (isApiRoute) {
@@ -92,7 +92,7 @@ export async function updateSession(request: NextRequest) {
         }
 
         // ADMIN ROUTES PROTECTION
-        if (path.startsWith('/admin') && role !== 'admin') {
+        if (path.startsWith('/admin') && !isAdmin) {
             console.log(`[Middleware] Unauthorized admin access attempt by ${user.email}`);
             const url = request.nextUrl.clone();
             url.pathname = '/sphere';

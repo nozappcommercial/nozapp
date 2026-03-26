@@ -28,6 +28,17 @@ status: active## [19:30] [tipo: feature]
 **Problema di partenza**: Il riquadro profilo si apriva in posizione errata (non centrato) e non copriva correttamente l'header su desktop.
 **Soluzione applicata**: Separato il posizionamento (CSS Flex) dall'animazione (Framer Motion). Aumentata la gerarchia visiva tramite z-index e reso il movimento più premium.
 **Side effects**: Nessuno.
+## [20:31] [tipo: refactor]
+**File toccati**:
+- `supabase/migrations/20260326000000_editorial_schema.sql` — Sostituito `role` con `is_admin` nelle policy RLS e aggiunte istruzioni `DROP POLICY IF EXISTS` e `DROP TRIGGER IF EXISTS` per rendere la migrazione idempotente.
+- `src/lib/supabase/middleware.ts` — Aggiornato il controllo d'accesso per le rotte `/admin` utilizzando il booleano `is_admin`.
+- `src/app/actions/editorial.ts` — Aggiornato l'helper `checkAdmin` per verificare `is_admin === true`.
+- `src/types/supabase.ts` — Aggiornati i tipi TypeScript della tabella `users`.
+- `docs/walkthrough.md` — Aggiornate le istruzioni SQL per l'abilitazione admin.
+
+**Problema di partenza**: Utilizzo di un campo `role` (stringa) non esistente, preferendo l'esistente variabile booleana `is_admin`.
+**Soluzione applicata**: Refactoring completo della logica di autorizzazione admin per allinearsi alla struttura dati esistente del progetto.
+**Side effects**: Nessuno, ora il sistema è coerente con il database esistente.
 
 ---
 
