@@ -213,8 +213,9 @@ export default function Header() {
         const section = document.getElementById(id);
         if (section) {
             const anime = (await import('animejs')).default;
-
-            const targetPos = Math.max(0, section.offsetTop);
+            
+            // RESPONSIBLE LINE: Added 60px offset to avoid showing the end of the previous section
+            const targetPos = Math.max(0, section.offsetTop + 60);
             const currentPos = window.scrollY;
 
             anime({
