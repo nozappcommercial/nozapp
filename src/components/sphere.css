@@ -316,10 +316,12 @@ body.dragging {
     top: 50%;
     right: 40px;
     width: 380px;
-    height: 570px; /* Slightly taller for ticket proportions */
+    height: 570px;
+    /* Slightly taller for ticket proportions */
     transform: translateY(120vh);
     background: transparent;
-    border: none; /* Border is now handled by the mask/shadow */
+    border: none;
+    /* Border is now handled by the mask/shadow */
     opacity: 1;
     transition: transform 0.42s cubic-bezier(0.2, 0, 0.2, 1);
     pointer-events: none;
@@ -331,7 +333,7 @@ body.dragging {
     --panel-slide-y: 15px;
 
     /* Cinema Ticket Mask */
-    -webkit-mask-image: 
+    -webkit-mask-image:
         radial-gradient(circle at 0 0, transparent 14px, black 15px),
         radial-gradient(circle at 100% 0, transparent 14px, black 15px),
         radial-gradient(circle at 0 100%, transparent 14px, black 15px),
@@ -339,7 +341,7 @@ body.dragging {
         radial-gradient(circle at 0 452px, transparent 18px, black 19px),
         radial-gradient(circle at 100% 452px, transparent 18px, black 19px);
     -webkit-mask-composite: destination-in;
-    mask-image: 
+    mask-image:
         radial-gradient(circle at 0 0, transparent 14px, black 15px),
         radial-gradient(circle at 100% 0, transparent 14px, black 15px),
         radial-gradient(circle at 0 100%, transparent 14px, black 15px),
@@ -537,9 +539,12 @@ body.dragging {
 }
 
 .p-streaming-badge.subscribed {
-    background: rgba(6, 78, 59, 0.75); /* Dark forest green, still glass though */
-    border-color: rgba(34, 197, 94, 0.6); /* Vibrant green border for glow */
-    color: #ffffff; /* White text for max contrast */
+    background: rgba(6, 78, 59, 0.75);
+    /* Dark forest green, still glass though */
+    border-color: rgba(34, 197, 94, 0.6);
+    /* Vibrant green border for glow */
+    color: #ffffff;
+    /* White text for max contrast */
     box-shadow: 0 0 14px rgba(34, 197, 94, 0.25);
     font-weight: 800;
 }
@@ -634,7 +639,7 @@ body.dragging {
    ═══════════════════════════════════════════════════════════ */
 @media (max-width: 768px) {
     .sphere-header {
-        padding: 20px;
+        padding: max(20px, env(safe-area-inset-top)) 20px 20px;
         flex-direction: row;
         justify-content: space-between;
         align-items: center;
@@ -680,7 +685,8 @@ body.dragging {
         aspect-ratio: 380 / 570;
         max-height: 85vh !important;
         transform: translate(-50%, 120vh) !important;
-        border-radius: 0; /* Mask is preserved */
+        border-radius: 0;
+        /* Mask is preserved */
 
         /* Mobile Slide Offsets */
         --panel-slide-x: 100vw;
@@ -690,7 +696,7 @@ body.dragging {
     #panel.visible {
         transform: translate(-50%, -50%) !important;
     }
-    
+
     #panel.minimized {
         transform: translate(-50%, calc(-50% + 580px)) !important;
     }
@@ -822,6 +828,7 @@ body.dragging {
 #panel.panel-shell-secondary {
     border-color: var(--cold);
 }
+
 /* ═══════════════════════════════════════════════════════════
    TICKET TEAR LINE
    ═══════════════════════════════════════════════════════════ */
@@ -883,7 +890,8 @@ body.dragging {
     font-family: 'Fragment Mono', monospace;
     font-size: 8px;
     color: var(--text);
-    opacity: 0.5; /* increased contrast */
+    opacity: 0.5;
+    /* increased contrast */
     letter-spacing: 0.2em;
     white-space: nowrap;
 }
@@ -896,7 +904,8 @@ body.dragging {
     font-size: 10px;
     font-weight: 700;
     color: var(--ember);
-    opacity: 0.35; /* increased contrast */
+    opacity: 0.35;
+    /* increased contrast */
     padding: 4px 10px;
     border: 2px solid var(--ember);
     border-radius: 4px;
