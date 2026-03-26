@@ -7,7 +7,17 @@ import EditorialSection from "@/components/home/EditorialSection";
 import NowShowingCarousel from "@/components/home/NowShowingCarousel";
 import Footer from "@/components/layout/Footer";
 
+import { cookies } from "next/headers";
+import { redirect } from "next/navigation";
+
 export default async function Home() {
+  const cookieStore = await cookies();
+  const isAdminSession = cookieStore.get('admin_session')?.value === 'verified';
+
+  if (isAdminSession) {
+    redirect('/admin');
+  }
+
   const [{ nodes, edges, subscriptions }, articles] = await Promise.all([
     getPersonalizedGraph(),
     getPublishedArticles()

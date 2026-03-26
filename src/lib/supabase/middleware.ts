@@ -91,12 +91,22 @@ export async function updateSession(request: NextRequest) {
             return supabaseResponse;
         }
 
-        // ADMIN ROUTES PROTECTION
-        if (path.startsWith('/admin') && !isAdmin) {
-            console.log(`[Middleware] Unauthorized admin access attempt by ${user.email}`);
-            const url = request.nextUrl.clone();
-            url.pathname = '/sphere';
-            return NextResponse.redirect(url);
+        // ADMIN ROUTES PROTECTION (Role + MFA)
+        if (path.startsWith('/admin')) {
+            if (!isAdmin) {
+                console.log(`[Middleware] Unauthorized admin access attempt by ${user.email}`);
+                const url = request.nextUrl.clone();
+                url.pathname = '/sphere';
+                return NextResponse.redirect(url);
+            }
+
+            const adminSession = request.cookies.get('admin_session')?.value;
+            if (!adminSession && path !== '/admin/verify') {
+                console.log(`[Middleware] Admin MFA check failed for ${user.email} -> redirecting to /admin/verify`);
+                const url = request.nextUrl.clone();
+                url.pathname = '/admin/verify';
+                return NextResponse.redirect(url);
+            }
         }
 
         // Ensure we don't end in an infinite redirect loop if going to /onboarding

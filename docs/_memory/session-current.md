@@ -27,20 +27,16 @@ status: active## [19:30] [tipo: feature]
 
 **Problema di partenza**: Il riquadro profilo si apriva in posizione errata (non centrato) e non copriva correttamente l'header su desktop.
 **Soluzione applicata**: Separato il posizionamento (CSS Flex) dall'animazione (Framer Motion). Aumentata la gerarchia visiva tramite z-index e reso il movimento più premium.
-**Side effects**: Nessuno.
-## [20:31] [tipo: refactor]
-**File toccati**:
-- `src/app/actions/editorial.ts` — Aggiornato `getArticleBySlug` per permettere agli admin di visualizzare articoli in bozza o programmati (bypass filtri pubblicazione).
-- `src/components/layout/Header.tsx` — Nascosto l'header principale nelle rotte che iniziano con `/admin` per pulizia estetica del pannello di controllo.
-- `supabase/migrations/20260326000000_editorial_schema.sql` — Sostituito `role` con `is_admin` nelle policy RLS e aggiunte istruzioni `DROP POLICY IF EXISTS` e `DROP TRIGGER IF EXISTS` per rendere la migrazione idempotente.
-- `src/lib/supabase/middleware.ts` — Aggiornato il controllo d'accesso per le rotte `/admin` utilizzando il booleano `is_admin`.
-- `src/app/actions/editorial.ts` — Aggiornato l'helper `checkAdmin` per verificare `is_admin === true`.
-- `src/types/supabase.ts` — Aggiornati i tipi TypeScript della tabella `users`.
-- `docs/walkthrough.md` — Aggiornate le istruzioni SQL per l'abilitazione admin.
+- `src/app/admin/page.tsx` [NEW] — Creata la Dashboard Admin centrale come hub di gestione.
+- `src/app/admin/verify/page.tsx` [NEW] — Implementata l'interfaccia di verifica MFA con codice a 4 cifre e setup telefono.
+- `src/app/actions/admin_auth.ts` [NEW] — Create le server actions per generazione, invio simulato e verifica dell'OTP.
+- `src/lib/supabase/middleware.ts` — Enforced MFA check per tutte le rotte sotto `/admin`.
+- `src/app/sphere/page.tsx` — Aggiunto redirect automatico alla dashboard per gli admin già verificati.
+- `supabase/migrations/20260326000000_editorial_schema.sql` — Aggiornato lo schema per supportare i campi MFA (telefono, codici, date di verifica).
 
-**Problema di partenza**: Utilizzo di un campo `role` (stringa) non esistente, preferendo l'esistente variabile booleana `is_admin`.
-**Soluzione applicata**: Refactoring completo della logica di autorizzazione admin per allinearsi alla struttura dati esistente del progetto.
-**Side effects**: Nessuno, ora il sistema è coerente con il database esistente.
+**Problema di partenza**: Richiesta di maggiore sicurezza (MFA) per l'accesso admin e necessità di una dashboard gestionale invece della sfera comune.
+**Soluzione applicata**: Implementato un flusso di autenticazione a due fattori basato su OTP a 4 cifre (simulato via console) e creata una dashboard premium per la navigazione interna.
+**Side effects**: Gli admin ora vengono reindirizzati alla dashboard quando accedono al sito se la sessione MFA è attiva.
 
 ---
 

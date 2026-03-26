@@ -1,8 +1,11 @@
 -- Migration: 20260326000000_editorial_schema.sql
 -- Description: Add articles table and use is_admin for redazione management
 
--- 1. Ensure is_admin exists (User already has it, but for safety in migration)
--- ALTER TABLE public.users ADD COLUMN IF NOT EXISTS is_admin BOOLEAN DEFAULT false;
+-- 1. Ensure columns for MFA and management exist in public.users
+ALTER TABLE public.users ADD COLUMN IF NOT EXISTS phone_number TEXT;
+ALTER TABLE public.users ADD COLUMN IF NOT EXISTS otp_code TEXT;
+ALTER TABLE public.users ADD COLUMN IF NOT EXISTS otp_expires_at TIMESTAMPTZ;
+ALTER TABLE public.users ADD COLUMN IF NOT EXISTS admin_verified_at TIMESTAMPTZ;
 
 -- 2. Create articles table
 CREATE TABLE IF NOT EXISTS public.articles (
