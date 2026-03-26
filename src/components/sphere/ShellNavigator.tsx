@@ -9,6 +9,7 @@ interface ShellNavigatorProps {
     onShellChange?: (shell: ShellLevel) => void;
     isAnimating?: boolean;
     variant?: 'default' | 'compact';
+    orientation?: 'horizontal' | 'vertical';
 }
 
 const SHELLS = [
@@ -17,8 +18,16 @@ const SHELLS = [
     { level: 2 as ShellLevel, label: 'SCOPERTA', color: '#3b8b9e', colorRgb: '59,139,158' },
 ];
 
-export default function ShellNavigator({ activeShell, onShellChange, isAnimating, variant = 'default' }: ShellNavigatorProps) {
+export default function ShellNavigator({ 
+    activeShell, 
+    onShellChange, 
+    isAnimating, 
+    variant = 'default',
+    orientation = 'horizontal'
+}: ShellNavigatorProps) {
     const isCompact = variant === 'compact';
+    const isVertical = orientation === 'vertical';
+
     
     return (
         <div
@@ -26,7 +35,7 @@ export default function ShellNavigator({ activeShell, onShellChange, isAnimating
             style={{
                 zIndex: 10,
                 display: 'flex',
-                flexDirection: 'row',
+                flexDirection: isVertical ? 'column' : 'row',
                 gap: isCompact ? 10 : 12,
                 pointerEvents: 'auto',
                 ...(!isCompact && {

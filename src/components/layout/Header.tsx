@@ -19,6 +19,7 @@ export default function Header() {
     const [isCollapsed, setIsCollapsed] = useState(true);
     const [isHiddenByModal, setIsHiddenByModal] = useState(false);
     const [bubbleStyle, setBubbleStyle] = useState<{ left?: number, width?: number, top?: number, height?: number, opacity: number }>({ left: 0, width: 0, top: 0, height: 0, opacity: 0 });
+    const [isMobile, setIsMobile] = useState(false);
 
     useEffect(() => {
         const hide = () => setIsHiddenByModal(true);
@@ -53,8 +54,16 @@ export default function Header() {
         }
     };
 
-    // Toggle this to test experimental vertical layout
-    const isVerticalLayout = false;
+    // Responsive detection
+    useEffect(() => {
+        const mql = window.matchMedia('(max-width: 768px)');
+        const onChange = () => setIsMobile(mql.matches);
+        mql.addEventListener('change', onChange);
+        setIsMobile(mql.matches);
+        return () => mql.removeEventListener('change', onChange);
+    }, []);
+
+    const isVerticalLayout = !isMobile;
 
     /**
      * Updates the navigation bubble's position and size.
@@ -283,26 +292,11 @@ export default function Header() {
     );
 
     return (
-        <>
-            {/* Primary Header (Horizontal, bottom-centered) */}
-            {!isVerticalLayout && (
-                <header 
-                    className={`${styles.headerWrapper} ${styles.headerHorizontal} ${isCollapsed ? styles.headerCollapsed : ''} ${isHiddenByModal ? styles.headerHidden : ''}`} 
-                    ref={headerRef}
-                >
-                    {renderContent(false)}
-                </header>
-            )}
-
-            {/* Alternative Vertical Header */}
-            {isVerticalLayout && (
-                <header 
-                    className={`${styles.headerWrapper} ${styles.headerVertical} ${isHiddenByModal ? styles.headerHidden : ''}`} 
-                    ref={headerRef}
-                >
-                    {renderContent(true)}
-                </header>
-            )}
-        </>
+        <header 
+            className={`${styles.headerWrapper} ${isVerticalLayout ? styles.headerVertical : styles.headerHorizontal} ${isCollapsed && !isVerticalLayout ? styles.headerCollapsed : ''} ${isHiddenByModal ? styles.headerHidden : ''}`} 
+            ref={headerRef}
+        >
+            {renderContent(isVerticalLayout)}
+        </header>
     );
 }

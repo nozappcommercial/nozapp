@@ -100,15 +100,21 @@ export default function SemanticSphere({ files = [], edges = [], userSubscriptio
         }
     };
 
-    // Global Header visibility toggle
+    // Global Header visibility toggle & Body Scroll Lock
     useEffect(() => {
         if (selectedFilm) {
             window.dispatchEvent(new CustomEvent('hide-header'));
+            // Only lock scroll on mobile/small screens to maintain desktop fluidity
+            if (window.innerWidth <= 768) {
+                document.body.style.overflow = 'hidden';
+            }
         } else {
             window.dispatchEvent(new CustomEvent('show-header'));
+            document.body.style.overflow = '';
         }
         return () => {
             window.dispatchEvent(new CustomEvent('show-header'));
+            document.body.style.overflow = '';
         };
     }, [selectedFilm]);
 
@@ -1058,6 +1064,7 @@ export default function SemanticSphere({ files = [], edges = [], userSubscriptio
                         activeShell={activeShell}
                         onShellChange={setActiveShell}
                         isAnimating={isAnimating}
+                        orientation="vertical"
                     />
                 </div>
             </div>
