@@ -68,7 +68,11 @@ export async function logSecurityEvent(
     logMethod(`[SEC-AUDIT] ${type.toUpperCase()}: ${ip || 'no-ip'} | ${path || 'no-path'}`, JSON.stringify(logEntry, null, 2));
 
     // 2. Persistent logging (Database)
-    if (process.env.NODE_ENV === 'production' || process.env.ENABLE_DB_LOGGING === 'true') {
+    // Silently ignore Next.js "Dynamic server usage" errors during build/optimization, 
+    // as they are internal framework warnings, not real security or application errors.
+    const isDynamicServerError = metadata.error?.includes('Dynamic server usage');
+    
+    if (!isDynamicServerError && (process.env.NODE_ENV === 'production' || process.env.ENABLE_DB_LOGGING === 'true')) {
         try {
             const supabase = createAdminClient();
             const { error } = await supabase.from('security_logs').insert(logEntry);

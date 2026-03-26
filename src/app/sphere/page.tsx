@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic';
+
 import { getPersonalizedGraph } from "@/app/actions/graph";
 import SphereWithProfile from "@/components/profile/SphereWithProfile";
 import EditorialSection from "@/components/home/EditorialSection";
