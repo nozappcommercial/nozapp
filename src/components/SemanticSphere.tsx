@@ -1060,15 +1060,22 @@ export default function SemanticSphere({ files = [], edges = [], userSubscriptio
 
 
 
-            <div className="desktop-only-floating-nav" style={{ position: 'absolute', left: 28, top: '50%', transform: 'translateY(-50%)', zIndex: 10, display: 'flex', flexDirection: 'column', gap: 8, transformOrigin: 'left center' }}>
-                <div style={{ transform: 'scale(0.82)', transformOrigin: 'left center' }}>
-                    <ShellNavigator
-                        activeShell={activeShell}
-                        onShellChange={setActiveShell}
-                        isAnimating={isAnimating}
-                        orientation="vertical"
-                    />
-                </div>
+            <div className="desktop-only-floating-nav" style={{ 
+                position: 'absolute', 
+                left: 48, 
+                top: '50%', 
+                transform: 'translateY(-50%)', 
+                zIndex: 10, 
+                display: 'flex', 
+                flexDirection: 'column', 
+                gap: 12 
+            }}>
+                <ShellNavigator
+                    activeShell={activeShell}
+                    onShellChange={setActiveShell}
+                    isAnimating={isAnimating}
+                    orientation="vertical"
+                />
             </div>
 
             {/* Breadcrumb */}

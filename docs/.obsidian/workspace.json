@@ -13,12 +13,12 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "ui-system.md",
+                "file": "components.md",
                 "mode": "source",
                 "source": false
               },
               "icon": "lucide-file",
-              "title": "ui-system"
+              "title": "components"
             }
           }
         ]
@@ -53,7 +53,7 @@
             "state": {
               "type": "search",
               "state": {
-                "query": "",
+                "query": "redazione",
                 "matchingCase": false,
                 "explainSearch": false,
                 "collapseAll": false,
@@ -74,7 +74,8 @@
               "title": "Segnalibri"
             }
           }
-        ]
+        ],
+        "currentTab": 1
       }
     ],
     "direction": "horizontal",
@@ -94,8 +95,8 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "ui-system.md",
-                "collapseAll": false,
+                "file": "components.md",
+                "collapseAll": true,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
                 "showSearch": false,
@@ -104,7 +105,7 @@
                 "unlinkedCollapsed": true
               },
               "icon": "links-coming-in",
-              "title": "Riferimenti a ui-system"
+              "title": "Riferimenti a components"
             }
           },
           {
@@ -113,12 +114,12 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "ui-system.md",
+                "file": "components.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               },
               "icon": "links-going-out",
-              "title": "Collegamenti in uscita da ui-system"
+              "title": "Collegamenti in uscita da components"
             }
           },
           {
@@ -156,13 +157,13 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "ui-system.md",
+                "file": "components.md",
                 "followCursor": false,
                 "showSearch": false,
                 "searchQuery": ""
               },
               "icon": "lucide-list",
-              "title": "Struttura di ui-system"
+              "title": "Struttura di components"
             }
           }
         ]
@@ -184,11 +185,28 @@
   },
   "active": "1857785e5c4beb70",
   "lastOpenFiles": [
-    "auth.md",
     "progetto.md",
+    "_memory/session-current.md",
+    "_memory",
+    "onboarding-guide.md",
+    "known-issues.md",
+    "scripts.md",
+    "dependencies.md",
+    "configuration.md",
+    "types.md",
+    "hooks-and-utilities.md",
+    "data-flow.md",
+    "dataset.md",
+    "api.md",
+    "pages-and-routing.md",
+    "three-js.md",
+    "components.md",
+    "project-structure.md",
+    "architecture.md",
+    "auth.md",
+    "ui-system.md",
     "onboarding.md",
     "data-infrastructure.md",
-    "ui-system.md",
     "sphere-engine.md",
     "Benvenuto.md"
   ]

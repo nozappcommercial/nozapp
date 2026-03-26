@@ -2,6 +2,27 @@
 
 import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
+import Link from "next/link";
+
+interface Article {
+    id: string;
+    title: string;
+    slug: string;
+    excerpt: string | null;
+    cover_image: string | null;
+    published_at: string | null;
+    author?: {
+        display_name: string | null;
+    } | null;
+}
+
+const formatDate = (dateStr: string) => {
+    return new Intl.DateTimeFormat('it-IT', {
+        day: '2-digit',
+        month: 'long',
+        year: 'numeric'
+    }).format(new Date(dateStr));
+};
 
 /**
  * EDITORIAL SECTION
@@ -9,7 +30,7 @@ import Image from "next/image";
  * Displays curated articles/editorials with a scroll-reveal animation.
  * Uses IntersectionObserver to trigger animations when the section enters the viewport.
  */
-export default function EditorialSection() {
+export default function EditorialSection({ articles = [] }: { articles: Article[] }) {
     const [isVisible, setIsVisible] = useState(false);
     const sectionRef = useRef<HTMLElement>(null);
 
@@ -34,28 +55,7 @@ export default function EditorialSection() {
         return () => observer.disconnect();
     }, []);
 
-    const articles = [
-        {
-            id: 1,
-            title: "Il cinema contemplativo di Tarkovsky: un viaggio nel tempo e nello spazio interiore",
-            date: "12 Ottobre 2026",
-            excerpt: "Da Solaris a Stalker, un'esplorazione profonda dei pilastri del cinema russo e del modo in cui la percezione del tempo modella la psiche dei protagonisti...",
-            authorName: "Nome Cognome",
-            authorRole: "Redattore Capo",
-            authorAvatar: "data:image/gif;base64,R0lGODlhAQABAIAAAMLCwgAAACH5BAAAAAAALAAAAAABAAEAAAICRAEAOw==",
-            coverImage: "https://images.unsplash.com/photo-1440404653325-ab127d49abc1?auto=format&fit=crop&q=80&w=800&h=400"
-        },
-        {
-            id: 2,
-            title: "L'estetica del Neon-Noir: ombre, luci al neon e alienazione urbana",
-            date: "28 Settembre 2026",
-            excerpt: "Analisi dell'evoluzione stilistica partendo dal capolavoro Blade Runner fino ad arrivare alle luci al neon disperate nelle opere metropolitane di Nicolas Winding Refn...",
-            authorName: "Nome Cognome",
-            authorRole: "Critica Cinematografica",
-            authorAvatar: "data:image/gif;base64,R0lGODlhAQABAIAAAMLCwgAAACH5BAAAAAAALAAAAAABAAEAAAICRAEAOw==",
-            coverImage: "https://images.unsplash.com/photo-1536440136628-849c177e76a1?auto=format&fit=crop&q=80&w=800&h=400"
-        }
-    ];
+    if (articles.length === 0) return null;
 
     return (
         <section 
@@ -74,27 +74,32 @@ export default function EditorialSection() {
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
                     {articles.map((article, index) => (
-                        <article 
-                            key={article.id} 
+                        <Link
+                            key={article.id}
+                            href={`/redazione/${article.slug}`}
                             style={{ transitionDelay: `${index * 200}ms` }} // Staggered delay logic
                             className={`group cursor-pointer flex flex-col transition-all duration-1000 transform hover:-translate-y-2 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-12'}`}
                         >
                             {/* Cover Image */}
                             <div className="relative w-full aspect-[16/9] mb-6 overflow-hidden rounded-sm bg-black/5">
-                                <Image
-                                    src={article.coverImage}
-                                    alt={article.title}
-                                    fill
-                                    sizes="(max-width: 768px) 100vw, 50vw"
-                                    className="object-cover transition-transform duration-700 group-hover:scale-105"
-                                />
+                                {article.cover_image ? (
+                                    <Image
+                                        src={article.cover_image}
+                                        alt={article.title}
+                                        fill
+                                        sizes="(max-width: 768px) 100vw, 50vw"
+                                        className="object-cover transition-transform duration-700 group-hover:scale-105"
+                                    />
+                                ) : (
+                                    <div className="w-full h-full bg-[#1a1a1a]/10" />
+                                )}
                                 <div className="absolute inset-0 bg-black/10 group-hover:bg-transparent transition-colors duration-300" />
                             </div>
 
                             {/* Meta & Title */}
                             <div className="flex flex-col flex-1">
                                 <div className="font-['Fragment_Mono'] text-[9px] uppercase tracking-[0.2em] text-[var(--ember)] mb-3 opacity-80">
-                                    {article.date}
+                                    {article.published_at ? formatDate(article.published_at) : ''}
                                 </div>
                                 <h3 className="text-2xl md:text-3xl leading-snug mb-4 group-hover:text-[var(--gold)] transition-colors">
                                     {article.title}
@@ -105,26 +110,20 @@ export default function EditorialSection() {
 
                                 {/* Author footer */}
                                 <div className="flex items-center gap-4 mt-auto pt-6 border-t border-black/5">
-                                    <div className="relative w-10 h-10 rounded-full overflow-hidden border border-black/10 bg-black/5">
-                                        <Image
-                                            src={article.authorAvatar}
-                                            alt={article.authorName}
-                                            fill
-                                            sizes="40px"
-                                            className="object-cover grayscale group-hover:grayscale-0 transition-all duration-300"
-                                        />
+                                    <div className="w-10 h-10 rounded-full flex items-center justify-center border border-black/10 bg-black/5 text-black/40">
+                                        <span className="font-serif italic text-lg">{article.author?.display_name?.charAt(0) || 'R'}</span>
                                     </div>
                                     <div className="flex flex-col">
                                         <span className="font-['Fragment_Mono'] text-[8px] uppercase tracking-widest opacity-50 mb-1">
                                             Scritto da
                                         </span>
                                         <span className="text-lg leading-none">
-                                            {article.authorName}
+                                            {article.author?.display_name || 'Redazione'}
                                         </span>
                                     </div>
                                 </div>
                             </div>
-                        </article>
+                        </Link>
                     ))}
                 </div>
             </div>

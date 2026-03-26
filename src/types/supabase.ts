@@ -67,23 +67,70 @@ export interface Database {
                     created_at?: string
                 }
             }
+            articles: {
+                Row: {
+                    id: string
+                    title: string
+                    slug: string
+                    content: string
+                    excerpt: string | null
+                    cover_image: string | null
+                    author_id: string | null
+                    status: 'draft' | 'published'
+                    published_at: string | null
+                    expires_at: string | null
+                    created_at: string
+                    updated_at: string
+                }
+                Insert: {
+                    id?: string
+                    title: string
+                    slug: string
+                    content: string
+                    excerpt?: string | null
+                    cover_image?: string | null
+                    author_id?: string | null
+                    status?: 'draft' | 'published'
+                    published_at?: string | null
+                    expires_at?: string | null
+                    created_at?: string
+                    updated_at?: string
+                }
+                Update: {
+                    id?: string
+                    title?: string
+                    slug?: string
+                    content?: string
+                    excerpt?: string | null
+                    cover_image?: string | null
+                    author_id?: string | null
+                    status?: 'draft' | 'published'
+                    published_at?: string | null
+                    expires_at?: string | null
+                    created_at?: string
+                    updated_at?: string
+                }
+            }
             users: {
                 Row: {
                     id: string
                     display_name: string | null
                     onboarding_complete: boolean
+                    role: 'user' | 'admin'
                     created_at: string
                 }
                 Insert: {
                     id: string
                     display_name?: string | null
                     onboarding_complete?: boolean
+                    role?: 'user' | 'admin'
                     created_at?: string
                 }
                 Update: {
                     id?: string
                     display_name?: string | null
                     onboarding_complete?: boolean
+                    role?: 'user' | 'admin'
                     created_at?: string
                 }
             }
@@ -91,21 +138,21 @@ export interface Database {
                 Row: {
                     id: string
                     user_id: string
-                    film_id: string
+                    film_id: number
                     rank: number
                     created_at: string
                 }
                 Insert: {
                     id?: string
                     user_id: string
-                    film_id: string
+                    film_id: number
                     rank: number
                     created_at?: string
                 }
                 Update: {
                     id?: string
                     user_id?: string
-                    film_id?: string
+                    film_id?: number
                     rank?: number
                     created_at?: string
                 }

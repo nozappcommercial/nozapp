@@ -1,13 +1,17 @@
 export const dynamic = 'force-dynamic';
 
 import { getPersonalizedGraph } from "@/app/actions/graph";
+import { getPublishedArticles } from "@/app/actions/editorial";
 import SphereWithProfile from "@/components/profile/SphereWithProfile";
 import EditorialSection from "@/components/home/EditorialSection";
 import NowShowingCarousel from "@/components/home/NowShowingCarousel";
 import Footer from "@/components/layout/Footer";
 
 export default async function Home() {
-  const { nodes, edges, subscriptions } = await getPersonalizedGraph();
+  const [{ nodes, edges, subscriptions }, articles] = await Promise.all([
+    getPersonalizedGraph(),
+    getPublishedArticles()
+  ]);
 
   if (!nodes || nodes.length === 0) {
     return (
@@ -49,7 +53,7 @@ export default async function Home() {
       <section id="sfera" className="relative w-full h-[100vh] overflow-hidden">
         <SphereWithProfile nodes={nodes} edges={cappedEdges} subscriptions={subscriptions} />
       </section>
-      <EditorialSection />
+      <EditorialSection articles={articles as any} />
       <NowShowingCarousel movies={carouselMovies} />
       <Footer />
     </main>

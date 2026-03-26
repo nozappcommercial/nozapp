@@ -73,7 +73,7 @@ export async function updateSession(request: NextRequest) {
     if (user) {
         const { data: profile, error: profileError } = await supabase
             .from('users')
-            .select('onboarding_complete')
+            .select('onboarding_complete, role')
             .eq('id', user.id)
             .single();
 
@@ -81,17 +81,26 @@ export async function updateSession(request: NextRequest) {
             console.error(`[Middleware] Error fetching profile for ${user.id}:`, profileError);
         }
 
-        const onboardingComplete = (profile as unknown as { onboarding_complete?: boolean })?.onboarding_complete ?? false;
+        const onboardingComplete = (profile as any)?.onboarding_complete ?? false;
+        const role = (profile as any)?.role ?? 'user';
         
-        console.log(`[Middleware] User: ${user.email} (${user.id}), onboarding_complete: ${onboardingComplete}, path: ${path}`);
+        console.log(`[Middleware] User: ${user.email} (${user.id}), role: ${role}, onboarding_complete: ${onboardingComplete}, path: ${path}`);
 
         // If it's an API route, don't redirect, just let the request through
         if (isApiRoute) {
             return supabaseResponse;
         }
 
+        // ADMIN ROUTES PROTECTION
+        if (path.startsWith('/admin') && role !== 'admin') {
+            console.log(`[Middleware] Unauthorized admin access attempt by ${user.email}`);
+            const url = request.nextUrl.clone();
+            url.pathname = '/sphere';
+            return NextResponse.redirect(url);
+        }
+
         // Ensure we don't end in an infinite redirect loop if going to /onboarding
-        if (!onboardingComplete && path !== '/onboarding' && !isAuthRoute) {
+        if (!onboardingComplete && path !== '/onboarding' && !isAuthRoute && !path.startsWith('/admin')) {
             console.log(`[Middleware] Case 1: Not complete & not on /onboarding -> Redirecting to /onboarding`);
             const url = request.nextUrl.clone();
             url.pathname = '/onboarding';
@@ -105,7 +114,7 @@ export async function updateSession(request: NextRequest) {
             return NextResponse.redirect(url);
         }
 
-        if (isAuthRoute || path === '/') {
+        if ((isAuthRoute || path === '/') && !path.startsWith('/admin')) {
             console.log(`[Middleware] Case 3: (Auth route or root) -> Redirecting to /sphere`);
             const url = request.nextUrl.clone();
             url.pathname = '/sphere';

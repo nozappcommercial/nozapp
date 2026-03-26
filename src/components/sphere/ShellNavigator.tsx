@@ -39,7 +39,7 @@ export default function ShellNavigator({
                 flexDirection: isVertical ? 'column' : 'row',
                 gap: isCompact ? 10 : 12,
                 pointerEvents: 'auto',
-                ...(!isCompact && {
+                ...(!isCompact && !isVertical && {
                     position: 'fixed',
                     top: 'max(env(safe-area-inset-top), 24px)',
                     left: '50%',
