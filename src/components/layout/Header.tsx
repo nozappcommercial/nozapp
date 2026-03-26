@@ -16,7 +16,7 @@ const NAV_ITEMS = [
 export default function Header() {
     const [activeSection, setActiveSection] = useState('sfera');
     const [hoveredSection, setHoveredSection] = useState<string | null>(null);
-    const [isCollapsed, setIsCollapsed] = useState(true);
+    const [isCollapsed, setIsCollapsed] = useState(false);
     const [isHiddenByModal, setIsHiddenByModal] = useState(false);
     const [bubbleStyle, setBubbleStyle] = useState<{ left?: number, width?: number, top?: number, height?: number, opacity: number }>({ left: 0, width: 0, top: 0, height: 0, opacity: 0 });
     const [isMobile, setIsMobile] = useState(false);
@@ -133,11 +133,11 @@ export default function Header() {
                 const scrollPos = window.scrollY;
                 const scrollThreshold = 10;
 
-                // Set collapsed state
-                if (scrollPos > scrollThreshold && isCollapsed) {
-                    setIsCollapsed(false);
-                } else if (scrollPos <= scrollThreshold && !isCollapsed) {
+                // Set collapsed state (Inverted: Expanded at top, Collapsed when scrolling down)
+                if (scrollPos > scrollThreshold && !isCollapsed) {
                     setIsCollapsed(true);
+                } else if (scrollPos <= scrollThreshold && isCollapsed) {
+                    setIsCollapsed(false);
                 }
 
                 // Remove purely scroll-based tracking; handled by IntersectionObserver
@@ -214,8 +214,9 @@ export default function Header() {
         if (section) {
             const anime = (await import('animejs')).default;
             
-            // RESPONSIBLE LINE: Added 60px offset to avoid showing the end of the previous section
-            const targetPos = Math.max(0, section.offsetTop + 60);
+            // Apply offset only for editorial sections to avoid cutting off the top sphere logo
+            const offset = id === 'sphere' ? 0 : 60;
+            const targetPos = Math.max(0, section.offsetTop + offset);
             const currentPos = window.scrollY;
 
             anime({
