@@ -134,6 +134,13 @@ export default function VerifyAdminPage() {
                             {isSending ? <Loader2 className="animate-spin" size={18} /> : <Mail size={18} />}
                             Invia Codice via Email
                         </button>
+                        <button
+                            onClick={() => setStep('verify')}
+                            type="button"
+                            className="w-full text-[10px] font-['Fragment_Mono'] uppercase tracking-widest text-black/30 hover:text-black/60 transition-colors text-center"
+                        >
+                            Ho già un codice
+                        </button>
                     </div>
                 ) : (
                     <form onSubmit={handleVerify} className="space-y-8">

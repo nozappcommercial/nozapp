@@ -5,6 +5,7 @@ status: active
 
 ## [09:15] [tipo: feature]
 
+
 **File toccati**:
 - `src/app/actions/admin_auth.ts` — Migrazione dall'invio simulato (console) all'invio reale tramite Supabase Auth (`signInWithOtp`).
 - `src/app/admin/verify/page.tsx` — Aggiornata la UI di verifica per supportare l'OTP a 6 cifre di Supabase (precedentemente 4).
@@ -17,7 +18,7 @@ status: active
 
 **File toccati**:
 - `src/app/actions/admin_auth.ts` — Cambiato il metodo di autenticazione da `phone` a `email` nelle chiamate a Supabase Auth. Rimosse le dipendenze dalla colonna `phone_number` per l'MFA.
-- `src/app/admin/verify/page.tsx` — Riprogettata la UI per l'Email MFA: rimosso il setup del telefono, aggiornate le icone (Mail) e i testi. Il numero di slot per l'OTP è stato esteso a 8 cifre per supportare il codice generato dal template Supabase.
+- `src/app/admin/verify/page.tsx` — Riprogettata la UI per l'Email MFA: rimosso il setup del telefono, aggiornate le icone (Mail) e i testi. Il numero di slot per l'OTP è stato esteso a 8 cifre per supportare il codice generato dal template Supabase. Aggiunto pulsante "Ho già un codice" per saltare l'invio.
 
 **Problema di partenza**: L'invio SMS tramite Supabase restituiva l'errore "Unsupported phone provider" a causa dei costi e della necessità di configurazione di provider esterni.
 **Soluzione applicata**: Migrato l'intero sistema MFA su Email. Essendo un pannello Admin, l'email è un canale sicuro, gratuito e già verificato per ogni utente. Questo garantisce affidabilità totale senza costi aggiuntivi.
