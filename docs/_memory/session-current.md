@@ -17,3 +17,56 @@ status: active
 **Side effects**: Migliorata la precisione dello scroll e la velocità di percezione del caricamento.
 
 ---
+
+## [16:01] config
+
+**File toccati**:
+
+- `.gitignore` — Aggiunta `.agents` per evitare l'upload delle cartelle di configurazione degli agenti su git.
+
+**Problema di partenza**: La cartella `.agents` non era esclusa dal controllo di versione.
+**Soluzione applicata**: Inserito `.agents` nel file `.gitignore`.
+**Side effects**: Nessuno.
+
+---
+
+## [16:20] feature
+
+**File toccati**:
+
+- `docs/todo.md` — [Nuovo] Generazione automatica della lista TODO basata sull'analisi della documentazione (`IMPORTANT`, `TIP`, alert).
+
+**Problema di partenza**: Necessità di centralizzare i problemi e suggerimenti sparsi nella documentazione in un unico file azionabile.
+**Soluzione applicata**: Eseguito il workflow `/analista`. Scansionati tutti i file `.md` in `docs/`, classificate 14 voci per priorità (P1-P4) e organizzate in `docs/todo.md`.
+**Side effects**: Nessuno.
+
+---
+
+## [16:08] meccanico — P1-001
+
+**File toccati**:
+
+- `src/lib/config.ts` — [Nuovo] Centralizzazione e validazione Zod delle variabili d'ambiente.
+- `src/app/api/admin/sync-streaming/route.ts` — Utilizzo del modulo `config` per l'accesso alle chiavi.
+- `.env.example` — Aggiunta documentazione per `TMDB_API_KEY`.
+
+**Problema di partenza**: Non esporre mai le API Key (`TMDB_API_KEY`, `RAPIDAPI_KEY`) sul lato client.
+**Soluzione applicata**: Creato un modulo `config.ts` marcato con `server-only` che valida le chiavi all'avvio. Rimosso l'accesso diretto a `process.env` nelle rotte server per garantire che le chiavi siano gestite in modo sicuro e centralizzato.
+**Side effects**: Nessuno. Richiede il riavvio del server per caricare le nuove configurazioni.
+**Todo chiuso**: P1-001 → ✅
+
+---
+
+## [16:50] refactor: typescript — P2-001
+
+**File toccati**:
+
+- `src/components/SemanticSphere.tsx` — Transizione a tipizzazione rigorosa e rimozione `@ts-nocheck`.
+- `src/types/three-extended.d.ts` — [Nuovo] Definizioni tipi per `userData` e TweenTasks di Three.js.
+
+**Problema di partenza**: Il componente Three.js principale (`SemanticSphere.tsx`) era privo di tipi e utilizzava `@ts-nocheck`, rendendo difficile la manutenzione e prono a bug silenziosi.
+**Soluzione applicata**: Rimossa la direttiva `@ts-nocheck`. Implementata una tipizzazione completa per mesh, materiali (cast a `MeshBasicMaterial`), eventi touch/mouse e logica di navigazione dei nodi. Utilizzate le interfacce custom `ExtendedMesh` e `ExtendedLine` per gestire i metadati dei nodi.
+**Side effects**: Nessuno, verificato con `npm run build`. Migliorata drasticamente l'affidabilità del codice durante lo sviluppo.
+**Todo chiuso**: P2-001 → ✅
+
+---

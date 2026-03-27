@@ -1,27 +1,20 @@
 import { createClient } from "@supabase/supabase-js";
 import { NextResponse } from "next/server";
+import { config } from "@/lib/config";
 
 const RAPIDAPI_URL = "https://streaming-availability.p.rapidapi.com/shows/search/title";
 
 export async function GET(req: Request) {
-  const RAPIDAPI_KEY = process.env.RAPIDAPI_KEY;
-  const CRON_SECRET = process.env.CRON_SECRET;
+  const RAPIDAPI_KEY = config.RAPIDAPI_KEY;
+  const CRON_SECRET = config.CRON_SECRET;
 
   const authHeader = req.headers.get('authorization');
-  if (CRON_SECRET && authHeader !== `Bearer ${CRON_SECRET}`) {
+  if (authHeader !== `Bearer ${CRON_SECRET}`) {
       return NextResponse.json({ error: "Unauthorized access" }, { status: 401 });
   }
 
-  if (!RAPIDAPI_KEY) {
-    return NextResponse.json({ error: "Manca la 'RAPIDAPI_KEY' nel file .env (assicurati di aver salvato il file e riavviato npm run dev)" }, { status: 500 });
-  }
-
-  // Use Service Role Key to bypass Row Level Security on the `films` table
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
-  if (!supabaseUrl || !supabaseServiceKey) {
-     return NextResponse.json({ error: "Manca la 'SUPABASE_SERVICE_ROLE_KEY' nel file .env" }, { status: 500 });
-  }
+  const supabaseUrl = config.NEXT_PUBLIC_SUPABASE_URL;
+  const supabaseServiceKey = config.SUPABASE_SERVICE_ROLE_KEY;
   
   const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
