@@ -117,9 +117,6 @@ export interface Database {
                     display_name: string | null
                     onboarding_complete: boolean
                     is_admin: boolean
-                    phone_number: string | null
-                    otp_code: string | null
-                    otp_expires_at: string | null
                     admin_verified_at: string | null
                     created_at: string
                 }
@@ -128,9 +125,6 @@ export interface Database {
                     display_name?: string | null
                     onboarding_complete?: boolean
                     is_admin?: boolean
-                    phone_number?: string | null
-                    otp_code?: string | null
-                    otp_expires_at?: string | null
                     admin_verified_at?: string | null
                     created_at?: string
                 }
@@ -139,9 +133,6 @@ export interface Database {
                     display_name?: string | null
                     onboarding_complete?: boolean
                     is_admin?: boolean
-                    phone_number?: string | null
-                    otp_code?: string | null
-                    otp_expires_at?: string | null
                     admin_verified_at?: string | null
                     created_at?: string
                 }

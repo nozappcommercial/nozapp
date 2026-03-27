@@ -18,7 +18,7 @@ Generati automaticamente tramite Supabase CLI, definiscono lo schema esatto dell
 | `user_onboarding_results` | `OnboardingResult` | Configurazione JSON dei risultati del wizard. |
 | `security_logs` | `SecurityLog` | Record degli audit di sicurezza. |
 | `articles` | `Article` | Contenuti redazionali (titolo, slug, contenuto). |
-| `users` | `User` | Profili utente estesi con flag `is_admin` e campi MFA (`phone_number`, `otp_code`). |
+| `users` | `User` | Profili utente estesi con flag `is_admin`, `onboarding_complete` e timestamp MFA (`admin_verified_at`). |
 
 ## Tipi del Grafo (`src/lib/graph/`)
 Utilizzati dallo Sphere Engine per il rendering e la navigazione.

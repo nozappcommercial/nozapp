@@ -42,33 +42,6 @@ export async function generateAdminOTP() {
     }
 }
 
-/**
- * UPDATE ADMIN PHONE (Initial Setup)
- */
-export async function updateAdminPhone(phone: string) {
-    const supabase = await createClient();
-    const { data: { user } } = await supabase.auth.getUser();
-
-    if (!user) throw new Error('Non autorizzato');
-
-    // Verify is_admin
-    const { data: profile } = await supabase
-        .from('users')
-        .select('is_admin')
-        .eq('id', user.id)
-        .single();
-
-    if (!profile?.is_admin) throw new Error('Accesso riservato agli amministratori');
-
-    const { error } = await supabase
-        .from('users')
-        .update({ phone_number: phone })
-        .eq('id', user.id);
-
-    if (error) throw new Error('Errore nell\'aggiornamento del numero di telefono');
-
-    return { success: true };
-}
 
 /**
  * VERIFY OTP
@@ -127,7 +100,7 @@ export async function getAdminProfile() {
 
     const { data: profile } = await supabase
         .from('users')
-        .select('is_admin, phone_number')
+        .select('is_admin')
         .eq('id', user.id)
         .single();
 

@@ -3,15 +3,14 @@
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { ShieldCheck, Mail, Loader2, ArrowLeft, Send } from 'lucide-react';
-import { generateAdminOTP, verifyAdminOTP, getAdminProfile, updateAdminPhone } from '@/app/actions/admin_auth';
+import { generateAdminOTP, verifyAdminOTP } from '@/app/actions/admin_auth';
 
 export default function VerifyAdminPage() {
     const [code, setCode] = useState(['', '', '', '', '', '', '', '']);
     const [isLoading, setIsLoading] = useState(false);
     const [isSending, setIsSending] = useState(false);
     const [error, setError] = useState<string | null>(null);
-    const [step, setStep] = useState<'setup' | 'request' | 'verify'>('request');
-    const [phone, setPhone] = useState('');
+    const [step, setStep] = useState<'request' | 'verify'>('request');
     const router = useRouter();
 
     useEffect(() => {
@@ -19,19 +18,6 @@ export default function VerifyAdminPage() {
         setStep('request');
     }, []);
 
-    const handleSetupPhone = async (e: React.FormEvent) => {
-        e.preventDefault();
-        if (!phone) return;
-        setIsLoading(true);
-        try {
-            await updateAdminPhone(phone);
-            setStep('request');
-        } catch (err: any) {
-            setError(err.message);
-        } finally {
-            setIsLoading(false);
-        }
-    };
 
     const handleSendOTP = async () => {
         setIsSending(true);

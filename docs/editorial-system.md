@@ -39,5 +39,5 @@ Per proteggere l'area amministrativa, è stato implementato un secondo livello d
 Vedere [[database]] per il dettaglio della tabella `articles` e le nuove colonne MFA nella tabella `users`.
 
 ---
-🔄 **Aggiornato il 2026-03-27**: Migrazione completa da SMS simulato a Email MFA reale (8 cifre). Rimosso obbligo configurazione telefono.
-File modificati: `src/app/actions/admin_auth.ts`, `src/app/admin/verify/page.tsx`
+🔄 **Aggiornato il 2026-03-27**: Migrazione completa da SMS a Email MFA reale (8 cifre). Rimosso obbligo configurazione telefono e puliti campi obsoleti nel DB (`phone_number`, `otp_code`, `role`).
+File modificati: `src/app/actions/admin_auth.ts`, `src/app/admin/verify/page.tsx`, `supabase/migrations/20260327000000_cleanup_users_table.sql`

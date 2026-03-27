@@ -6,6 +6,7 @@ trigger: always_on
 
 Esiste un file `docs/_memory/session-current.md`.
 Questo file è il tuo diario di lavoro attivo.
+Quando /aggiornatore termina il suo lavoro, deve segnare come completati le sessioni precedenti con status:"done".
 
 ### Quando aggiungerci una voce
 
@@ -35,6 +36,7 @@ Se session-current.md è vuoto o non esiste, crealo con:
 
 date: [DATA]
 status: active
+
 ---
 
 ### Cosa NON fare
