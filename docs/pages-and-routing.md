@@ -18,6 +18,9 @@ NoZapp utilizza l'**App Router** di Next.js 14 per gestire la navigazione. La ma
 | `/redazione/[slug]` | `app/redazione/[slug]/page.tsx` | Dynamic | Root | Visualizzazione articolo singolo (template pubblico). |
 | `/admin` | `app/admin/page.tsx` | SSR | Admin | Dashboard gestionale per amministratori. |
 | `/admin/redazione` | `app/admin/redazione/page.tsx` | SSR | Admin | Lista articoli e gestione contenuti. |
+| `/admin/cinema` | `app/admin/cinema/page.tsx` | SSR | Admin | Lista film in programmazione (manuale). |
+| `/admin/cinema/nuovo` | `app/admin/cinema/nuovo/page.tsx` | SSR | Admin | Form creazione nuovo film. |
+| `/admin/cinema/[id]` | `app/admin/cinema/[id]/page.tsx` | SSR | Admin | Form modifica film esistente. |
 | `/admin/verify` | `app/admin/verify/page.tsx` | CSR | Root | Verifica MFA (Multi-Factor Authentication). |
 
 ## Strategie di Rendering
@@ -68,4 +71,4 @@ graph TD
 > [!TIP]
 > Il middleware in `src/lib/supabase/middleware.ts` è il centro di controllo del routing basato sullo stato di onboarding dell'utente e sui permessi amministrativi (MFA).
 
-🔄 **Aggiornato il 2026-03-27**: Refactoring del layout admin: introdotto header dinamico con titoli contestuali e pulsante di ritorno alla dashboard dalle sottopagine.
+🔄 **Aggiornato il 2026-03-27**: Introdotte le rotte per la gestione manuale del Cinema (`/admin/cinema`).

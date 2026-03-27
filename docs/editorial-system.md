@@ -18,7 +18,15 @@ Il workflow si basa su uno stato binario (`draft` | `published`) e sulla program
 ## Dashboard Admin (`/admin`)
 La dashboard centrale funge da hub per:
 - **Redazione**: Lista articoli con indicatori di stato (Bozza/Pubblicato/Scaduto).
+- **Cinema**: Gestione manuale del carosello pubblico "Ora al Cinema" con supporto per le date di scadenza.
 - **Sicurezza**: Gestione del profilo e sessione MFA.
+
+## Gestione Cinema (Manuale)
+A differenza del resto della Sfera Semantica (che è dinamica), la sezione Cinema è curata manualmente dagli amministratori per garantire il lancio di titoli specifici o promozioni.
+
+- **Campi**: Titolo, Regista, Anno, URL Poster, Temi (Tag), Data di Scadenza.
+- **Automazione**: Il sistema nasconde automaticamente i film dal carosello pubblico non appena viene superata la `expires_at`.
+- **Integrazione**: I dati sono recuperati tramite la Server Action `getCinemaMoviesPublic` che filtra i record scaduti.
 
 ## Sicurezza: Multi-Factor Authentication (MFA)
 Per proteggere l'area amministrativa, è stato implementato un secondo livello di sicurezza basato su Email OTP (One-Time Password) a 8 cifre.
@@ -39,5 +47,5 @@ Per proteggere l'area amministrativa, è stato implementato un secondo livello d
 Vedere [[database]] per il dettaglio della tabella `articles` e le nuove colonne MFA nella tabella `users`.
 
 ---
-🔄 **Aggiornato il 2026-03-27**: Migrazione completa da SMS a Email MFA reale (8 cifre). Rimosso obbligo configurazione telefono e puliti campi obsoleti nel DB (`phone_number`, `otp_code`, `role`).
+🔄 **Aggiornato il 2026-03-27**: Introdotto il sistema di gestione manuale Cinema (`cinema_movies`) con CRUD completo e scadenze automatiche.
 File modificati: `src/app/actions/admin_auth.ts`, `src/app/admin/verify/page.tsx`, `supabase/migrations/20260327000000_cleanup_users_table.sql`

@@ -18,6 +18,7 @@ Generati automaticamente tramite Supabase CLI, definiscono lo schema esatto dell
 | `user_onboarding_results` | `OnboardingResult` | Configurazione JSON dei risultati del wizard. |
 | `security_logs` | `SecurityLog` | Record degli audit di sicurezza. |
 | `articles` | `Article` | Contenuti redazionali (titolo, slug, contenuto). |
+| `cinema_movies` | `CinemaMovie` | Film in programmazione (manuali, con scadenza). |
 | `users` | `User` | Profili utente estesi con flag `is_admin`, `onboarding_complete` e timestamp MFA (`admin_verified_at`). |
 
 🔄 **Aggiornato il 2026-03-27**: Rimozione dei campi `role`, `phone_number`, `otp_code` e `otp_expires_at` dalla tabella `users` in favore di un sistema MFA via Email semplificato.
@@ -75,4 +76,4 @@ L'utilizzo del tipo `any` è scoraggiato e limitato esclusivamente a:
 > [!IMPORTANT]
 > Quando modifichi lo schema del database su Supabase, ricordati di rigenerare i tipi tramite `npx supabase gen types typescript --project-id ... > src/types/supabase.ts`.
 
-🔄 **Aggiornato il 2026-03-26**: Inseriti i tipi per il sistema editoriale e le estensioni MFA dei profili utente.
+🔄 **Aggiornato il 2026-03-27**: Inseriti i tipi per il sistema di gestione manuale Cinema (`cinema_movies`).

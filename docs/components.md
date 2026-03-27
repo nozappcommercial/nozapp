@@ -65,6 +65,17 @@ I componenti di NoZapp sono suddivisi in **UI atomici** (Shadcn), **Layout** (st
 
 ---
 
+### `CinemaForm` — `src/components/admin/CinemaForm.tsx`
+**Scopo**: Form per la gestione manuale dei film nel carosello "Ora al Cinema".
+**Responsabilità**:
+- Validazione dei dati tramite Zod.
+- Gestione dell'integrità dei temi (conversione stringa -> array).
+- Calcolo e visualizzazione della preview del poster.
+- Gestione della data di scadenza (`expires_at`).
+**Integrazione**: Utilizza le Server Actions in `src/app/actions/cinema.ts`.
+
+---
+
 ### `AuthHandler` — `src/components/auth/AuthHandler.tsx`
 **Scopo**: Gestore invisibile lato client per la logica di autenticazione.
 **Responsabilità**:
@@ -85,4 +96,4 @@ Questi componenti si trovano in `src/components/ui/` e seguono le specifiche di 
 > [!NOTE]
 > Tutti i componenti utilizzano tipicamente `framer-motion` per micro-interazioni e transizioni di stato.
 
-🔄 **Aggiornato il 2026-03-27**: Introdotto `AdminHeader` per la gestione dinamica del titolo e della navigazione nell'area gestionale.
+🔄 **Aggiornato il 2026-03-27**: Introdotto `CinemaForm` per la gestione della programmazione film.
