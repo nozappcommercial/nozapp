@@ -37,6 +37,7 @@ Per proteggere l'area amministrativa, è stato implementato un secondo livello d
 3. **Verifica Sessione**: Se il cookie `admin_session` è assente, l'utente viene reindirizzato a `/admin/verify`.
 4. **Invio Codice**: L'utente richiede un codice via Email (servizio nativo Supabase Auth). 
 5. **Validazione**: Inserito il codice a 8 cifre corretto, viene impostato un cookie `httpOnly` sicuro della durata di 2 ore. L'utente ha anche l'opzione "Ho già un codice" per inserire un token precedentemente ricevuto senza generare un nuovo invio.
+6. **Logout**: La disconnessione avviene tramite Server Action (`logoutAdmin`) che invalida la sessione Supabase e rimuove il cookie `admin_session` per prevenire loop di redirect.
 
 ## Componenti Chiave
 - `ArticleForm.tsx`: Componente client per il CRUD degli articoli.
@@ -47,5 +48,5 @@ Per proteggere l'area amministrativa, è stato implementato un secondo livello d
 Vedere [[database]] per il dettaglio della tabella `articles` e le nuove colonne MFA nella tabella `users`.
 
 ---
-🔄 **Aggiornato il 2026-03-27**: Introdotto il sistema di gestione manuale Cinema (`cinema_movies`) con CRUD completo e scadenze automatiche.
+🔄 **Aggiornato il 2026-03-27**: Introdotto il sistema di gestione Cinema e risolti i problemi di redirect nel logout tramite Server Action dedicata.
 File modificati: `src/app/actions/admin_auth.ts`, `src/app/admin/verify/page.tsx`, `supabase/migrations/20260327000000_cleanup_users_table.sql`
