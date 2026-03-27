@@ -108,4 +108,15 @@ status: active
 **Soluzione applicata**: Aggiunto stato `isVibrating` per animazione CSS shake. Inserito messaggio di successo temporaneo (`resendSuccess`) per il reinvio mail. Migliorata la UX con loader durante la verifica.
 **Side effects**: Nessuno.
 
+
+## [18:00] fix: react hook violation (#310) & vercel stability
+
+**File toccati**:
+
+- `src/components/layout/Header.tsx` — Spostato l'early return condizionale dopo la dichiarazione di tutti gli hooks.
+
+**Problema di partenza**: Errore fatale `React Error #310` su Vercel durante la navigazione tra Admin e Sfera. Questo causava il crash dell'intera applicazione ("This page couldn't load").
+**Soluzione applicata**: Corretta la violazione delle "Rules of Hooks". Il componente `Header` ora inizializza sempre lo stesso numero di hooks prima di decidere se renderizzare `null` o il JSX. Questo stabilizza la navigazione client-side.
+**Side effects**: Risolti i crash intermittenti segnalati dall'utente.
+
 ---

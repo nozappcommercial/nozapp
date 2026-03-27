@@ -56,9 +56,11 @@ export default function Header() {
         checkAdminStatus();
     }, []);
 
-    // Hide header entirely on login, onboarding, admin, and article detail pages
+    // Determine if header should be hidden
+    const isLoginOrOnboarding = pathname === '/login' || pathname === '/onboarding';
+    const isAdminRoute = pathname?.startsWith('/admin');
     const isArticleDetail = pathname?.startsWith('/redazione/') && pathname.split('/').filter(Boolean).length > 1;
-    if (pathname === '/login' || pathname === '/onboarding' || pathname?.startsWith('/admin') || isArticleDetail) return null;
+    const shouldHideHeader = isLoginOrOnboarding || isAdminRoute || isArticleDetail;
 
     const handleLogout = async () => {
         if (isLoggingOut) return;
@@ -321,6 +323,8 @@ export default function Header() {
             </div>
         </React.Fragment>
     );
+
+    if (shouldHideHeader) return null;
 
     return (
         <header 
