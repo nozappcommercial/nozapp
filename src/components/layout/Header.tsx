@@ -5,6 +5,9 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { Home, Newspaper, Clapperboard, LogOut, User, Settings } from 'lucide-react';
 import { createClient } from '@/lib/supabase/client';
+import { getAdminStatus } from '@/lib/supabase/auth-client';
+import { smoothScrollTo } from '@/lib/scroll-utils';
+import { useIsMobile } from '@/hooks/use-is-mobile';
 import styles from './Header.module.css';
 
 const NAV_ITEMS = [
@@ -19,7 +22,7 @@ export default function Header() {
     const [isCollapsed, setIsCollapsed] = useState(false);
     const [isHiddenByModal, setIsHiddenByModal] = useState(false);
     const [bubbleStyle, setBubbleStyle] = useState<{ left?: number, width?: number, top?: number, height?: number, opacity: number }>({ left: 0, width: 0, top: 0, height: 0, opacity: 0 });
-    const [isMobile, setIsMobile] = useState(false);
+    const isMobile = useIsMobile(768);
 
     useEffect(() => {
         const hide = () => setIsHiddenByModal(true);
@@ -45,12 +48,8 @@ export default function Header() {
             const supabase = createClient();
             const { data: { user } } = await supabase.auth.getUser();
             if (user) {
-                const { data } = await supabase
-                    .from('users')
-                    .select('is_admin')
-                    .eq('id', user.id)
-                    .single();
-                if (data?.is_admin) setIsAdmin(true);
+                const isAdmin = await getAdminStatus(user.id);
+                setIsAdmin(isAdmin);
             }
         };
         checkAdminStatus();
@@ -75,16 +74,7 @@ export default function Header() {
         }
     };
 
-    // Responsive detection
-    useEffect(() => {
-        const mql = window.matchMedia('(max-width: 768px)');
-        const onChange = () => setIsMobile(mql.matches);
-        mql.addEventListener('change', onChange);
-        setIsMobile(mql.matches);
-        return () => mql.removeEventListener('change', onChange);
-    }, []);
-
-    const isVerticalLayout = !isMobile;
+    const isVerticalLayout = isMobile === false;
 
     /**
      * Updates the navigation bubble's position and size.
@@ -238,24 +228,7 @@ export default function Header() {
         e.preventDefault();
         const section = document.getElementById(id);
         if (section) {
-            const anime = (await import('animejs')).default;
-            
-            // Use 0 offset for all sections as they handle their own internal spacing (py-20/py-24)
-            const offset = 0;
-            const targetPos = Math.max(0, section.offsetTop - offset);
-            const currentPos = window.scrollY;
-
-            anime({
-                targets: { scrollY: currentPos },
-                scrollY: targetPos,
-                duration: 1200, // Slower duration for a more premium feel
-                easing: 'easeInOutQuart',
-                update: (anim) => {
-                    const obj = anim.animatables[0].target as unknown as { scrollY: number };
-                    window.scrollTo(0, obj.scrollY);
-                }
-            });
-
+            await smoothScrollTo(section, 1200, 0);
             setActiveSection(id);
         }
     };

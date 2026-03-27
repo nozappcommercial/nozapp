@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef, useCallback } from "react";
+import { useIsMobile } from "@/hooks/use-is-mobile";
 import type { OnboardingFilm } from "@/app/onboarding/page";
 
 /* ─── Constants ─────────────────────────────────────────────────── */
@@ -29,20 +30,9 @@ interface OnboardingFlowProps {
   films: OnboardingFilm[];
 }
 
-/* ─── Helpers ───────────────────────────────────────────────────── */
-function useIsMobile() {
-  const [mobile, setMobile] = useState<boolean | undefined>(undefined);
-  useEffect(() => {
-    const check = () => setMobile(window.innerWidth < 640);
-    check();
-    window.addEventListener("resize", check);
-    return () => window.removeEventListener("resize", check);
-  }, []);
-  return mobile;
-}
 
 export default function OnboardingFlow({ films }: OnboardingFlowProps) {
-  const isMobile = useIsMobile();
+  const isMobile = useIsMobile(640);
 
   // Split films into 3 groups based on onboarding_group
   const STEPS = [

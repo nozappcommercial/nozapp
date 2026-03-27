@@ -79,7 +79,7 @@
       }
     ],
     "direction": "horizontal",
-    "width": 303.5
+    "width": 200
   },
   "right": {
     "id": "d9cceedaf437acd3",
@@ -170,7 +170,7 @@
       }
     ],
     "direction": "horizontal",
-    "width": 300
+    "width": 294.5
   },
   "left-ribbon": {
     "hiddenItems": {
@@ -185,34 +185,33 @@
   },
   "active": "210fda53ff551c12",
   "lastOpenFiles": [
-    "known-issues.md",
+    "Senza nome.canvas",
+    "pages-and-routing.md",
+    "progetto.md",
+    "data-flow.md",
     "todo.md",
     "security.md",
+    "dataset.md",
+    "types.md",
+    "project-structure.md",
+    "known-issues.md",
     "_memory/session-2026-03-27.md",
-    "Senza nome.canvas",
     "Senza nome.base",
     "editorial-system.md",
     "_memory/session-current.md",
     "components.md",
-    "progetto.md",
     "_memory",
     "onboarding-guide.md",
     "scripts.md",
     "dependencies.md",
     "configuration.md",
-    "types.md",
     "hooks-and-utilities.md",
-    "data-flow.md",
-    "dataset.md",
     "api.md",
-    "pages-and-routing.md",
     "three-js.md",
-    "project-structure.md",
     "architecture.md",
     "auth.md",
     "ui-system.md",
     "onboarding.md",
-    "data-infrastructure.md",
-    "sphere-engine.md"
+    "data-infrastructure.md"
   ]
 }

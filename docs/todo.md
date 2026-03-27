@@ -20,22 +20,22 @@ source-docs: [[api]], [[architecture]], [[components]], [[configuration]], [[dat
 
 ## P2 — Alto
 
-| #      | Problematica                      | Macroarea          | Documentazione   |
-| ------ | --------------------------------- | ------------------ | ---------------- |
-| ✅ P2-001 | Il componente `SemanticSphere.tsx` utilizza `@ts-nocheck` (complessità Three.js). | [[three-js]] | [[three-js]] completed: 2026-03-27 |
-| P2-002 | La variabile `CRON_SECRET` è critica; non utilizzarla per altri scopi. | [[security]] | [[known-issues]] |
-| P2-003 | Alcune dipendenze (Next.js 15+) potrebbero essere fissate per stabilità. | [[dependencies]] | [[dependencies]] |
-| P2-004 | Non modificare manualmente `movies.csv`; usare sempre gli script della pipeline. | [[dataset]] | [[dataset]] |
-| P2-005 | Rigenerare i tipi Supabase dopo ogni modifica strutturale del database. | [[types]] | [[types]] |
-| P2-006 | Il workspace principale è `/Volumes/Crucial/workspace/web/nozapp`. | [[project-structure]] | [[project-structure]] |
-| ✅ P2-008 | Affinamento UI Admin (Verifica, Centramento, Tasto Ritorno Sfera). | [[components]] | [[components]] completed: 2026-03-27 |
-| ✅ P2-009 | Feedback visivi OTP (Errore/Successo) e Reinvio Email. | [[components]] | [[components]] completed: 2026-03-27 |
+| #        | Problematica                                                                      | Macroarea             | Documentazione                       |
+| -------- | --------------------------------------------------------------------------------- | --------------------- | ------------------------------------ |
+| ✅ P2-001 | Il componente `SemanticSphere.tsx` utilizza `@ts-nocheck` (complessità Three.js). | [[three-js]]          | [[three-js]] completed: 2026-03-27   |
+| ✅ P2-002 | La variabile `CRON_SECRET` è critica; non utilizzarla per altri scopi.            | [[security]]          | [[known-issues]]                     |
+| ✅ P2-003 | Alcune dipendenze (Next.js 15+) potrebbero essere fissate per stabilità.          | [[dependencies]]      | [[dependencies]]                     |
+| ✅ P2-004 | Non modificare manualmente `movies.csv`; usare sempre gli script della pipeline.  | [[dataset]]           | [[dataset]]                          |
+| ✅ P2-005 | Rigenerare i tipi Supabase dopo ogni modifica strutturale del database.           | [[types]]             | [[types]]                            |
+| ✅ P2-006 | Il workspace principale è `/Volumes/Crucial/workspace/web/nozapp`.                | [[project-structure]] | [[project-structure]]                |
+| ✅ P2-008 | Affinamento UI Admin (Verifica, Centramento, Tasto Ritorno Sfera).                | [[components]]        | [[components]] completed: 2026-03-27 |
+| ✅ P2-009 | Feedback visivi OTP (Errore/Successo) e Reinvio Email.                            | [[components]]        | [[components]] completed: 2026-03-27 |
 
 ## P3 — Medio
 
 | #      | Problematica                      | Macroarea          | Documentazione   |
 | ------ | --------------------------------- | ------------------ | ---------------- |
-| P3-001 | Preferire le utility in `src/lib/` anziché logica low-level nei componenti. | [[hooks-and-utilities]] | [[hooks-and-utilities]] |
+| ✅ P3-001 | Preferire le utility in `src/lib/` anziché logica low-level nei componenti. | [[hooks-and-utilities]] | [[hooks-and-utilities]] completed: 2026-03-27 |
 
 ## P4 — Basso
 

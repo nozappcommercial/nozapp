@@ -120,3 +120,20 @@ status: active
 **Side effects**: Risolti i crash intermittenti segnalati dall'utente.
 
 ---
+
+## [18:15] meccanico — P3-001
+
+**File toccati**:
+
+- `src/hooks/use-is-mobile.ts` — [NUOVO] Hook centralizzato per la gestione dei breakpoint.
+- `src/lib/supabase/auth-client.ts` — [NUOVO] Utility client-side per il controllo permessi admin.
+- `src/lib/scroll-utils.ts` — [NUOVO] Helper per lo scroll fluido con Anime.js.
+- `src/components/layout/Header.tsx` — Refactoring completo: rimozione logiche low-level di scroll, mobile detection e auth manuale.
+- `src/components/onboarding/OnboardingFlow.tsx` — Rimozione hook locale `useIsMobile`.
+
+**Problema di partenza**: Logica di basso livello (rilevamento mobile, scroll, auth) ripetuta nei componenti invece di usare utility centralizzate.
+**Soluzione applicata**: Estratti i comportamenti comuni in hooks e utility in `src/hooks/` e `src/lib/`. Questo riduce le dimensioni dei componenti UI e centralizza la manutenzione delle logiche di sistema.
+**Side effects**: Nessuno. Migliorata la pulizia del codice e il caricamento asincrono di librerie come Anime.js.
+**Todo chiuso**: P3-001 → ✅
+
+---
