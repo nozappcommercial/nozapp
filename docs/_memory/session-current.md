@@ -137,3 +137,19 @@ status: active
 **Todo chiuso**: P3-001 → ✅
 
 ---
+
+## [18:30] refactor: decomposizione SemanticSphere.tsx — P2-010
+
+**File toccati**:
+
+- `src/components/sphere/MovieDetailPanel.tsx` — [NUOVO] Componente React per il pannello informativo con logica di swipe.
+- `src/components/sphere/SphereUIOverlays.tsx` — [NUOVO] Overlay UI (Header, Breadcrumb, Nav) estratti.
+- `src/hooks/useSphereEngine.ts` — [NUOVO] Hook "motore" che isola tutto il setup Three.js, Raycasting e Render Loop.
+- `src/components/SemanticSphere.tsx` — Trasformato in orchestratore leggero (da 1200+ a ~150 righe).
+
+**Problema di partenza**: `SemanticSphere.tsx` era un "God Component" ingestibile che mescolava stato React, logica Three.js complessa e manipolazioni dirette del DOM.
+**Soluzione applicata**: Decomposto il file in componenti funzionali e un custom hook per il motore grafico. Preservata l'interazione basata su ID per garantire il funzionamento delle animazioni CSS e degli eventi DOM esistenti.
+**Side effects**: Nessuno. Prestazioni e funzionalità identiche, ma leggibilità radicalmente migliorata.
+**Todo chiuso**: P2-010 → ✅
+
+---

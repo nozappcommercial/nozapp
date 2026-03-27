@@ -29,6 +29,7 @@ source-docs: [[api]], [[architecture]], [[components]], [[configuration]], [[dat
 | ✅ P2-005 | Rigenerare i tipi Supabase dopo ogni modifica strutturale del database.           | [[types]]             | [[types]]                            |
 | ✅ P2-006 | Il workspace principale è `/Volumes/Crucial/workspace/web/nozapp`.                | [[project-structure]] | [[project-structure]]                |
 | ✅ P2-008 | Affinamento UI Admin (Verifica, Centramento, Tasto Ritorno Sfera).                | [[components]]        | [[components]] completed: 2026-03-27 |
+| ✅ P2-010 | Decomposizione SemanticSphere.tsx in hook `useSphereEngine` e sub-componenti.      | [[three-js]]          | [[three-js]] completed: 2026-03-27   |
 | ✅ P2-009 | Feedback visivi OTP (Errore/Successo) e Reinvio Email.                            | [[components]]        | [[components]] completed: 2026-03-27 |
 
 ## P3 — Medio
