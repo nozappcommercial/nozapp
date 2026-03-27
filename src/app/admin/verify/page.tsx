@@ -6,7 +6,7 @@ import { ShieldCheck, Mail, Loader2, ArrowLeft, Send } from 'lucide-react';
 import { generateAdminOTP, verifyAdminOTP, getAdminProfile, updateAdminPhone } from '@/app/actions/admin_auth';
 
 export default function VerifyAdminPage() {
-    const [code, setCode] = useState(['', '', '', '', '', '']);
+    const [code, setCode] = useState(['', '', '', '', '', '', '', '']);
     const [isLoading, setIsLoading] = useState(false);
     const [isSending, setIsSending] = useState(false);
     const [error, setError] = useState<string | null>(null);
@@ -59,7 +59,7 @@ export default function VerifyAdminPage() {
         setCode(newCode);
 
         // Auto-focus next
-        if (value && index < 5) {
+        if (value && index < 7) {
             const nextInput = document.getElementById(`otp-${index + 1}`);
             nextInput?.focus();
         }
@@ -75,7 +75,7 @@ export default function VerifyAdminPage() {
     const handleVerify = async (e?: React.FormEvent) => {
         e?.preventDefault();
         const fullCode = code.join('');
-        if (fullCode.length < 6) return;
+        if (fullCode.length < 8) return;
 
         setIsLoading(true);
         setError(null);
@@ -124,7 +124,7 @@ export default function VerifyAdminPage() {
                 {step === 'request' ? (
                     <div className="space-y-6">
                         <p className="text-center text-lg leading-relaxed opacity-70">
-                            Per accedere alla dashboard è necessario un codice a 6 cifre inviato alla tua email certificata.
+                            Per accedere alla dashboard è necessario un codice a 8 cifre inviato alla tua email certificata.
                         </p>
                         <button
                             onClick={handleSendOTP}
@@ -148,7 +148,7 @@ export default function VerifyAdminPage() {
                                     value={digit}
                                     onChange={(e) => handleCodeChange(i, e.target.value)}
                                     onKeyDown={(e) => handleKeyDown(i, e)}
-                                    className="w-12 h-16 text-center text-3xl font-light bg-black/5 border-none rounded-xl focus:ring-2 focus:ring-[var(--gold)]/30 outline-none transition-all"
+                                    className="w-8 h-12 text-center text-2xl font-light bg-black/5 border-none rounded-lg focus:ring-2 focus:ring-[var(--gold)]/30 outline-none transition-all"
                                 />
                             ))}
                         </div>
