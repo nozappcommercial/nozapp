@@ -13,17 +13,15 @@ status: active
 **Soluzione applicata**: Collegato il flusso MFA al provider SMS nativo di Supabase Auth. Ora il codice viene inviato realmente al numero certificato nel DB. Aumentata la sicurezza passando a un codice a 6 cifre standard.
 **Side effects**: Nessuno, ma l'utente deve assicurarsi che il provider SMS sia correttamente configurato nel dashboard di Supabase.
 
----
-
-## [09:25] [tipo: bug-fix]
+## [09:30] [tipo: feature]
 
 **File toccati**:
-- `src/app/actions/admin_auth.ts` — Rifatto il sistema di ritorno delle Action: ora restituiscono un oggetto `{ success, error }` invece di sollevare eccezioni. Aggiunta la pulizia del numero di telefono (rimozione spazi).
-- `src/app/admin/verify/page.tsx` — Aggiornata la gestione della risposta delle Action per mostrare messaggi di errore precisi invece del crash generico di produzione Next.js.
+- `src/app/actions/admin_auth.ts` — Cambiato il metodo di autenticazione da `phone` a `email` nelle chiamate a Supabase Auth. Rimosse le dipendenze dalla colonna `phone_number` per l'MFA.
+- `src/app/admin/verify/page.tsx` — Riprogettata la UI per l'Email MFA: rimosso il setup del telefono, aggiornate le icone (Mail) e i testi. Il flusso ora è più diretto.
 
-**Problema di partenza**: Errore "Server Components render" criptico durante l'invio dell'SMS in ambiente di produzione.
-**Soluzione applicata**: Individuata un'eccezione non gestita che causava il crash del rendering. Implementata una gestione degli errori robusta nelle Server Action e migliorata la resilienza della UI. Pulito il formato del numero di telefono per Supabase.
-**Side effects**: Se Supabase restituisce un errore reale (es. "SMS provider not configured"), ora verrà mostrato esplicitamente a video.
+**Problema di partenza**: L'invio SMS tramite Supabase restituiva l'errore "Unsupported phone provider" a causa dei costi e della necessità di configurazione di provider esterni.
+**Soluzione applicata**: Migrato l'intero sistema MFA su Email. Essendo un pannello Admin, l'email è un canale sicuro, gratuito e già verificato per ogni utente. Questo garantisce affidabilità totale senza costi aggiuntivi.
+**Side effects**: Il campo `phone_number` nel DB è ora opzionale e non più richiesto per l'accesso admin.
 
 ---
 

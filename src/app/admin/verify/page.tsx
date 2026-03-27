@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { ShieldCheck, MessageSquare, Loader2, ArrowLeft, Phone, Save } from 'lucide-react';
+import { ShieldCheck, Mail, Loader2, ArrowLeft, Send } from 'lucide-react';
 import { generateAdminOTP, verifyAdminOTP, getAdminProfile, updateAdminPhone } from '@/app/actions/admin_auth';
 
 export default function VerifyAdminPage() {
@@ -15,13 +15,8 @@ export default function VerifyAdminPage() {
     const router = useRouter();
 
     useEffect(() => {
-        async function checkProfile() {
-            const profile = await getAdminProfile();
-            if (profile && !profile.phone_number) {
-                setStep('setup');
-            }
-        }
-        checkProfile();
+        // No setup step needed for Email MFA as we use the account email
+        setStep('request');
     }, []);
 
     const handleSetupPhone = async (e: React.FormEvent) => {
@@ -126,45 +121,18 @@ export default function VerifyAdminPage() {
                     </div>
                 )}
 
-                {step === 'setup' ? (
-                    <form onSubmit={handleSetupPhone} className="space-y-6">
-                        <p className="text-center text-lg leading-relaxed opacity-70">
-                            Configura il tuo numero di telefono per ricevere i codici di sicurezza.
-                        </p>
-                        <div className="relative">
-                            <div className="absolute left-4 top-1/2 -translate-y-1/2 opacity-30">
-                                <Phone size={18} />
-                            </div>
-                            <input
-                                type="tel"
-                                placeholder="+39 333 1234567"
-                                value={phone}
-                                onChange={(e) => setPhone(e.target.value)}
-                                required
-                                className="w-full pl-12 pr-4 py-4 bg-black/5 border-none rounded-2xl focus:ring-2 focus:ring-[var(--gold)]/30 outline-none transition-all font-['Fragment_Mono']"
-                            />
-                        </div>
-                        <button
-                            type="submit"
-                            disabled={isLoading}
-                            className="w-full flex items-center justify-center gap-3 py-4 bg-[#1a1a1a] text-white rounded-full hover:bg-black transition-all disabled:opacity-50 font-['Fragment_Mono'] text-xs uppercase tracking-widest"
-                        >
-                            {isLoading ? <Loader2 className="animate-spin" size={18} /> : <Save size={18} />}
-                            Salva e Continua
-                        </button>
-                    </form>
-                ) : step === 'request' ? (
+                {step === 'request' ? (
                     <div className="space-y-6">
                         <p className="text-center text-lg leading-relaxed opacity-70">
-                            Per accedere alla dashboard è necessario un codice a 6 cifre inviato al tuo numero certificato.
+                            Per accedere alla dashboard è necessario un codice a 6 cifre inviato alla tua email certificata.
                         </p>
                         <button
                             onClick={handleSendOTP}
                             disabled={isSending}
                             className="w-full flex items-center justify-center gap-3 py-4 bg-[#1a1a1a] text-white rounded-full hover:bg-black transition-all disabled:opacity-50 font-['Fragment_Mono'] text-xs uppercase tracking-widest"
                         >
-                            {isSending ? <Loader2 className="animate-spin" size={18} /> : <MessageSquare size={18} />}
-                            Invia Codice SMS
+                            {isSending ? <Loader2 className="animate-spin" size={18} /> : <Mail size={18} />}
+                            Invia Codice via Email
                         </button>
                     </div>
                 ) : (

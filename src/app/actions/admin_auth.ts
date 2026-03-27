@@ -14,32 +14,28 @@ export async function generateAdminOTP() {
         const supabase = await createClient();
         const { data: { user } } = await supabase.auth.getUser();
 
-        if (!user) return { success: false, error: 'Non autorizzato' };
+        if (!user || !user.email) return { success: false, error: 'Non autorizzato o email mancante' };
 
         // Verify is_admin
         const { data: profile } = await supabase
             .from('users')
-            .select('is_admin, phone_number')
+            .select('is_admin')
             .eq('id', user.id)
             .single();
 
         if (!profile?.is_admin) return { success: false, error: 'Accesso riservato agli amministratori' };
-        if (!profile.phone_number) return { success: false, error: 'Numero di telefono non configurato' };
 
-        // REAL SENDING VIA SUPABASE AUTH
-        // Clean phone number (remove spaces)
-        const cleanPhone = profile.phone_number.replace(/\s+/g, '');
-
+        // REAL SENDING VIA SUPABASE AUTH (EMAIL)
         const { error: otpError } = await supabase.auth.signInWithOtp({
-            phone: cleanPhone,
+            email: user.email,
         });
 
         if (otpError) {
-            console.error('[ADMIN MFA] Error sending OTP:', otpError);
+            console.error('[ADMIN MFA] Error sending Email OTP:', otpError);
             return { success: false, error: 'Errore Supabase: ' + otpError.message };
         }
         
-        return { success: true, message: 'Codice inviato via SMS' };
+        return { success: true, message: 'Codice inviato via Email' };
     } catch (e: any) {
         console.error('[ADMIN MFA] Unexpected error in generateAdminOTP:', e);
         return { success: false, error: 'Errore imprevisto durante l\'invio.' };
@@ -86,20 +82,10 @@ export async function verifyAdminOTP(code: string) {
 
         if (!user) return { success: false, error: 'Non autorizzato' };
 
-        const { data: profile } = await supabase
-            .from('users')
-            .select('phone_number')
-            .eq('id', user.id)
-            .single();
-
-        if (!profile?.phone_number) return { success: false, error: 'Numero di telefono non trovato' };
-
-        // VERIFY OTP VIA SUPABASE AUTH
-        const cleanPhone = profile.phone_number.replace(/\s+/g, '');
         const { data: verifyData, error: verifyError } = await supabase.auth.verifyOtp({
-            phone: cleanPhone,
+            email: user.email!,
             token: code,
-            type: 'sms'
+            type: 'email'
         });
 
         if (verifyError || !verifyData.user) {
