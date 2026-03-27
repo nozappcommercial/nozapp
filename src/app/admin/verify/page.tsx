@@ -42,10 +42,15 @@ export default function VerifyAdminPage() {
         setIsSending(true);
         setError(null);
         try {
-            await generateAdminOTP();
+            const res = await generateAdminOTP();
+            if (res && 'success' in res && !res.success) {
+                setError(res.error || 'Errore nell\'invio del codice');
+                return;
+            }
             setStep('verify');
         } catch (err: any) {
-            setError(err.message || 'Errore nell\'invio del codice');
+            console.error('[VerifyPage] OTP request failed:', err);
+            setError('Errore di connessione o del server.');
         } finally {
             setIsSending(false);
         }
@@ -80,11 +85,17 @@ export default function VerifyAdminPage() {
         setIsLoading(true);
         setError(null);
         try {
-            await verifyAdminOTP(fullCode);
+            const res = await verifyAdminOTP(fullCode);
+            if (res && 'success' in res && !res.success) {
+                setError(res.error || 'Codice non valido');
+                setIsLoading(false);
+                return;
+            }
             router.push('/admin');
             router.refresh();
         } catch (err: any) {
-            setError(err.message || 'Codice non valido');
+            console.error('[VerifyPage] OTP verification failed:', err);
+            setError('Errore di connessione o del server.');
             setIsLoading(false);
         }
     };

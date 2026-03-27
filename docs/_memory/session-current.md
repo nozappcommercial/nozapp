@@ -1,56 +1,10 @@
 ---
-date: 2026-03-26
-status: active## [19:30] [tipo: feature]
-**File toccati**:
-- `supabase/migrations/20260326000000_editorial_schema.sql` — Tabella articoli e ruoli.
-- `src/lib/supabase/middleware.ts` — Protezione `/admin`.
-- `src/app/actions/editorial.ts` — Server Actions CRUD.
-- `src/app/admin/*` — Pagine gestione redazione.
-- `src/app/redazione/[slug]/page.tsx` — Template pubblico articoli.
-- `src/components/home/EditorialSection.tsx` — Integrazione dati dinamici.
-
-**Problema di partenza**: Mancanza di un sistema di caricamento e gestione degli articoli della redazione.
-**Soluzione applicata**: Implementato un sistema CMS custom integrato con Supabase, con ruoli admin, scheduling delle pubblicazioni, date di scadenza e template visuale coerente con il brand NoZapp.
-**Side effects**: Necessaria l'assegnazione manuale del ruolo 'admin' nel DB per il primo accesso al pannello.
-## [19:50] [tipo: bug-fix]
-**File toccati**:
-- `src/components/sphere/ShellNavigator.tsx` — Rimosso `position: fixed` quando in modalità verticale per permettere il posizionamento relativo al genitore.
-- `src/components/SemanticSphere.tsx` — Aumentato padding sinistro (da 28px a 48px) e corretta la centratura verticale delle pillole di navigazione desktop.
-
-**Problema di partenza**: Le pillole "Pilastri, Affinità, Scoperta" su desktop erano troppo vicine al bordo sinistro e non risultavano correttamente centrate in altezza.
-**Soluzione applicata**: Individuato un conflitto di posizionamento (`fixed` interno che ignorava il contenitore `absolute` centrato). Aumentato il margine e pulito il codice CSS inline.
-**Side effects**: Nessuno.
-## [20:25] [tipo: bug-fix]
-**File toccati**:
-- `src/components/profile/profile.css` — Rifatto il sistema di centratura (flex-container), aumentato z-index (2600) per coprire l'header e allineato breakpoint a 768px.
-- `src/components/profile/ProfileModal.tsx` — Inserito wrapper di centratura e implementata animazione d'ingresso/uscita fluida con Framer Motion (rimuovendo conflitti con i transform CSS).
-
-**Problema di partenza**: Il riquadro profilo si apriva in posizione errata (non centrato) e non copriva correttamente l'header su desktop.
-**Soluzione applicata**: Separato il posizionamento (CSS Flex) dall'animazione (Framer Motion). Aumentata la gerarchia visiva tramite z-index e reso il movimento più premium.
-- `src/app/admin/page.tsx` [NEW] — Creata la Dashboard Admin centrale come hub di gestione.
-- `src/app/admin/verify/page.tsx` [NEW] — Implementata l'interfaccia di verifica MFA con codice a 4 cifre e setup telefono.
-- `src/app/actions/admin_auth.ts` [NEW] — Create le server actions per generazione, invio simulato e verifica dell'OTP.
-- `src/lib/supabase/middleware.ts` — Enforced MFA check per tutte le rotte sotto `/admin`.
-- `src/app/sphere/page.tsx` — Aggiunto redirect automatico alla dashboard per gli admin già verificati.
-- `supabase/migrations/20260326000000_editorial_schema.sql` — Aggiornato lo schema per supportare i campi MFA (telefono, codici, date di verifica).
-
-**Problema di partenza**: Richiesta di maggiore sicurezza (MFA) per l'accesso admin e necessità di una dashboard gestionale invece della sfera comune.
-**Soluzione applicata**: Implementato un flusso di autenticazione a due fattori basato su OTP a 4 cifre (simulato via console) e creata una dashboard premium per la navigazione interna.
-**Side effects**: Gli admin ora vengono reindirizzati alla dashboard quando accedono al sito se la sessione MFA è attiva.
-
----
-
-## [18:45] [tipo: feature]
-**File toccati**:
-- `docs/*.md` — Ristrutturazione completa della documentazione in 16 file granulari.
-- `docs/progetto.md` — Aggiornato come master index generale.
-
-**Problema di partenza**: La documentazione precedente era troppo accorpata in poche macroaree. L'utente ha richiesto una struttura più dettagliata e tecnica per facilitare l'onboarding e la manutenzione.
-**Soluzione applicata**: Rimossi i vecchi file e creato un nuovo set di documenti che copre separatamente: architettura, componenti, 3D, API, dataset, tipi, configurazione e guide operative.
-**Side effects**: Tutti i link Obsidian interni sono stati aggiornati per puntare ai nuovi file.
+date: 2026-03-27
+status: active
 ---
 
 ## [09:15] [tipo: feature]
+
 **File toccati**:
 - `src/app/actions/admin_auth.ts` — Migrazione dall'invio simulato (console) all'invio reale tramite Supabase Auth (`signInWithOtp`).
 - `src/app/admin/verify/page.tsx` — Aggiornata la UI di verifica per supportare l'OTP a 6 cifre di Supabase (precedentemente 4).
@@ -58,3 +12,19 @@ status: active## [19:30] [tipo: feature]
 **Problema di partenza**: L'SMS con l'OTP non arrivava perché il sistema era in modalità simulazione per lo sviluppo iniziale.
 **Soluzione applicata**: Collegato il flusso MFA al provider SMS nativo di Supabase Auth. Ora il codice viene inviato realmente al numero certificato nel DB. Aumentata la sicurezza passando a un codice a 6 cifre standard.
 **Side effects**: Nessuno, ma l'utente deve assicurarsi che il provider SMS sia correttamente configurato nel dashboard di Supabase.
+
+---
+
+## [09:25] [tipo: bug-fix]
+
+**File toccati**:
+- `src/app/actions/admin_auth.ts` — Rifatto il sistema di ritorno delle Action: ora restituiscono un oggetto `{ success, error }` invece di sollevare eccezioni. Aggiunta la pulizia del numero di telefono (rimozione spazi).
+- `src/app/admin/verify/page.tsx` — Aggiornata la gestione della risposta delle Action per mostrare messaggi di errore precisi invece del crash generico di produzione Next.js.
+
+**Problema di partenza**: Errore "Server Components render" criptico durante l'invio dell'SMS in ambiente di produzione.
+**Soluzione applicata**: Individuata un'eccezione non gestita che causava il crash del rendering. Implementata una gestione degli errori robusta nelle Server Action e migliorata la resilienza della UI. Pulito il formato del numero di telefono per Supabase.
+**Side effects**: Se Supabase restituisce un errore reale (es. "SMS provider not configured"), ora verrà mostrato esplicitamente a video.
+
+---
+
+---

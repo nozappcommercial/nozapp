@@ -10,32 +10,40 @@ import { cookies } from 'next/headers';
  * and logging it to the console (development only).
  */
 export async function generateAdminOTP() {
-    const supabase = await createClient();
-    const { data: { user } } = await supabase.auth.getUser();
+    try {
+        const supabase = await createClient();
+        const { data: { user } } = await supabase.auth.getUser();
 
-    if (!user) throw new Error('Non autorizzato');
+        if (!user) return { success: false, error: 'Non autorizzato' };
 
-    // Verify is_admin
-    const { data: profile } = await supabase
-        .from('users')
-        .select('is_admin, phone_number')
-        .eq('id', user.id)
-        .single();
+        // Verify is_admin
+        const { data: profile } = await supabase
+            .from('users')
+            .select('is_admin, phone_number')
+            .eq('id', user.id)
+            .single();
 
-    if (!profile?.is_admin) throw new Error('Accesso riservato agli amministratori');
-    if (!profile.phone_number) throw new Error('Numero di telefono non configurato');
+        if (!profile?.is_admin) return { success: false, error: 'Accesso riservato agli amministratori' };
+        if (!profile.phone_number) return { success: false, error: 'Numero di telefono non configurato' };
 
-    // REAL SENDING VIA SUPABASE AUTH
-    const { error: otpError } = await supabase.auth.signInWithOtp({
-        phone: profile.phone_number,
-    });
+        // REAL SENDING VIA SUPABASE AUTH
+        // Clean phone number (remove spaces)
+        const cleanPhone = profile.phone_number.replace(/\s+/g, '');
 
-    if (otpError) {
-        console.error('[ADMIN MFA] Error sending OTP:', otpError);
-        throw new Error('Errore nell\'invio del codice via SMS: ' + otpError.message);
+        const { error: otpError } = await supabase.auth.signInWithOtp({
+            phone: cleanPhone,
+        });
+
+        if (otpError) {
+            console.error('[ADMIN MFA] Error sending OTP:', otpError);
+            return { success: false, error: 'Errore Supabase: ' + otpError.message };
+        }
+        
+        return { success: true, message: 'Codice inviato via SMS' };
+    } catch (e: any) {
+        console.error('[ADMIN MFA] Unexpected error in generateAdminOTP:', e);
+        return { success: false, error: 'Errore imprevisto durante l\'invio.' };
     }
-    
-    return { success: true, message: 'Codice inviato via SMS' };
 }
 
 /**
@@ -72,48 +80,54 @@ export async function updateAdminPhone(phone: string) {
  * Validates the code and sets a session cookie.
  */
 export async function verifyAdminOTP(code: string) {
-    const supabase = await createClient();
-    const { data: { user } } = await supabase.auth.getUser();
+    try {
+        const supabase = await createClient();
+        const { data: { user } } = await supabase.auth.getUser();
 
-    if (!user) throw new Error('Non autorizzato');
+        if (!user) return { success: false, error: 'Non autorizzato' };
 
-    const { data: profile } = await supabase
-        .from('users')
-        .select('phone_number')
-        .eq('id', user.id)
-        .single();
+        const { data: profile } = await supabase
+            .from('users')
+            .select('phone_number')
+            .eq('id', user.id)
+            .single();
 
-    if (!profile?.phone_number) throw new Error('Numero di telefono non trovato');
+        if (!profile?.phone_number) return { success: false, error: 'Numero di telefono non trovato' };
 
-    // VERIFY OTP VIA SUPABASE AUTH
-    const { data: verifyData, error: verifyError } = await supabase.auth.verifyOtp({
-        phone: profile.phone_number,
-        token: code,
-        type: 'sms'
-    });
+        // VERIFY OTP VIA SUPABASE AUTH
+        const cleanPhone = profile.phone_number.replace(/\s+/g, '');
+        const { data: verifyData, error: verifyError } = await supabase.auth.verifyOtp({
+            phone: cleanPhone,
+            token: code,
+            type: 'sms'
+        });
 
-    if (verifyError || !verifyData.user) {
-        throw new Error('Codice non valido o scaduto');
+        if (verifyError || !verifyData.user) {
+            return { success: false, error: 'Codice non valido o scaduto' };
+        }
+
+        // Success: Mark as verified in our custom users table
+        await supabase
+            .from('users')
+            .update({
+                admin_verified_at: new Date().toISOString()
+            })
+            .eq('id', user.id);
+
+        // Set secure session cookie (expires in 2 hours for security)
+        const cookieStore = await cookies();
+        cookieStore.set('admin_session', 'verified', {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'production',
+            sameSite: 'lax',
+            maxAge: 60 * 60 * 2 // 2 hours
+        });
+
+        return { success: true };
+    } catch (e: any) {
+        console.error('[ADMIN MFA] Unexpected error in verifyAdminOTP:', e);
+        return { success: false, error: 'Errore imprevisto durante la verifica.' };
     }
-
-    // Success: Mark as verified in our custom users table
-    await supabase
-        .from('users')
-        .update({
-            admin_verified_at: new Date().toISOString()
-        })
-        .eq('id', user.id);
-
-    // Set secure session cookie (expires in 2 hours for security)
-    const cookieStore = await cookies();
-    cookieStore.set('admin_session', 'verified', {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === 'production',
-        sameSite: 'lax',
-        maxAge: 60 * 60 * 2 // 2 hours
-    });
-
-    return { success: true };
 }
 
 /**
