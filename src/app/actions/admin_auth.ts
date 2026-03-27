@@ -25,24 +25,17 @@ export async function generateAdminOTP() {
     if (!profile?.is_admin) throw new Error('Accesso riservato agli amministratori');
     if (!profile.phone_number) throw new Error('Numero di telefono non configurato');
 
-    // Generate 4-digit code
-    const otp = Math.floor(1000 + Math.random() * 9000).toString();
-    const expiresAt = new Date(Date.now() + 5 * 60 * 1000).toISOString(); // 5 minutes
+    // REAL SENDING VIA SUPABASE AUTH
+    const { error: otpError } = await supabase.auth.signInWithOtp({
+        phone: profile.phone_number,
+    });
 
-    const { error } = await supabase
-        .from('users')
-        .update({
-            otp_code: otp,
-            otp_expires_at: expiresAt
-        })
-        .eq('id', user.id);
-
-    if (error) throw new Error('Errore nella generazione del codice');
-
-    // SIMULATED SENDING
-    console.log(`\n[ADMIN MFA] OTP for ${user.email}: ${otp}\n`);
+    if (otpError) {
+        console.error('[ADMIN MFA] Error sending OTP:', otpError);
+        throw new Error('Errore nell\'invio del codice via SMS: ' + otpError.message);
+    }
     
-    return { success: true, message: 'Codice inviato via SMS (simulato)' };
+    return { success: true, message: 'Codice inviato via SMS' };
 }
 
 /**
@@ -86,25 +79,27 @@ export async function verifyAdminOTP(code: string) {
 
     const { data: profile } = await supabase
         .from('users')
-        .select('otp_code, otp_expires_at')
+        .select('phone_number')
         .eq('id', user.id)
         .single();
 
-    if (!profile) throw new Error('Profilo non trovato');
-    if (!profile.otp_code || profile.otp_code !== code) {
-        throw new Error('Codice non valido');
+    if (!profile?.phone_number) throw new Error('Numero di telefono non trovato');
+
+    // VERIFY OTP VIA SUPABASE AUTH
+    const { data: verifyData, error: verifyError } = await supabase.auth.verifyOtp({
+        phone: profile.phone_number,
+        token: code,
+        type: 'sms'
+    });
+
+    if (verifyError || !verifyData.user) {
+        throw new Error('Codice non valido o scaduto');
     }
 
-    if (new Date(profile.otp_expires_at!) < new Date()) {
-        throw new Error('Codice scaduto');
-    }
-
-    // Success: Mark as verified in DB
+    // Success: Mark as verified in our custom users table
     await supabase
         .from('users')
         .update({
-            otp_code: null,
-            otp_expires_at: null,
             admin_verified_at: new Date().toISOString()
         })
         .eq('id', user.id);

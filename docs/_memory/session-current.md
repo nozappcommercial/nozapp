@@ -48,3 +48,13 @@ status: active## [19:30] [tipo: feature]
 **Problema di partenza**: La documentazione precedente era troppo accorpata in poche macroaree. L'utente ha richiesto una struttura più dettagliata e tecnica per facilitare l'onboarding e la manutenzione.
 **Soluzione applicata**: Rimossi i vecchi file e creato un nuovo set di documenti che copre separatamente: architettura, componenti, 3D, API, dataset, tipi, configurazione e guide operative.
 **Side effects**: Tutti i link Obsidian interni sono stati aggiornati per puntare ai nuovi file.
+---
+
+## [09:15] [tipo: feature]
+**File toccati**:
+- `src/app/actions/admin_auth.ts` — Migrazione dall'invio simulato (console) all'invio reale tramite Supabase Auth (`signInWithOtp`).
+- `src/app/admin/verify/page.tsx` — Aggiornata la UI di verifica per supportare l'OTP a 6 cifre di Supabase (precedentemente 4).
+
+**Problema di partenza**: L'SMS con l'OTP non arrivava perché il sistema era in modalità simulazione per lo sviluppo iniziale.
+**Soluzione applicata**: Collegato il flusso MFA al provider SMS nativo di Supabase Auth. Ora il codice viene inviato realmente al numero certificato nel DB. Aumentata la sicurezza passando a un codice a 6 cifre standard.
+**Side effects**: Nessuno, ma l'utente deve assicurarsi che il provider SMS sia correttamente configurato nel dashboard di Supabase.
