@@ -68,4 +68,4 @@ graph TD
 > [!TIP]
 > Il middleware in `src/lib/supabase/middleware.ts` è il centro di controllo del routing basato sullo stato di onboarding dell'utente e sui permessi amministrativi (MFA).
 
-🔄 **Aggiornato il 2026-03-26**: Inserite le rotte dell'area Redazione e il flusso di autenticazione MFA per l'area Admin.
+🔄 **Aggiornato il 2026-03-27**: Aggiornato il flusso MFA nella pagina `/admin/verify` (passaggio da 4 a 8 cifre e invio via Email).

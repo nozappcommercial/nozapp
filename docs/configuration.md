@@ -49,5 +49,4 @@ Per avviare il progetto da zero:
 5. Avvia il server di sviluppo: `npm run dev`.
 
 ---
-> [!CAUTION]
-> Non includere mai variabili d'ambiente reali (segreti) nei file `.md` o nel sistema di controllo versione (Git).
+🔄 **Aggiornato il 2026-03-27**: L'infrastruttura MFA ora utilizza il servizio Email nativo di Supabase. Non è più richiesto il setup di provider SMS esterni per l'area Admin.

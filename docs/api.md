@@ -36,9 +36,9 @@ Le Server Actions sono funzioni asincrone eseguite sul server, ma chiamate diret
 - **`getArticleBySlug`**: Recupera un articolo specifico tramite lo slug URL (include bypass per preview admin).
 
 ### Autenticazione Admin (MFA) — `admin_auth.ts`
-- **`generateAdminOTP`**: Crea e invia (simulazione) un codice a 4 cifre all'amministratore.
-- **`verifyAdminOTP`**: Valida il codice e imposta il cookie di sessione sicura `admin_session`.
-- **`updateAdminPhone`**: Configurazione iniziale del numero di telefono per l'MFA.
+- **`generateAdminOTP`**: Richiede a Supabase di inviare un codice OTP via Email all'amministratore loggato.
+- **`verifyAdminOTP`**: Valida il codice a 8 cifre e imposta il cookie di sessione sicura `admin_session`.
+- **`updateAdminPhone`**: (Legacy) Precedentemente usato per la configurazione del telefono, ora non più richiesto per l'MFA via Email.
 
 ## Integrazione TMDB API
 
@@ -62,3 +62,6 @@ Tutte le API e le Actions implementano:
 ---
 > [!IMPORTANT]
 > Non esporre mai le API Key (`TMDB_API_KEY`, `RAPIDAPI_KEY`) sul lato client. Devono essere utilizzate esclusivamente in ambiente server.
+
+🔄 **Aggiornato il 2026-03-27**: Rifattorizzate Server Actions MFA per supporto Email e codici a 8 cifre.
+File modificato: `src/app/actions/admin_auth.ts`

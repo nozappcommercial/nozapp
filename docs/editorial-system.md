@@ -21,14 +21,14 @@ La dashboard centrale funge da hub per:
 - **Sicurezza**: Gestione del profilo e sessione MFA.
 
 ## Sicurezza: Multi-Factor Authentication (MFA)
-Per proteggere l'area amministrativa, è stato implementato un secondo livello di sicurezza basato su OTP (One-Time Password) a 4 cifre.
+Per proteggere l'area amministrativa, è stato implementato un secondo livello di sicurezza basato su Email OTP (One-Time Password) a 8 cifre.
 
 ### Flusso di Autenticazione
 1. **Punto di Ingresso**: L'utente tenta di accedere a una rotta `/admin`. Il [[middleware]] intercetta la richiesta.
 2. **Verifica Ruolo**: Viene controllato il flag `is_admin` nella tabella `users`.
 3. **Verifica Sessione**: Se il cookie `admin_session` è assente, l'utente viene reindirizzato a `/admin/verify`.
-4. **Invio Codice**: L'utente richiede un codice (simulato via SMS). Il codice viene salvato nel DB (`otp_code`) con scadenza a 5 minuti.
-5. **Validazione**: Inserito il codice corretto, viene impostato un cookie `httpOnly` sicuro della durata di 2 ore.
+4. **Invio Codice**: L'utente richiede un codice via Email (servizio nativo Supabase Auth). 
+5. **Validazione**: Inserito il codice a 8 cifre corretto, viene impostato un cookie `httpOnly` sicuro della durata di 2 ore. L'utente ha anche l'opzione "Ho già un codice" per inserire un token precedentemente ricevuto senza generare un nuovo invio.
 
 ## Componenti Chiave
 - `ArticleForm.tsx`: Componente client per il CRUD degli articoli.
@@ -39,5 +39,5 @@ Per proteggere l'area amministrativa, è stato implementato un secondo livello d
 Vedere [[database]] per il dettaglio della tabella `articles` e le nuove colonne MFA nella tabella `users`.
 
 ---
-🔄 **Aggiornato il 2026-03-26**: Implementazione completa sistema editoriale e sicurezza MFA admin.
-File modificati: `src/app/actions/editorial.ts`, `src/app/actions/admin_auth.ts`, `src/app/admin/*`, `src/app/redazione/[slug]/*`
+🔄 **Aggiornato il 2026-03-27**: Migrazione completa da SMS simulato a Email MFA reale (8 cifre). Rimosso obbligo configurazione telefono.
+File modificati: `src/app/actions/admin_auth.ts`, `src/app/admin/verify/page.tsx`
