@@ -10,8 +10,9 @@ interface EditCinemaMoviePageProps {
     };
 }
 
-export default async function EditCinemaMoviePage({ params }: EditCinemaMoviePageProps) {
-    const movie = await getCinemaMovieById(params.id);
+export default async function EditCinemaMoviePage({ params }: { params: Promise<{ id: string }> }) {
+    const { id } = await params;
+    const movie = await getCinemaMovieById(id);
 
     if (!movie) {
         notFound();
