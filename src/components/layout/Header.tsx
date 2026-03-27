@@ -190,7 +190,7 @@ export default function Header() {
     useEffect(() => {
         const observerOptions = {
             root: null,
-            rootMargin: '-40% 0px -40% 0px', // Balanced detection window (center 20% of viewport)
+            rootMargin: '-20% 0px -20% 0px', // Increased window to 60% to catch smaller empty sections better
             threshold: 0
         };
 

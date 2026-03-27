@@ -486,11 +486,12 @@
 @media (max-width: 768px) {
     .prf-modal {
         top: auto; left: 0; right: 0; bottom: 0; width: 100%;
-        max-height: 92vh;
+        max-height: 70vh;
         transform: translateY(40px) scale(1);
         filter: blur(2px);
         border-left: none; border-right: none; border-bottom: none;
         border-radius: 28px 28px 0 0;
+        padding-bottom: env(safe-area-inset-bottom, 20px);
     }
     .prf-modal.open { transform: translateY(0) scale(1); filter: blur(0); }
     .prf-body {
