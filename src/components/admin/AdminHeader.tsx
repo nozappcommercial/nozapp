@@ -1,21 +1,37 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
-import { ArrowLeft, LayoutDashboard } from 'lucide-react';
+import { usePathname, useRouter } from 'next/navigation';
+import { ArrowLeft, LayoutDashboard, Loader2 } from 'lucide-react';
+import { logoutAdmin } from '@/app/actions/admin_auth';
 
 export default function AdminHeader() {
     const pathname = usePathname();
+    const router = useRouter();
+    const [isLoggingOut, setIsLoggingOut] = useState(false);
     
     // Determine the page title based on the route
     const getPageTitle = () => {
         if (pathname.includes('/redazione')) return 'Redazione';
         if (pathname.includes('/verify')) return 'Verifica';
+        if (pathname.includes('/cinema')) return 'Cinema';
         return 'Dashboard';
     };
 
     const isRootAdmin = pathname === '/admin';
+
+    const handleLogout = async () => {
+        setIsLoggingOut(true);
+        try {
+            await logoutAdmin();
+            router.push('/login');
+            router.refresh();
+        } catch (error) {
+            console.error('Logout error:', error);
+            setIsLoggingOut(false);
+        }
+    };
 
     return (
         <header className="h-16 border-b border-black/5 bg-white/50 backdrop-blur-md sticky top-0 z-50 px-8 flex items-center justify-between">
@@ -41,13 +57,14 @@ export default function AdminHeader() {
 
             {/* Right side: Logout */}
             <nav className="w-1/3 flex items-center justify-end gap-4 font-['Fragment_Mono'] text-[10px] uppercase tracking-widest">
-                <Link 
-                    href="/login" 
-                    className="px-4 py-2 bg-black text-white rounded-full hover:bg-black/80 transition-all flex items-center gap-2"
+                <button 
+                    onClick={handleLogout}
+                    disabled={isLoggingOut}
+                    className="px-4 py-2 bg-black text-white rounded-full hover:bg-black/80 transition-all flex items-center gap-2 disabled:opacity-50"
                 >
-                    <ArrowLeft size={14} />
+                    {isLoggingOut ? <Loader2 size={14} className="animate-spin" /> : <ArrowLeft size={14} />}
                     LOGOUT
-                </Link>
+                </button>
             </nav>
         </header>
     );

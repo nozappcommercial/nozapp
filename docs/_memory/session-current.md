@@ -21,3 +21,15 @@ status: active
 **Side effects**: Nessuno, la logica di fallback del carosello è stata preservata.
 
 ---
+
+## [12:45] bug-fix
+
+**File toccati**:
+- `src/app/actions/admin_auth.ts` — Aggiunta Server Action `logoutAdmin` per il sign-out reale.
+- `src/components/admin/AdminHeader.tsx` — Conversione del link di logout in pulsante interattivo con gestione stato.
+
+**Problema di partenza**: Il logout admin non terminava la sessione Supabase, causando redirect automatici verso `/sphere` o `/admin` impedendo il cambio di utente.
+**Soluzione applicata**: Implementato logout lato server che invalida la sessione e pulisce i cookie di sicurezza.
+**Side effects**: Nessuno.
+
+---

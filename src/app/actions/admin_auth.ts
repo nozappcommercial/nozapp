@@ -106,3 +106,19 @@ export async function getAdminProfile() {
 
     return profile;
 }
+
+/**
+ * LOGOUT ADMIN
+ * ────────────
+ * Signs out from Supabase and clears the admin session cookie.
+ */
+export async function logoutAdmin() {
+    const supabase = await createClient();
+    await supabase.auth.signOut();
+    
+    // Clear admin session cookie
+    const cookieStore = await cookies();
+    cookieStore.delete('admin_session');
+    
+    return { success: true };
+}
