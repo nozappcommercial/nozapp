@@ -238,8 +238,8 @@ export default function Header() {
         if (section) {
             const anime = (await import('animejs')).default;
             
-            // Apply offset only for editorial sections to avoid cutting off the top sphere logo
-            const offset = id === 'sfera' ? 0 : 60;
+            // Use 0 offset for all sections as they handle their own internal spacing (py-20/py-24)
+            const offset = 0;
             const targetPos = Math.max(0, section.offsetTop - offset);
             const currentPos = window.scrollY;
 
