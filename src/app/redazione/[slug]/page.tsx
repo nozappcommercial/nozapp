@@ -40,67 +40,77 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
     const readingTime = getReadingTime(article.content);
 
     return (
-        <main className="min-h-screen bg-[#faf7f2] font-['Cormorant_Garamond'] selection:bg-[var(--gold)]/20">
-            {/* Hero Section */}
-            <div className="relative w-full h-[70vh] md:h-[80vh] overflow-hidden">
-                {article.cover_image ? (
-                    <Image
-                        src={article.cover_image}
-                        alt={article.title}
-                        fill
-                        priority
-                        className="object-cover scale-105"
-                    />
-                ) : (
-                    <div className="w-full h-full bg-[#1a1a1a]" />
-                )}
-                <div className="absolute inset-0 bg-gradient-to-t from-[#faf7f2] via-[#faf7f2]/10 to-transparent" />
-                
-                <div className="absolute bottom-0 left-0 w-full p-8 md:p-16 lg:p-24 max-w-7xl mx-auto">
+        <main className="min-h-screen bg-[#faf7f2] font-['Cormorant_Garamond'] selection:bg-[var(--gold)]/20 pb-20">
+            {/* Clean Header Section */}
+            <header className="pt-32 pb-16 px-8 md:px-16 lg:px-24 max-w-7xl mx-auto space-y-12">
+                <nav className="flex flex-wrap items-center gap-8 text-[10px] font-['Fragment_Mono'] uppercase tracking-[0.4em] opacity-40">
                     <Link 
-                        href="/sphere#redazione" 
-                        className="inline-flex items-center gap-2 text-[10px] font-['Fragment_Mono'] uppercase tracking-[0.4em] opacity-40 hover:opacity-100 transition-opacity mb-12 group"
+                        href="/sphere" 
+                        className="inline-flex items-center gap-2 hover:opacity-100 transition-opacity group"
                     >
                         <ArrowLeft size={12} className="group-hover:-translate-x-1 transition-transform" /> 
-                        Torna alla Redazione
+                        Torna alla Sfera
                     </Link>
+                    <span className="opacity-20">/</span>
+                    <Link 
+                        href="/redazione" 
+                        className="inline-flex items-center gap-2 hover:opacity-100 transition-opacity"
+                    >
+                        Redazione NoZapp
+                    </Link>
+                </nav>
+                
+                <div className="space-y-8 animate-in fade-in slide-in-from-bottom-8 duration-1000">
+                    <div className="flex flex-wrap items-center gap-x-6 gap-y-2 font-['Fragment_Mono'] text-[10px] uppercase tracking-[0.3em] text-[var(--gold)]">
+                        <span className="flex items-center gap-2">
+                            <Calendar size={12} strokeWidth={1.5} />
+                            {article.published_at ? formatDate(article.published_at) : ''}
+                        </span>
+                        <span className="opacity-20 hidden md:inline">|</span>
+                        <span className="flex items-center gap-2">
+                            <Clock size={12} strokeWidth={1.5} />
+                            {readingTime} min di lettura
+                        </span>
+                        <span className="opacity-20 hidden md:inline">|</span>
+                        <span>{article.author?.display_name || 'Redazione'}</span>
+                    </div>
                     
-                    <div className="space-y-6 animate-in fade-in slide-in-from-bottom-8 duration-1000">
-                        <div className="flex flex-wrap items-center gap-x-6 gap-y-2 font-['Fragment_Mono'] text-[10px] uppercase tracking-[0.3em] text-[var(--gold)]">
-                            <span className="flex items-center gap-2">
-                                <Calendar size={12} strokeWidth={1.5} />
-                                {article.published_at ? formatDate(article.published_at) : ''}
-                            </span>
-                            <span className="opacity-20 hidden md:inline">|</span>
-                            <span className="flex items-center gap-2">
-                                <Clock size={12} strokeWidth={1.5} />
-                                {readingTime} min di lettura
-                            </span>
-                            <span className="opacity-20 hidden md:inline">|</span>
-                            <span>{article.author?.display_name || 'Redazione'}</span>
-                        </div>
-                        <h1 className="text-6xl md:text-8xl lg:text-9xl font-light leading-[0.85] tracking-tight text-balance max-w-5xl">
-                            {article.title}
-                        </h1>
+                    <h1 className="text-6xl md:text-8xl lg:text-9xl font-light leading-[0.85] tracking-tight text-[#1a1a1a] text-balance max-w-6xl">
+                        {article.title}
+                    </h1>
+                </div>
+            </header>
+
+            {/* Featured Image - Moved from hero to content-top */}
+            {article.cover_image && (
+                <div className="w-full px-8 md:px-16 lg:px-24 max-w-7xl mx-auto mb-20 animate-in fade-in duration-1000 delay-300">
+                    <div className="relative aspect-[21/9] md:aspect-[21/8] overflow-hidden rounded-sm ring-1 ring-black/5">
+                        <Image
+                            src={article.cover_image}
+                            alt={article.title}
+                            fill
+                            priority
+                            className="object-cover"
+                        />
                     </div>
                 </div>
-            </div>
+            )}
 
             {/* Article Content */}
-            <article className="max-w-4xl mx-auto px-8 py-20 md:py-32 space-y-16 animate-in fade-in slide-in-from-bottom-4 duration-1500 delay-500">
+            <article className="max-w-4xl mx-auto px-8 py-12 md:py-20 space-y-16 animate-in fade-in slide-in-from-bottom-4 duration-1500 delay-500">
                 {article.excerpt && (
-                    <p className="text-3xl md:text-4xl font-light italic leading-relaxed text-[#1a1a1a]/80 border-l-2 border-[var(--gold)] pl-8 md:pl-12 py-4 max-w-3xl">
+                    <p className="text-3xl md:text-4xl font-light italic leading-relaxed text-[#1a1a1a]/70 border-l-2 border-[var(--gold)] pl-8 md:pl-12 py-4">
                         {article.excerpt}
                     </p>
                 )}
 
                 <div className="prose prose-xl prose-stone max-w-none 
                     prose-headings:font-light prose-headings:font-['Cormorant_Garamond'] prose-headings:tracking-tight
-                    prose-h2:text-4xl prose-h2:mt-16 prose-h2:mb-6
-                    prose-p:text-xl prose-p:md:text-2xl prose-p:leading-relaxed prose-p:opacity-90 prose-p:mb-8
+                    prose-h2:text-4xl prose-h2:mt-16 prose-h2:mb-6 prose-h2:text-[#1a1a1a]
+                    prose-p:text-xl prose-p:md:text-2xl prose-p:leading-relaxed prose-p:text-[#1a1a1a]/85 prose-p:mb-8
                     prose-blockquote:border-[var(--gold)] prose-blockquote:bg-black/5 prose-blockquote:p-8 prose-blockquote:rounded-r-xl prose-blockquote:italic
                     prose-a:text-[var(--gold)] prose-a:no-underline hover:prose-a:underline
-                    prose-img:rounded-sm prose-img:shadow-2xl prose-img:mx-auto prose-img:block
+                    prose-img:rounded-sm prose-img:shadow-xl prose-img:mx-auto prose-img:block
                     prose-strong:font-medium prose-strong:text-black
                     font-serif">
                     <ReactMarkdown remarkPlugins={[remarkGfm]}>
@@ -124,8 +134,9 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
                     <div className="flex gap-4">
                         <Link 
                             href="/sphere"
-                            className="px-8 py-3 bg-black text-white text-[10px] font-['Fragment_Mono'] uppercase tracking-widest rounded-full hover:bg-[var(--gold)] transition-colors duration-500"
+                            className="flex items-center gap-3 px-8 py-3 bg-black text-white text-[10px] font-['Fragment_Mono'] uppercase tracking-[0.2em] rounded-full hover:bg-[var(--gold)] transition-all duration-500 group"
                         >
+                            <ArrowLeft size={12} className="group-hover:-translate-x-1 transition-transform" />
                             Esplora la Sfera
                         </Link>
                     </div>
@@ -136,4 +147,5 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
         </main>
     );
 }
+
 

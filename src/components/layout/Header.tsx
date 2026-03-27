@@ -38,8 +38,9 @@ export default function Header() {
     const pathname = usePathname();
     const [isLoggingOut, setIsLoggingOut] = useState(false);
 
-    // Hide header entirely on login, onboarding and admin pages
-    if (pathname === '/login' || pathname === '/onboarding' || pathname?.startsWith('/admin')) return null;
+    // Hide header entirely on login, onboarding, admin, and article detail pages
+    const isArticleDetail = pathname?.startsWith('/redazione/') && pathname.split('/').filter(Boolean).length > 1;
+    if (pathname === '/login' || pathname === '/onboarding' || pathname?.startsWith('/admin') || isArticleDetail) return null;
 
     const handleLogout = async () => {
         if (isLoggingOut) return;
@@ -133,6 +134,11 @@ export default function Header() {
                 const scrollPos = window.scrollY;
                 const scrollThreshold = 10;
 
+                // Force active section to 'sfera' when at the top to fix stuck bubble bug
+                if (scrollPos < 50 && activeSection !== 'sfera') {
+                    setActiveSection('sfera');
+                }
+
                 // Set collapsed state (Inverted: Expanded at top, Collapsed when scrolling down)
                 if (scrollPos > scrollThreshold && !isCollapsed) {
                     setIsCollapsed(true);
@@ -215,8 +221,8 @@ export default function Header() {
             const anime = (await import('animejs')).default;
             
             // Apply offset only for editorial sections to avoid cutting off the top sphere logo
-            const offset = id === 'sphere' ? 0 : 60;
-            const targetPos = Math.max(0, section.offsetTop + offset);
+            const offset = id === 'sfera' ? 0 : 60;
+            const targetPos = Math.max(0, section.offsetTop - offset);
             const currentPos = window.scrollY;
 
             anime({

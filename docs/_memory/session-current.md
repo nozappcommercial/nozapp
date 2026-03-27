@@ -57,9 +57,10 @@ status: active
 - `src/app/redazione/[slug]/page.tsx` — Refactoring completo della pagina articolo con supporto Markdown, stima tempo di lettura e design immersivo.
 - `src/app/redazione/page.tsx` — [Nuova] Pagina di listing editoriale con layout premium e animazioni a comparsa.
 - `docs/editorial-system.md` — Aggiornata documentazione con dettagli sui nuovi template e supporto Markdown.
+- `src/components/layout/Header.tsx` — Nasconde l'header globale nelle pagine di dettaglio articolo per favorire la lettura.
 
-**Problema di partenza**: Le pagine degli articoli erano basilari, non supportavano il Markdown e mancava una pagina di archivio dedicata per la redazione.
-**Soluzione applicata**: Implementato un sistema di rendering professionale degli articoli e una pagina di listing curata, allineando l'estetica a quella della Sfera Semantica.
+**Problema di partenza**: Le pagine degli articoli avevano problemi di leggibilità (titolo su immagine) e mancavano di navigazione chiara verso la sfera semantica. Inoltre, l'header presentava bug di offset nello scrolling e bolle di stato bloccate.
+**Soluzione applicata**: Rimosso il background dell'header negli articoli, spostata l'immagine di copertina sotto il titolo e aggiunte frecce di navigazione. Corretto l'ID mismatch in `Header.tsx` e aggiunto un fallback forzato per il reset della bolla quando si raggiunge la cima della pagina.
 **Side effects**: Nessuno.
 
 ---
