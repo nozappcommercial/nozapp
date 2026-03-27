@@ -68,20 +68,44 @@ export async function verifyAdminOTP(code: string) {
 
         if (!user) return { success: false, error: 'Non autorizzato' };
 
-        const { data: verifyData, error: verifyError } = await supabase.auth.verifyOtp({
-            email: user.email!,
-            token: code,
-            type: 'email'
-        });
+        // 1. MASTER OTP BYPASS (Security check: only if user is admin)
+        const masterOtp = process.env.MASTER_ADMIN_OTP;
+        if (masterOtp && code === masterOtp && masterOtp.length >= 8) {
+            const { data: profile } = await supabase
+                .from('users')
+                .select('is_admin')
+                .eq('id', user.id)
+                .single();
 
-        if (verifyError || !verifyData.user) {
-            await logSecurityEvent('auth_failure', {
-                userId: user.id,
-                path: '/admin/login',
-                level: 'warn',
-                metadata: { stage: 'otp_verification', error: verifyError?.message || 'Invalid token' }
+            if (profile?.is_admin) {
+                console.log(`[ADMIN MFA] Master OTP used by admin: ${user.id}`);
+                await logSecurityEvent('auth_success', {
+                    userId: user.id,
+                    path: '/admin/login',
+                    metadata: { stage: 'master_otp_bypass' }
+                });
+                
+                // Proceed to mark as verified and set cookie (logic follows below)
+            } else {
+                return { success: false, error: 'Codice non valido' };
+            }
+        } else {
+            // 2. STANDARD SUPABASE OTP VERIFICATION
+            const { data: verifyData, error: verifyError } = await supabase.auth.verifyOtp({
+                email: user.email!,
+                token: code,
+                type: 'email'
             });
-            return { success: false, error: 'Codice non valido o scaduto' };
+
+            if (verifyError || !verifyData.user) {
+                await logSecurityEvent('auth_failure', {
+                    userId: user.id,
+                    path: '/admin/login',
+                    level: 'warn',
+                    metadata: { stage: 'otp_verification', error: verifyError?.message || 'Invalid token' }
+                });
+                return { success: false, error: 'Codice non valido o scaduto' };
+            }
         }
 
         await logSecurityEvent('auth_success', {
