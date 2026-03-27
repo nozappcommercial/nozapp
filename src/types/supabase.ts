@@ -137,6 +137,41 @@ export interface Database {
                     created_at?: string
                 }
             }
+            security_logs: {
+                Row: {
+                    id: string
+                    event_type: string
+                    level: 'info' | 'warn' | 'error' | 'critical'
+                    ip_address: string | null
+                    user_id: string | null
+                    path: string | null
+                    user_agent: string | null
+                    metadata: Json
+                    created_at: string
+                }
+                Insert: {
+                    id?: string
+                    event_type: string
+                    level?: 'info' | 'warn' | 'error' | 'critical'
+                    ip_address?: string | null
+                    user_id?: string | null
+                    path?: string | null
+                    user_agent?: string | null
+                    metadata?: Json
+                    created_at?: string
+                }
+                Update: {
+                    id?: string
+                    event_type?: string
+                    level?: 'info' | 'warn' | 'error' | 'critical'
+                    ip_address?: string | null
+                    user_id?: string | null
+                    path?: string | null
+                    user_agent?: string | null
+                    metadata?: Json
+                    created_at?: string
+                }
+            }
             cinema_movies: {
                 Row: {
                     id: string

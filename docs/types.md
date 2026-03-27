@@ -76,4 +76,4 @@ L'utilizzo del tipo `any` è scoraggiato e limitato esclusivamente a:
 > [!IMPORTANT]
 > Quando modifichi lo schema del database su Supabase, ricordati di rigenerare i tipi tramite `npx supabase gen types typescript --project-id ... > src/types/supabase.ts`.
 
-🔄 **Aggiornato il 2026-03-27**: Inseriti i tipi per il sistema di gestione manuale Cinema (`cinema_movies`).
+🔄 **Aggiornato il 2026-03-27**: Ripristinata la tabella `security_logs` nel database e nei tipi TypeScript.

@@ -26,6 +26,8 @@ agent: scrittore
 - [[project-structure]] — Albero delle cartelle e convenzioni di naming.
 - [[configuration]] — File di configurazione e variabili d'ambiente.
 - [[dependencies]] — Elenco e ruolo delle dipendenze principali.
+- [[security]] — Audit Log, MFA e criteri di sicurezza dell'area admin.
+
 
 ### Logica e UI
 - [[pages-and-routing]] — Mappa delle rotte e strategie di rendering.

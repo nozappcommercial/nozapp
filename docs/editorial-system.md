@@ -11,8 +11,10 @@ Il sistema editoriale di NoZapp permette alla sala stampa di creare e pubblicare
 ## Workflow Editoriale
 Il workflow si basa su uno stato binario (`draft` | `published`) e sulla programmazione temporale.
 
-- **Creazione**: Attraverso il form in `/admin/redazione/nuovo`. Viene generato automaticamente uno slug URL.
+- **Creazione**: Attraverso il form in `/admin/redazione/nuovo`. Viene generato automaticamente uno slug URL. Supporta la sintassi **Markdown** (Gfm) per gli stili e le immagini.
 - **Preview**: Gli amministratori possono visualizzare l'articolo in anteprima all'indirizzo `/redazione/[slug]` anche se è in bozza.
+- **Listing Pubblico**: La pagina `/redazione` elenca tutti gli articoli pubblicati con un layout dinamico e immersivo.
+- **Dettaglio Articolo**: La pagina `/redazione/[slug]` visualizza l'articolo con rendering Markdown, stili tipografici avanzati e stima del tempo di lettura.
 - **Pubblicazione**: L'articolo diventa visibile al pubblico solo se `status = published` e la data corrente è compresa tra `published_at` e `expires_at`.
 
 ## Dashboard Admin (`/admin`)
@@ -39,6 +41,17 @@ Per proteggere l'area amministrativa, è stato implementato un secondo livello d
 5. **Validazione**: Inserito il codice a 8 cifre corretto, viene impostato un cookie `httpOnly` sicuro della durata di 2 ore. L'utente ha anche l'opzione "Ho già un codice" per inserire un token precedentemente ricevuto senza generare un nuovo invio.
 6. **Logout**: La disconnessione avviene tramite Server Action (`logoutAdmin`) che invalida la sessione Supabase e rimuove il cookie `admin_session` per prevenire loop di redirect.
 
+## Audit e Logging di Sicurezza
+Tutti gli eventi critici per la sicurezza della piattaforma vengono tracciati tramite un logger centralizzato (`src/lib/logger.ts`).
+
+- **Destinazione**: I log vengono stampati sulla console del server e salvati nella tabella `security_logs` (solo in produzione o se abilitato esplicitamente).
+- **Eventi Tracciati**:
+    - Tentativi di accesso (successo/fallimento).
+    - Blocchi per Rate Limiting.
+    - Rilevamento Bot e Crawler malevoli.
+    - Errori API critici e traffico sospetto.
+- **Accesso**: I log sono consultabili direttamente dal database Supabase dagli amministratori.
+
 ## Componenti Chiave
 - `ArticleForm.tsx`: Componente client per il CRUD degli articoli.
 - `EditorialSection.tsx`: Rendering degli articoli nella home page.
@@ -48,5 +61,5 @@ Per proteggere l'area amministrativa, è stato implementato un secondo livello d
 Vedere [[database]] per il dettaglio della tabella `articles` e le nuove colonne MFA nella tabella `users`.
 
 ---
-🔄 **Aggiornato il 2026-03-27**: Introdotto il sistema di gestione Cinema e risolti i problemi di redirect nel logout tramite Server Action dedicata.
+🔄 **Aggiornato il 2026-03-27**: Ripristinata la persistenza degli audit di sicurezza tramite la tabella `security_logs`.
 File modificati: `src/app/actions/admin_auth.ts`, `src/app/admin/verify/page.tsx`, `supabase/migrations/20260327000000_cleanup_users_table.sql`

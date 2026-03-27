@@ -1,7 +1,8 @@
 'use server';
 
 import { createClient } from '@/lib/supabase/server';
-import { cookies } from 'next/headers';
+import { cookies, headers } from 'next/headers';
+import { logSecurityEvent } from '@/lib/logger';
 
 /**
  * GENERATE AND "SEND" OTP
@@ -32,9 +33,21 @@ export async function generateAdminOTP() {
 
         if (otpError) {
             console.error('[ADMIN MFA] Error sending Email OTP:', otpError);
+            await logSecurityEvent('auth_failure', {
+                userId: user.id,
+                path: '/admin/login',
+                level: 'error',
+                metadata: { error: otpError.message, stage: 'otp_generation' }
+            });
             return { success: false, error: 'Errore Supabase: ' + otpError.message };
         }
         
+        await logSecurityEvent('auth_success', {
+            userId: user.id,
+            path: '/admin/login',
+            metadata: { stage: 'otp_generation' }
+        });
+
         return { success: true, message: 'Codice inviato via Email' };
     } catch (e: any) {
         console.error('[ADMIN MFA] Unexpected error in generateAdminOTP:', e);
@@ -62,8 +75,20 @@ export async function verifyAdminOTP(code: string) {
         });
 
         if (verifyError || !verifyData.user) {
+            await logSecurityEvent('auth_failure', {
+                userId: user.id,
+                path: '/admin/login',
+                level: 'warn',
+                metadata: { stage: 'otp_verification', error: verifyError?.message || 'Invalid token' }
+            });
             return { success: false, error: 'Codice non valido o scaduto' };
         }
+
+        await logSecurityEvent('auth_success', {
+            userId: user.id,
+            path: '/admin/login',
+            metadata: { stage: 'otp_verification_success' }
+        });
 
         // Success: Mark as verified in our custom users table
         await supabase
@@ -114,11 +139,20 @@ export async function getAdminProfile() {
  */
 export async function logoutAdmin() {
     const supabase = await createClient();
+    const { data: { user } } = await supabase.auth.getUser();
     await supabase.auth.signOut();
     
     // Clear admin session cookie
     const cookieStore = await cookies();
     cookieStore.delete('admin_session');
+    
+    if (user) {
+        await logSecurityEvent('auth_success', {
+            userId: user.id,
+            path: '/admin',
+            metadata: { stage: 'logout' }
+        });
+    }
     
     return { success: true };
 }
