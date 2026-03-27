@@ -83,3 +83,18 @@ status: active
 **Side effects**: Nessuno. Garantisce che il CI/CD possa scalare anche se i segreti non sono configurati esplicitamente in fase di build.
 
 ---
+
+## [17:30] feature: admin ui refinement — P2-008
+
+**File toccati**:
+
+- `src/components/admin/AdminHeader.tsx` — Aggiunto tasto "Sfera", rimosso link ridondante su `/verify`.
+- `src/app/admin/verify/page.tsx` — Centramento box, rimozione scroll e sfondi doppi.
+- `src/app/admin/layout.tsx` — Transizione a Client Component per layout dinamico (padding condizionale).
+- `src/components/layout/Header.tsx` — Sostituito `Link` con `<a>` per l'accesso admin (fix crash Vercel).
+
+**Problema di partenza**: La UI di verifica non era centrata e presentava link ridondanti. L'accesso all'admin dalla sfera causava crash transitori su Vercel (richiedendo reload).
+**Soluzione applicata**: Ottimizzato il layout flexbox per il centramento perfetto. Implementato il caricamento full-page (SSR) per l'ingresso nell'admin per stabilizzare il middleware. Aggiunta navigazione rapida verso la sfera.
+**Side effects**: Nessuno. Migliorata l'esperienza utente e la stabilità della sessione admin.
+
+---

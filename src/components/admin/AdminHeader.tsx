@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import { ArrowLeft, LayoutDashboard, Loader2 } from 'lucide-react';
+import { ArrowLeft, LayoutDashboard, Loader2, Globe } from 'lucide-react';
 import { logoutAdmin } from '@/app/actions/admin_auth';
 
 export default function AdminHeader() {
@@ -20,6 +20,7 @@ export default function AdminHeader() {
     };
 
     const isRootAdmin = pathname === '/admin';
+    const isVerifyPage = pathname === '/admin/verify';
 
     const handleLogout = async () => {
         setIsLoggingOut(true);
@@ -37,7 +38,7 @@ export default function AdminHeader() {
         <header className="h-16 border-b border-black/5 bg-white/50 backdrop-blur-md sticky top-0 z-50 px-8 flex items-center justify-between">
             {/* Left side: Back to Dashboard if not on root */}
             <div className="w-1/3 flex items-center">
-                {!isRootAdmin && (
+                {!isRootAdmin && !isVerifyPage && (
                     <Link 
                         href="/admin" 
                         className="flex items-center gap-2 text-[10px] font-['Fragment_Mono'] uppercase tracking-widest text-black/40 hover:text-black transition-colors group"
@@ -56,7 +57,14 @@ export default function AdminHeader() {
             </div>
 
             {/* Right side: Logout */}
-            <nav className="w-1/3 flex items-center justify-end gap-4 font-['Fragment_Mono'] text-[10px] uppercase tracking-widest">
+            <nav className="w-1/3 flex items-center justify-end gap-3 font-['Fragment_Mono'] text-[10px] uppercase tracking-widest">
+                <Link 
+                    href="/sphere"
+                    className="px-4 py-2 border border-black/5 rounded-full hover:bg-black/5 transition-all flex items-center gap-2 text-black/60 hover:text-black"
+                >
+                    <Globe size={14} />
+                    Sfera
+                </Link>
                 <button 
                     onClick={handleLogout}
                     disabled={isLoggingOut}

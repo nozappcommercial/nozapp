@@ -89,7 +89,7 @@ export default function VerifyAdminPage() {
     }, [code]);
 
     return (
-        <div className="min-h-screen bg-[#faf7f2] flex items-center justify-center p-6 font-['Cormorant_Garamond']">
+        <div className="h-[calc(100vh-64px)] flex items-center justify-center p-6 overflow-hidden">
             <div className="max-w-md w-full bg-white rounded-3xl p-10 shadow-xl shadow-black/5 ring-1 ring-black/5 space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
                 <div className="text-center space-y-2">
                     <div className="w-16 h-16 bg-[var(--gold)]/10 rounded-full flex items-center justify-center mx-auto mb-6">

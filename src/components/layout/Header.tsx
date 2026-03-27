@@ -306,9 +306,9 @@ export default function Header() {
                     <User size={14} strokeWidth={1.1} />
                 </button>
                 {isAdmin && (
-                    <Link href="/admin/verify" className={styles.actionBtn} title="Verifica Amministratore">
+                    <a href="/admin/verify" className={styles.actionBtn} title="Verifica Amministratore">
                         <Settings size={14} strokeWidth={1.1} />
-                    </Link>
+                    </a>
                 )}
                 <button
                     className={`${styles.actionBtn} ${styles.actionBtnLogout} ${isLoggingOut ? styles.loading : ''}`}
