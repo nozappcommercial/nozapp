@@ -6,6 +6,7 @@ import { usePathname } from 'next/navigation';
 import { Home, Newspaper, Clapperboard, LogOut, User, Settings } from 'lucide-react';
 import { createClient } from '@/lib/supabase/client';
 import { getAdminStatus } from '@/lib/supabase/auth-client';
+import { signOutAction } from '@/app/actions/admin_auth';
 import { smoothScrollTo } from '@/lib/scroll-utils';
 import { useIsMobile } from '@/hooks/use-is-mobile';
 import styles from './Header.module.css';
@@ -65,8 +66,7 @@ export default function Header() {
         if (isLoggingOut) return;
         setIsLoggingOut(true);
         try {
-            const supabase = createClient();
-            await supabase.auth.signOut();
+            await signOutAction();
             window.location.href = '/login';
         } catch (error) {
             console.error('Logout error:', error);

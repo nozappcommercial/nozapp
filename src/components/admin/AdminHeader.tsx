@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { ArrowLeft, LayoutDashboard, Loader2, Globe } from 'lucide-react';
-import { logoutAdmin } from '@/app/actions/admin_auth';
+import { signOutAction } from '@/app/actions/admin_auth';
 
 export default function AdminHeader() {
     const pathname = usePathname();
@@ -25,7 +25,7 @@ export default function AdminHeader() {
     const handleLogout = async () => {
         setIsLoggingOut(true);
         try {
-            await logoutAdmin();
+            await signOutAction();
             router.push('/login');
             router.refresh();
         } catch (error) {
