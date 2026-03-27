@@ -12,9 +12,25 @@ I componenti di NoZapp sono suddivisi in **UI atomici** (Shadcn), **Layout** (st
 ## Componenti Specifici
 
 ### `ShellNavigator` — `src/components/sphere/ShellNavigator.tsx`
-**Scopo**: Gestisce la navigazione tra i livelli di astrazione (Pilastri, Affinità, Scoperta) della sfera.
-**Responsabilità**: Visualizzare il livello corrente, gestire l'hover per espandere le label e triggerare il cambio di shell nello Sphere Engine.
-**Nota Layout**: Il posizionamento è delegato al contenitore genitore per garantire la centratura verticale e il corretto padding dal bordo sinistro.
+**Scopo**: Gestisce la navigazione tra i livelli di shell della sfera.
+**Responsabilità**: Visualizzare il livello corrente, gestire l'hover e triggerare il cambio di shell.
+
+---
+
+### `MovieDetailPanel` — `src/components/sphere/MovieDetailPanel.tsx`
+**Scopo**: Visualizza i dettagli completi del film selezionato (Poster, Titolo, Meta, Feedbacks).
+**Caratteristiche**:
+- **Swipe UX**: Include logica di swipe orizzontale per navigare tra i film adiacenti.
+- **Micro-interazioni**: Animazione di entrata/uscita fluida gestita tramite classi CSS dinamiche.
+
+---
+
+### `SphereUIOverlays` — `src/components/sphere/SphereUIOverlays.tsx`
+**Scopo**: Contiene tutti gli elementi UI bidimensionali sovrapposti alla sfera 3D.
+**Responsabilità**:
+- Renderizza l'Header specifico della sfera (`SphereHeader`).
+- Visualizza i Breadcrumb di navigazione tra le shell.
+- Fornisce i pulsanti di controllo direzionale (Nav Buttons).
 
 | Prop | Tipo | Default | Obbligatorio | Descrizione |
 | :--- | :--- | :--- | :--- | :--- |
@@ -41,9 +57,9 @@ I componenti di NoZapp sono suddivisi in **UI atomici** (Shadcn), **Layout** (st
 **Scopo**: Navigazione principale dell'applicazione (Sfera, Redazione, Cinema).
 **Comportamento**: 
 - **Sticky / Collapsible**: Si riduce di dimensione durante lo scroll.
-- **Scroll Spy**: Utilizza `IntersectionObserver` per evidenziare la sezione attiva.
+- **Utility Centralizzate**: Utilizza l'hook globale `useIsMobile` e le utility `scroll-utils` per una gestione pulita delle interazioni.
 - **Bubble Effect**: Un indicatore circolare (orb/bubble) insegue l'icona attiva.
-- **Visibilità**: L'header è nascosto automaticamente in tutte le rotte che iniziano con `/admin` (Dashboard Redazione).
+- **Visibilità**: L'header è nascosto automaticamente in tutte le rotte che iniziano con `/admin` (Dashboard Redazione) o quando un film è selezionato nella sfera.
 
 | Sezione | ID | Icona | Ruolo |
 | :--- | :--- | :--- | :--- |
@@ -61,6 +77,7 @@ I componenti di NoZapp sono suddivisi in **UI atomici** (Shadcn), **Layout** (st
 - Mostrare il titolo contestuale (Dashboard, Redazione, Verifica).
 - Fornire il link di ritorno alla Dashboard nelle sottopagine.
 - Gestire il logout globale dell'area admin.
+- **Torna alla Sfera**: Include un pulsante rapido per tornare all'esperienza 3D pubblica.
 **Comportamento**: Utilizza `usePathname` per determinare lo stato della navigazione in tempo reale.
 
 ---
@@ -96,4 +113,5 @@ Questi componenti si trovano in `src/components/ui/` e seguono le specifiche di 
 > [!NOTE]
 > Tutti i componenti utilizzano tipicamente `framer-motion` per micro-interazioni e transizioni di stato.
 
-🔄 **Aggiornato il 2026-03-27**: Introdotto `CinemaForm` per la gestione della programmazione film.
+🔄 **Aggiornato il 2026-03-27**: Decomposizione dei componenti della Sfera (`MovieDetailPanel`, `SphereUIOverlays`) e integrazione utility globali nell'Header.
+File modificati: `src/components/sphere/MovieDetailPanel.tsx`, `src/components/sphere/SphereUIOverlays.tsx`, `src/components/layout/Header.tsx`, `src/components/admin/AdminHeader.tsx`

@@ -1,7 +1,5 @@
----
-tags: [#threejs, #status/complete]
-created: 2026-03-26
-agent: scrittore
+updated: 2026-03-27
+agent: aggiornatore
 ---
 
 # Motore 3D (Three.js)
@@ -11,10 +9,18 @@ agent: scrittore
 ## Panoramica
 Il cuore di NoZapp è un motore di rendering **Three.js** custom che visualizza il grafo dei film in uno spazio tridimensionale. A differenza di molti progetti Next.js, NoZapp utilizza Three.js **Vanilla** (non React Three Fiber) per avere il massimo controllo sulle performance e sul ciclo di vita degli oggetti.
 
-## Il Componente `SemanticSphere.tsx`
 Percorso: `src/components/SemanticSphere.tsx`
 
-Questo componente gestisce l'intera scena 3D, le luci, la telecamera e le interazioni raycasting. 
+Questo componente agisce come **orchestratore** leggero. Inizializza lo stato React, gestisce le interazioni con l'API (come il salvataggio dei feedback dei film) e coordina i componenti UI estratti con il motore Three.js.
+
+### Custom Hook: `useSphereEngine`
+Percorso: `src/hooks/useSphereEngine.ts`
+
+Tutta la logica imperativa di Three.js è stata isolata in questo hook per migliorare la manutenibilità e la leggibilità. L'hook gestisce:
+- Inizializzazione della scena, luci e camera.
+- Raycasting per la selezione dei nodi.
+- Gestione del loop di animazione (`animate()`).
+- Transizioni fluide tra i livelli di shell.
 
 ### Geometrie e Materiali
 1. **Nodi (Film)**: 
@@ -57,5 +63,9 @@ Nel codice sono presenti variabili chiave per il fine-tuning della scena:
 - `nodeScale`: Fattore di scala dei nodi in base alla popolarità/rating.
 
 ---
-> [!WARNING]
-> Il componente `SemanticSphere.tsx` utilizza `@ts-nocheck` a causa della complessità della tipizzazione degli oggetti Three.js vaniglia all'interno di React. Maneggiare con cautela.
+---
+> [!NOTE]
+> Il componente `SemanticSphere.tsx` è stato refatorizzato per eliminare `@ts-nocheck`. Ora utilizza interfacce TypeScript rigorose e una struttura decomposta per una manutenzione più sicura.
+
+🔄 **Aggiornato il 2026-03-27**: Decomposizione del componente in orchestratore e hook `useSphereEngine.ts`. Rimozione `@ts-nocheck`.
+File modificati: `src/components/SemanticSphere.tsx`, `src/hooks/useSphereEngine.ts`

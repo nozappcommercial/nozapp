@@ -56,7 +56,7 @@ graph TD
 
 ### 2. Layouts
 - **RootLayout (`app/layout.tsx`)**: Contiene il font (`Cormorant Garamond`), lo `SplashScreen`, l'header globale e il setup delle analytics.
-- **AdminLayout (`app/admin/layout.tsx`)**: Layout specifico per l'area gestionale. Utilizza il componente dinamico `AdminHeader` per mostrare il titolo della pagina corrente ("Dashboard" vs "Redazione") e fornire pulsanti di navigazione contestuali (es. "Torna alla Dashboard").
+- **AdminLayout (`app/admin/layout.tsx`)**: Layout specifico per l'area gestionale. Utilizza il componente dinamico `AdminHeader` per mostrare il titolo della pagina corrente ("Dashboard" vs "Redazione") e fornire pulsanti di navigazione contestuali (es. "Torna alla Dashboard", "Sfera"). Garantisce la stabilità del middleware tramite l'uso di link standard (`<a>`) per le transizioni area pubblica/admin.
 - **Auth Routes**: Utilizzano un layout semplificato che nasconde l'header globale per focalizzare l'utente sul form.
 
 ---
@@ -70,4 +70,5 @@ graph TD
 > [!TIP]
 > Il middleware in `src/lib/supabase/middleware.ts` è il centro di controllo del routing basato sullo stato di onboarding dell'utente e sui permessi amministrativi (MFA).
 
-🔄 **Aggiornato il 2026-03-27**: Introdotte le rotte per la gestione manuale del Cinema (`/admin/cinema`) e la pagina di archivio editoriale (`/redazione`). Aggiornato il diagramma di flusso per l'accesso admin non-bloccante.
+🔄 **Aggiornato il 2026-03-27**: Ottimizzazione layout admin e transizioni sicure tra contesti (public/admin) via SSR.
+File modificati: `app/admin/layout.tsx`

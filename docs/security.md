@@ -33,7 +33,11 @@ L'accesso all'area `/admin` è protetto da un sistema a due fattori (MFA) tramit
 2. **Controllo Admin**: Il sistema verifica il flag `is_admin` nella tabella `public.users`.
 3. **Email OTP**: Viene inviato un codice a 8 cifre via email.
 4. **Verifica e Sessione**: Dopo la verifica del codice, viene impostato un cookie `admin_session` (httpOnly, secure) con durata di 2 ore.
-5. **Accesso Rapido**: Per gli admin già autenticati, è presente un'icona Settings (rotellina) nell'header della Sfera che rimanda direttamente a `/admin/verify`.
+5. **Feedback Visivi**: La pagina di verifica include feedback sullo stato dell'OTP:
+   - **Errore**: Animazione "shake" del box di input e bordi rossi.
+   - **Successo**: Messaggi di conferma e reindirizzamento immediato.
+   - **Reinvio**: Notifica visiva al completamento dell'invio di un nuovo codice.
+6. **Accesso Rapido**: Per gli admin già autenticati, è presente un'icona Settings (rotellina) nell'header della Sfera che rimanda direttamente a `/admin/verify`.
 
 ## Utility di Logging
 
@@ -50,5 +54,5 @@ await logSecurityEvent('auth_success', {
 ```
 
 ---
-🔄 **Aggiornato il 2026-03-27**: Perfezionato il flusso MFA con codici a 8 cifre e aggiunto punto di ingresso rapido nell'header.
-File modificati: `src/app/actions/admin_auth.ts`, `src/components/layout/Header.tsx`, `src/app/admin/verify/page.tsx`
+🔄 **Aggiornato il 2026-03-27**: Perfezionamento feedback visivi OTP e gestione flussi di errore UX.
+File modificati: `src/app/admin/verify/page.tsx`
