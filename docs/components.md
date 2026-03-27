@@ -55,6 +55,16 @@ I componenti di NoZapp sono suddivisi in **UI atomici** (Shadcn), **Layout** (st
 
 ---
 
+### `AdminHeader` — `src/components/admin/AdminHeader.tsx`
+**Scopo**: Header dinamico per l'area amministrativa.
+**Responsabilità**:
+- Mostrare il titolo contestuale (Dashboard, Redazione, Verifica).
+- Fornire il link di ritorno alla Dashboard nelle sottopagine.
+- Gestire il logout globale dell'area admin.
+**Comportamento**: Utilizza `usePathname` per determinare lo stato della navigazione in tempo reale.
+
+---
+
 ### `AuthHandler` — `src/components/auth/AuthHandler.tsx`
 **Scopo**: Gestore invisibile lato client per la logica di autenticazione.
 **Responsabilità**:
@@ -75,4 +85,4 @@ Questi componenti si trovano in `src/components/ui/` e seguono le specifiche di 
 > [!NOTE]
 > Tutti i componenti utilizzano tipicamente `framer-motion` per micro-interazioni e transizioni di stato.
 
-🔄 **Aggiornato il 2026-03-26**: Documentati i fix di ShellNavigator, ProfileModal e la visibilità condizionale dell'Header.
+🔄 **Aggiornato il 2026-03-27**: Introdotto `AdminHeader` per la gestione dinamica del titolo e della navigazione nell'area gestionale.

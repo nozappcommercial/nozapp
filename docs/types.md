@@ -20,6 +20,8 @@ Generati automaticamente tramite Supabase CLI, definiscono lo schema esatto dell
 | `articles` | `Article` | Contenuti redazionali (titolo, slug, contenuto). |
 | `users` | `User` | Profili utente estesi con flag `is_admin`, `onboarding_complete` e timestamp MFA (`admin_verified_at`). |
 
+🔄 **Aggiornato il 2026-03-27**: Rimozione dei campi `role`, `phone_number`, `otp_code` e `otp_expires_at` dalla tabella `users` in favore di un sistema MFA via Email semplificato.
+
 ## Tipi del Grafo (`src/lib/graph/`)
 Utilizzati dallo Sphere Engine per il rendering e la navigazione.
 

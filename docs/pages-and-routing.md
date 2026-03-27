@@ -54,7 +54,7 @@ graph TD
 
 ### 2. Layouts
 - **RootLayout (`app/layout.tsx`)**: Contiene il font (`Cormorant Garamond`), lo `SplashScreen`, l'header globale e il setup delle analytics.
-- **AdminLayout (`app/admin/layout.tsx`)**: Layout specifico per l'area gestionale. Presenta un header dedicato che sostituisce quello globale della sfera per una navigazione focalizzata sugli strumenti di controllo.
+- **AdminLayout (`app/admin/layout.tsx`)**: Layout specifico per l'area gestionale. Utilizza il componente dinamico `AdminHeader` per mostrare il titolo della pagina corrente ("Dashboard" vs "Redazione") e fornire pulsanti di navigazione contestuali (es. "Torna alla Dashboard").
 - **Auth Routes**: Utilizzano un layout semplificato che nasconde l'header globale per focalizzare l'utente sul form.
 
 ---
@@ -68,4 +68,4 @@ graph TD
 > [!TIP]
 > Il middleware in `src/lib/supabase/middleware.ts` è il centro di controllo del routing basato sullo stato di onboarding dell'utente e sui permessi amministrativi (MFA).
 
-🔄 **Aggiornato il 2026-03-27**: Aggiornato il flusso MFA nella pagina `/admin/verify` (passaggio da 4 a 8 cifre e invio via Email).
+🔄 **Aggiornato il 2026-03-27**: Refactoring del layout admin: introdotto header dinamico con titoli contestuali e pulsante di ritorno alla dashboard dalle sottopagine.

@@ -18,3 +18,18 @@ status: active
 **Side effects**: Nessuno previsto, il sistema MFA via Email è già pienamente operativo e indipendente dai campi rimossi.
 
 ---
+
+---
+
+## [11:24] [tipo: feature]
+
+**File toccati**:
+
+- `src/components/admin/AdminHeader.tsx` — [Creazione componente Header client-side con titoli dinamici e pulsante "Torna alla Dashboard"]
+- `src/app/admin/layout.tsx` — [Integrazione Header dinamico e risoluzione import]
+
+**Problema di partenza**: Necessità di un header reattivo che mostri il titolo della pagina corrente e permetta la navigazione a ritroso nelle sottopagine admin.
+**Soluzione applicata**: Implementazione di `AdminHeader` con `usePathname` per gestire i titoli "Dashboard" e "Redazione" e il link di ritorno.
+**Side effects**: Nessuno.
+
+---
