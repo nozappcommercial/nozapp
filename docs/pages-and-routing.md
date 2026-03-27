@@ -14,8 +14,8 @@ NoZapp utilizza l'**App Router** di Next.js 14 per gestire la navigazione. La ma
 | `/` | `app/page.tsx` | SSR | Root | Landing page o redirect automatico alla sfera. |
 | `/login` | `app/(auth)/login/page.tsx` | CSR | Root | Autenticazione utente (Email/Password + Magic Link). |
 | `/onboarding`| `app/onboarding/page.tsx` | Dynamic | Root | Wizard iniziale di selezione dei pilastri del gusto. |
-| `/sphere` | `app/sphere/page.tsx` | Dynamic | Root | Schermata principale con il grafo 3D interattivo. |
-| `/redazione/[slug]` | `app/redazione/[slug]/page.tsx` | Dynamic | Root | Visualizzazione articolo singolo (template pubblico). |
+| `/redazione` | `app/redazione/page.tsx` | Dynamic | Root | Archivio editoriale con griglia animata dei contenuti. |
+| `/redazione/[slug]` | `app/redazione/[slug]/page.tsx` | Dynamic | Root | Visualizzazione articolo singolo (Markdown + Design Immersivo). |
 | `/admin` | `app/admin/page.tsx` | SSR | Admin | Dashboard gestionale per amministratori. |
 | `/admin/redazione` | `app/admin/redazione/page.tsx` | SSR | Admin | Lista articoli e gestione contenuti. |
 | `/admin/cinema` | `app/admin/cinema/page.tsx` | SSR | Admin | Lista film in programmazione (manuale). |
@@ -45,9 +45,8 @@ graph TD
     Start((Accesso)) --> Mid{Middleware}
     Mid -- No Auth --> Login[/login]
     Mid -- Auth & No Onb --> Onb[/onboarding]
-    Mid -- Auth & Onb OK --> IsAdmin{Is Admin?}
-    IsAdmin -- No --> Sph[/sphere]
-    IsAdmin -- Yes --> MFA{MFA Verified?}
+    Mid -- Auth & Onb OK --> Sph[/sphere]
+    Sph -- Admin Gear Icon --> MFA{MFA Verified?}
     MFA -- No --> Verify[/admin/verify]
     MFA -- Yes --> Dash[/admin]
     Login -- Success --> Onb
@@ -71,4 +70,4 @@ graph TD
 > [!TIP]
 > Il middleware in `src/lib/supabase/middleware.ts` è il centro di controllo del routing basato sullo stato di onboarding dell'utente e sui permessi amministrativi (MFA).
 
-🔄 **Aggiornato il 2026-03-27**: Introdotte le rotte per la gestione manuale del Cinema (`/admin/cinema`).
+🔄 **Aggiornato il 2026-03-27**: Introdotte le rotte per la gestione manuale del Cinema (`/admin/cinema`) e la pagina di archivio editoriale (`/redazione`). Aggiornato il diagramma di flusso per l'accesso admin non-bloccante.

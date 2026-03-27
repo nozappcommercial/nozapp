@@ -13,8 +13,8 @@ Il workflow si basa su uno stato binario (`draft` | `published`) e sulla program
 
 - **Creazione**: Attraverso il form in `/admin/redazione/nuovo`. Viene generato automaticamente uno slug URL. Supporta la sintassi **Markdown** (Gfm) per gli stili e le immagini.
 - **Preview**: Gli amministratori possono visualizzare l'articolo in anteprima all'indirizzo `/redazione/[slug]` anche se è in bozza.
-- **Listing Pubblico**: La pagina `/redazione` elenca tutti gli articoli pubblicati con un layout dinamico e immersivo.
-- **Dettaglio Articolo**: La pagina `/redazione/[slug]` visualizza l'articolo con rendering Markdown, stili tipografici avanzati e stima del tempo di lettura.
+- **Archive Page**: La pagina `/redazione` elenca tutti gli articoli pubblicati con un layout dinamico a griglia immersiva.
+- **Reading Experience**: La pagina `/redazione/[slug]` visualizza l'articolo con rendering Markdown, design "clean" senza hero background (massima leggibilità), stili tipografici in `Cormorant Garamond` e `Fragment Mono`, e stima automatica del tempo di lettura.
 - **Pubblicazione**: L'articolo diventa visibile al pubblico solo se `status = published` e la data corrente è compresa tra `published_at` e `expires_at`.
 
 ## Dashboard Admin (`/admin`)
@@ -61,5 +61,5 @@ Tutti gli eventi critici per la sicurezza della piattaforma vengono tracciati tr
 Vedere [[database]] per il dettaglio della tabella `articles` e le nuove colonne MFA nella tabella `users`.
 
 ---
-🔄 **Aggiornato il 2026-03-27**: Ripristinata la persistenza degli audit di sicurezza tramite la tabella `security_logs`.
-File modificati: `src/app/actions/admin_auth.ts`, `src/app/admin/verify/page.tsx`, `supabase/migrations/20260327000000_cleanup_users_table.sql`
+🔄 **Aggiornato il 2026-03-27**: Introdotto il supporto Markdown (react-markdown), il nuovo template immersivo per gli articoli e il sistema di gestione manuale del Cinema. Perfezionato il flusso MFA con codici a 8 cifre.
+File modificati: `src/app/redazione/[slug]/page.tsx`, `src/app/redazione/page.tsx`, `src/app/actions/cinema.ts`, `src/app/admin/verify/page.tsx`
