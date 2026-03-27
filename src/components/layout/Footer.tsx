@@ -1,3 +1,4 @@
+"use client";
 import React, { useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { Instagram, Twitter, MessageCircle, ArrowUpRight } from 'lucide-react';
