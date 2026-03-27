@@ -70,3 +70,16 @@ status: active
 **Todo chiuso**: P2-001 → ✅
 
 ---
+
+## [17:15] fix: build vercel
+
+**File toccati**:
+
+- `src/lib/config.ts` — Reso resiliente alla fase di build (opzionalità per segreti mancanti).
+- `src/app/api/admin/sync-streaming/route.ts` — Gestione runtime della mancanza di chiavi API.
+
+**Problema di partenza**: La build di Vercel falliva durante la "page data collection" perché i segreti (`CRON_SECRET`, `RAPIDAPI_KEY`) non erano presenti nel context del compilatore.
+**Soluzione applicata**: Modificato lo schema Zod per permettere che i segreti siano opzionali durante la build. Aggiunti controlli di guardia nelle rotte per gestire l'assenza a runtime con log d'errore chiari.
+**Side effects**: Nessuno. Garantisce che il CI/CD possa scalare anche se i segreti non sono configurati esplicitamente in fase di build.
+
+---

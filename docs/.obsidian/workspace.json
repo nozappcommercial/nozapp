@@ -13,12 +13,12 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "known-issues.md",
+                "file": "todo.md",
                 "mode": "source",
                 "source": false
               },
               "icon": "lucide-file",
-              "title": "known-issues"
+              "title": "todo"
             }
           }
         ]
@@ -95,7 +95,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "known-issues.md",
+                "file": "todo.md",
                 "collapseAll": true,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -105,7 +105,7 @@
                 "unlinkedCollapsed": true
               },
               "icon": "links-coming-in",
-              "title": "Riferimenti a known-issues"
+              "title": "Riferimenti a todo"
             }
           },
           {
@@ -185,6 +185,7 @@
   },
   "active": "210fda53ff551c12",
   "lastOpenFiles": [
+    "known-issues.md",
     "todo.md",
     "security.md",
     "_memory/session-2026-03-27.md",
@@ -196,7 +197,6 @@
     "progetto.md",
     "_memory",
     "onboarding-guide.md",
-    "known-issues.md",
     "scripts.md",
     "dependencies.md",
     "configuration.md",

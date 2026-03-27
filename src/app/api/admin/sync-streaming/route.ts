@@ -8,6 +8,11 @@ export async function GET(req: Request) {
   const RAPIDAPI_KEY = config.RAPIDAPI_KEY;
   const CRON_SECRET = config.CRON_SECRET;
 
+  if (!RAPIDAPI_KEY || !CRON_SECRET) {
+      console.error("❌ Missing critical configuration (RAPIDAPI_KEY or CRON_SECRET). Sync aborted.");
+      return NextResponse.json({ error: "Server configuration error" }, { status: 500 });
+  }
+
   const authHeader = req.headers.get('authorization');
   if (authHeader !== `Bearer ${CRON_SECRET}`) {
       return NextResponse.json({ error: "Unauthorized access" }, { status: 401 });
