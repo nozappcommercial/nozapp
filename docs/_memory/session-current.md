@@ -97,4 +97,15 @@ status: active
 **Soluzione applicata**: Ottimizzato il layout flexbox per il centramento perfetto. Implementato il caricamento full-page (SSR) per l'ingresso nell'admin per stabilizzare il middleware. Aggiunta navigazione rapida verso la sfera.
 **Side effects**: Nessuno. Migliorata l'esperienza utente e la stabilità della sessione admin.
 
+
+## [17:50] feature: otp feedback & resend notification — P2-009
+
+**File toccati**:
+
+- `src/app/admin/verify/page.tsx` — Implementata animazione di shake su errore, bordi colorati per stati (loading/error/success) e messaggio di conferma reinvio email.
+
+**Problema di partenza**: Mancanza di feedback visivi durante l'inserimento dell'OTP e dopo il clic su "Reinvia codice".
+**Soluzione applicata**: Aggiunto stato `isVibrating` per animazione CSS shake. Inserito messaggio di successo temporaneo (`resendSuccess`) per il reinvio mail. Migliorata la UX con loader durante la verifica.
+**Side effects**: Nessuno.
+
 ---
