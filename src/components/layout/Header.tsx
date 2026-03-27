@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useLayoutEffect, useRef, useCallback } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Home, Newspaper, Clapperboard, LogOut, User } from 'lucide-react';
+import { Home, Newspaper, Clapperboard, LogOut, User, Settings } from 'lucide-react';
 import { createClient } from '@/lib/supabase/client';
 import styles from './Header.module.css';
 
@@ -37,6 +37,24 @@ export default function Header() {
     const headerRef = useRef<HTMLElement>(null);
     const pathname = usePathname();
     const [isLoggingOut, setIsLoggingOut] = useState(false);
+    const [isAdmin, setIsAdmin] = useState(false);
+
+    // Fetch admin status
+    useEffect(() => {
+        const checkAdminStatus = async () => {
+            const supabase = createClient();
+            const { data: { user } } = await supabase.auth.getUser();
+            if (user) {
+                const { data } = await supabase
+                    .from('users')
+                    .select('is_admin')
+                    .eq('id', user.id)
+                    .single();
+                if (data?.is_admin) setIsAdmin(true);
+            }
+        };
+        checkAdminStatus();
+    }, []);
 
     // Hide header entirely on login, onboarding, admin, and article detail pages
     const isArticleDetail = pathname?.startsWith('/redazione/') && pathname.split('/').filter(Boolean).length > 1;
@@ -287,6 +305,11 @@ export default function Header() {
                 <button className={styles.actionBtn} title="Profilo" onClick={() => window.dispatchEvent(new Event('open-profile'))}>
                     <User size={14} strokeWidth={1.1} />
                 </button>
+                {isAdmin && (
+                    <Link href="/admin/verify" className={styles.actionBtn} title="Verifica Amministratore">
+                        <Settings size={14} strokeWidth={1.1} />
+                    </Link>
+                )}
                 <button
                     className={`${styles.actionBtn} ${styles.actionBtnLogout} ${isLoggingOut ? styles.loading : ''}`}
                     title="Logout"

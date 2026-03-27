@@ -64,3 +64,15 @@ status: active
 **Side effects**: Nessuno.
 
 ---
+
+## [13:15] feature / refactor
+
+**File toccati**:
+- `src/app/sphere/page.tsx` — Rimosso redirect forzato per gli admin.
+- `src/components/layout/Header.tsx` — Aggiunta icona Settings (rotellina) condizionale per gli admin che punta esplicitamente a `/admin/verify`.
+
+**Problema di partenza**: Gli admin venivano forzatamente reindirizzati al pannello di controllo, impossibilitati a vedere la sfera pubblica. C'era inoltre il rischio che un collegamento diretto potesse essere percepito come un bypass della sicurezza MFA.
+**Soluzione applicata**: Rimosso il blocco in `/sphere` e aggiunto un punto di ingresso discreto (rotellina) nell'header che porta alla verifica OTP, garantendo che l'MFA non venga mai saltato.
+**Side effects**: Nessuno.
+
+---

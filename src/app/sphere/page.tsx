@@ -16,11 +16,8 @@ type CinemaMovie = Database['public']['Tables']['cinema_movies']['Row'];
 
 export default async function Home() {
   const cookieStore = await cookies();
-  const isAdminSession = cookieStore.get('admin_session')?.value === 'verified';
-
-  if (isAdminSession) {
-    redirect('/admin');
-  }
+  // Removed forced admin redirect to allow admins to view the public sphere
+  // Admin access will be handled via a dedicated entry point in the header
 
   const [{ nodes, edges, subscriptions }, articles, cinemaMoviesData] = await Promise.all([
     getPersonalizedGraph(),
