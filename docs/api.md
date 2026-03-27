@@ -1,7 +1,5 @@
----
-tags: [#api, #status/complete]
-created: 2026-03-26
-agent: scrittore
+updated: 2026-03-26
+agent: aggiornatore
 ---
 
 # API e Server Actions
@@ -30,6 +28,17 @@ Le Server Actions sono funzioni asincrone eseguite sul server, ma chiamate diret
 - **`upsertMovieInteraction`**: Salva o aggiorna un feedback dell'utente (Like, Dislike, Seen, Ignore) su un determinato film.
 - **`getPersonalizedGraph`**: Recupera i nodi e gli archi che compongono la sfera personalizzata dell'utente, basandosi sui suoi pilastri e affinità.
 - **`updateUserStreaming`**: Aggiorna l'elenco delle piattaforme streaming sottoscritte.
+
+### Sistema Editoriale — `editorial.ts`
+- **`upsertArticle`**: Crea o aggiorna un articolo della redazione.
+- **`deleteArticle`**: Rimuove un articolo dal database.
+- **`getPublishedArticles`**: Recupera gli articoli visibili al pubblico.
+- **`getArticleBySlug`**: Recupera un articolo specifico tramite lo slug URL (include bypass per preview admin).
+
+### Autenticazione Admin (MFA) — `admin_auth.ts`
+- **`generateAdminOTP`**: Crea e invia (simulazione) un codice a 4 cifre all'amministratore.
+- **`verifyAdminOTP`**: Valida il codice e imposta il cookie di sessione sicura `admin_session`.
+- **`updateAdminPhone`**: Configurazione iniziale del numero di telefono per l'MFA.
 
 ## Integrazione TMDB API
 

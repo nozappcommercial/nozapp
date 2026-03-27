@@ -1,7 +1,7 @@
 ---
 tags: [#structure, #status/complete]
-created: 2026-03-26
-agent: scrittore
+updated: 2026-03-26
+agent: aggiornatore
 ---
 
 # Struttura delle Cartelle
@@ -17,6 +17,8 @@ nozapp/
 │   ├── (auth)/           # Route Group: Login e Recovery
 │   ├── api/              # Route Handlers (Internal API)
 │   ├── onboarding/       # Flusso di benvenuto utente
+│   ├── admin/            # Dashboard gestionale e verifica MFA
+│   ├── redazione/        # Template pubblico per gli articoli
 │   └── sphere/           # Dashboard principale con la sfera 3D
 ├── dataset/              # Dataset CSV e script di manipolazione dati
 │   ├── output/           # File generati (JSONL per seed)
@@ -65,3 +67,5 @@ Non è solo una cartella di asset: contiene l'intelligenza di pre-processing del
 ---
 > [!IMPORTANT]
 > Il workspace principale si trova in `/Volumes/Crucial/workspace/web/nozapp`. Evita di scrivere file al di fuori di questo percorso a meno che non sia strettamente necessario per la cache locale.
+
+🔄 **Aggiornato il 2026-03-26**: Inserite le nuove cartelle per l'area amministrativa e la gestione redazionale.

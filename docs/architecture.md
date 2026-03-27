@@ -65,6 +65,16 @@ graph TB
 3. Lo **Sphere Engine** riceve i dati iniziali come props e costruisce la scena 3D.
 4. Ogni interazione (like/seen) attiva una **Server Action** che aggiorna Supabase in tempo reale.
 
+## Sicurezza Multi-livello
+
+NoZapp adotta un approccio a più livelli per proteggere i dati e le funzionalità amministrative:
+
+1. **Role-Based Access Control (RBAC)**: Utilizzo del flag `is_admin` nella tabella `users` per distinguere gli amministratori.
+2. **Row-Level Security (RLS)**: Le policy di Supabase garantiscono che solo gli admin possano modificare gli articoli (`articles`), mentre il pubblico può solo leggerli.
+3. **Multi-Factor Authentication (MFA)**: Un secondo livello di verifica tramite OTP (One-Time Password) è richiesto per accedere a qualsiasi risorsa sotto il path `/admin`. La sessione MFA è gestita tramite cookie sicuri `httpOnly`.
+
 ---
 > [!TIP]
-> Il progetto utilizza un approccio "Defense-in-Depth" per la sicurezza, coordinando RLS su Supabase e validazione Zod nelle API.
+> Il progetto utilizza un approccio "Defense-in-Depth" per la sicurezza, coordinando RLS su Supabase, MFA nel middleware e validazione Zod nelle API.
+
+🔄 **Aggiornato il 2026-03-26**: Inserito il layer di sicurezza MFA per l'area amministrativa.

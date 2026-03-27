@@ -1,7 +1,5 @@
----
-tags: [#types, #status/complete]
-created: 2026-03-26
-agent: scrittore
+updated: 2026-03-26
+agent: aggiornatore
 ---
 
 # Tipi e Interfacce TypeScript
@@ -19,6 +17,8 @@ Generati automaticamente tramite Supabase CLI, definiscono lo schema esatto dell
 | `films` | `Film` | Metadati statici del film (titolo, anno, ecc.). |
 | `user_onboarding_results` | `OnboardingResult` | Configurazione JSON dei risultati del wizard. |
 | `security_logs` | `SecurityLog` | Record degli audit di sicurezza. |
+| `articles` | `Article` | Contenuti redazionali (titolo, slug, contenuto). |
+| `users` | `User` | Profili utente estesi con flag `is_admin` e campi MFA (`phone_number`, `otp_code`). |
 
 ## Tipi del Grafo (`src/lib/graph/`)
 Utilizzati dallo Sphere Engine per il rendering e la navigazione.
@@ -72,3 +72,5 @@ L'utilizzo del tipo `any` è scoraggiato e limitato esclusivamente a:
 ---
 > [!IMPORTANT]
 > Quando modifichi lo schema del database su Supabase, ricordati di rigenerare i tipi tramite `npx supabase gen types typescript --project-id ... > src/types/supabase.ts`.
+
+🔄 **Aggiornato il 2026-03-26**: Inseriti i tipi per il sistema editoriale e le estensioni MFA dei profili utente.

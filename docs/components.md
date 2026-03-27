@@ -1,7 +1,5 @@
----
-tags: [#components, #status/complete]
-created: 2026-03-26
-agent: scrittore
+updated: 2026-03-26
+agent: aggiornatore
 ---
 
 # Componenti UI
@@ -16,6 +14,7 @@ I componenti di NoZapp sono suddivisi in **UI atomici** (Shadcn), **Layout** (st
 ### `ShellNavigator` — `src/components/sphere/ShellNavigator.tsx`
 **Scopo**: Gestisce la navigazione tra i livelli di astrazione (Pilastri, Affinità, Scoperta) della sfera.
 **Responsabilità**: Visualizzare il livello corrente, gestire l'hover per espandere le label e triggerare il cambio di shell nello Sphere Engine.
+**Nota Layout**: Il posizionamento è delegato al contenitore genitore per garantire la centratura verticale e il corretto padding dal bordo sinistro.
 
 | Prop | Tipo | Default | Obbligatorio | Descrizione |
 | :--- | :--- | :--- | :--- | :--- |
@@ -29,12 +28,22 @@ I componenti di NoZapp sono suddivisi in **UI atomici** (Shadcn), **Layout** (st
 
 ---
 
+### `ProfileModal` — `src/components/profile/ProfileModal.tsx`
+**Scopo**: Interfaccia per la gestione del profilo utente e accesso alle impostazioni.
+**Caratteristiche**:
+- **Centratura**: Implementata tramite flex-container dedicato per evitare conflitti tra CSS `transform` e animazioni Framer Motion.
+- **Micro-interazioni**: Animazione di ingresso/uscita sulla scala e opacità.
+- **Responsiveness**: Allineata al breakpoint di 768px per coerenza con l'header.
+
+---
+
 ### `Header` — `src/components/layout/Header.tsx`
 **Scopo**: Navigazione principale dell'applicazione (Sfera, Redazione, Cinema).
 **Comportamento**: 
 - **Sticky / Collapsible**: Si riduce di dimensione durante lo scroll.
 - **Scroll Spy**: Utilizza `IntersectionObserver` per evidenziare la sezione attiva.
 - **Bubble Effect**: Un indicatore circolare (orb/bubble) insegue l'icona attiva.
+- **Visibilità**: L'header è nascosto automaticamente in tutte le rotte che iniziano con `/admin` (Dashboard Redazione).
 
 | Sezione | ID | Icona | Ruolo |
 | :--- | :--- | :--- | :--- |
@@ -65,3 +74,5 @@ Questi componenti si trovano in `src/components/ui/` e seguono le specifiche di 
 ---
 > [!NOTE]
 > Tutti i componenti utilizzano tipicamente `framer-motion` per micro-interazioni e transizioni di stato.
+
+🔄 **Aggiornato il 2026-03-26**: Documentati i fix di ShellNavigator, ProfileModal e la visibilità condizionale dell'Header.

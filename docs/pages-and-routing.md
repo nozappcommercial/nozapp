@@ -1,7 +1,5 @@
----
-tags: [#routing, #status/complete]
-created: 2026-03-26
-agent: scrittore
+updated: 2026-03-26
+agent: aggiornatore
 ---
 
 # Pagine e Routing
@@ -17,6 +15,10 @@ NoZapp utilizza l'**App Router** di Next.js 14 per gestire la navigazione. La ma
 | `/login` | `app/(auth)/login/page.tsx` | CSR | Root | Autenticazione utente (Email/Password + Magic Link). |
 | `/onboarding`| `app/onboarding/page.tsx` | Dynamic | Root | Wizard iniziale di selezione dei pilastri del gusto. |
 | `/sphere` | `app/sphere/page.tsx` | Dynamic | Root | Schermata principale con il grafo 3D interattivo. |
+| `/redazione/[slug]` | `app/redazione/[slug]/page.tsx` | Dynamic | Root | Visualizzazione articolo singolo (template pubblico). |
+| `/admin` | `app/admin/page.tsx` | SSR | Admin | Dashboard gestionale per amministratori. |
+| `/admin/redazione` | `app/admin/redazione/page.tsx` | SSR | Admin | Lista articoli e gestione contenuti. |
+| `/admin/verify` | `app/admin/verify/page.tsx` | CSR | Root | Verifica MFA (Multi-Factor Authentication). |
 
 ## Strategie di Rendering
 
@@ -36,17 +38,23 @@ I componenti critici per l'interazione sono isolati come Client Components:
 
 ### 1. Ciclo di Vita della Sessione
 ```mermaid
-graph LR
+graph TD
     Start((Accesso)) --> Mid{Middleware}
     Mid -- No Auth --> Login[/login]
     Mid -- Auth & No Onb --> Onb[/onboarding]
-    Mid -- Auth & Onb OK --> Sph[/sphere]
+    Mid -- Auth & Onb OK --> IsAdmin{Is Admin?}
+    IsAdmin -- No --> Sph[/sphere]
+    IsAdmin -- Yes --> MFA{MFA Verified?}
+    MFA -- No --> Verify[/admin/verify]
+    MFA -- Yes --> Dash[/admin]
     Login -- Success --> Onb
     Onb -- Success --> Sph
+    Verify -- Success --> Dash
 ```
 
 ### 2. Layouts
 - **RootLayout (`app/layout.tsx`)**: Contiene il font (`Cormorant Garamond`), lo `SplashScreen`, l'header globale e il setup delle analytics.
+- **AdminLayout (`app/admin/layout.tsx`)**: Layout specifico per l'area gestionale. Presenta un header dedicato che sostituisce quello globale della sfera per una navigazione focalizzata sugli strumenti di controllo.
 - **Auth Routes**: Utilizzano un layout semplificato che nasconde l'header globale per focalizzare l'utente sul form.
 
 ---
@@ -58,4 +66,6 @@ graph LR
 
 ---
 > [!TIP]
-> Il middleware in `src/lib/supabase/middleware.ts` è il centro di controllo del routing basato sullo stato di onboarding dell'utente.
+> Il middleware in `src/lib/supabase/middleware.ts` è il centro di controllo del routing basato sullo stato di onboarding dell'utente e sui permessi amministrativi (MFA).
+
+🔄 **Aggiornato il 2026-03-26**: Inserite le rotte dell'area Redazione e il flusso di autenticazione MFA per l'area Admin.

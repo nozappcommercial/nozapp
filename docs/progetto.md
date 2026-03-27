@@ -33,6 +33,7 @@ agent: scrittore
 - [[three-js]] — Il motore 3D: `SemanticSphere`, geometrie e performance.
 - [[hooks-and-utilities]] — Custom hook e helper di sistema.
 - [[types]] — Definition Type e interfacce TypeScript.
+- [[editorial-system]] — Gestione articoli, workflow redazione e dashboard admin.
 
 ### Dati e Integrazioni
 - [[dataset]] — Pipeline CSV e arricchimento titoli (Wikidata).
