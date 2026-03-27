@@ -2,7 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Cormorant_Garamond, Fragment_Mono } from "next/font/google";
 import { Analytics } from "@vercel/analytics/react";
 import { SpeedInsights } from "@vercel/speed-insights/next";
-import SplashScreen from "@/components/ui/SplashScreen";
+import AppLoader from "@/components/layout/AppLoader";
 import AuthHandler from "@/components/auth/AuthHandler";
 import "./globals.css";
 
@@ -41,7 +41,7 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#faf7f2",
+  themeColor: "#F2EDE3",
   width: "device-width",
   initialScale: 1,
   maximumScale: 1,
@@ -61,7 +61,7 @@ export default function RootLayout({
       <body
         className={`${cormorantGaramond.variable} ${fragmentMono.variable} antialiased`}
       >
-        <SplashScreen />
+        <AppLoader />
         <AuthHandler />
         <Header />
         {children}

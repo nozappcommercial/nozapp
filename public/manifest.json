@@ -1,21 +1,46 @@
 {
-  "name": "NoZapp",
-  "short_name": "NoZapp",
-  "description": "Entra nella Sfera Semantica",
+  "name": "La Sfera Semantica",
+  "short_name": "NOZAPP",
+  "description": "Una costellazione di film connessi da fili invisibili ma precisi.",
+  "id": "/",
   "start_url": "/login",
-  "display": "standalone",
-  "background_color": "#F7F5EA",
-  "theme_color": "#F7F5EA",
+  "display": "fullscreen",
+  "orientation": "any",
+  "background_color": "#F2EDE3",
+  "theme_color": "#F2EDE3",
   "icons": [
     {
       "src": "/logo.png",
       "sizes": "192x192",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "any"
     },
     {
       "src": "/logo.png",
       "sizes": "512x512",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "any maskable"
     }
-  ]
+  ],
+  "shortcuts": [
+    {
+      "name": "La mia Sfera",
+      "short_name": "Sfera",
+      "description": "Entra direttamente nella tua sfera semantica",
+      "url": "/sphere",
+      "icons": [{ "src": "/logo.png", "sizes": "96x96" }]
+    },
+    {
+      "name": "Scopri film",
+      "short_name": "Scopri",
+      "description": "Ricomincia il percorso di onboarding",
+      "url": "/onboarding",
+      "icons": [{ "src": "/logo.png", "sizes": "96x96" }]
+    }
+  ],
+  "launch_handler": {
+    "client_mode": "focus-existing"
+  },
+  "categories": ["entertainment", "lifestyle"],
+  "lang": "it"
 }
