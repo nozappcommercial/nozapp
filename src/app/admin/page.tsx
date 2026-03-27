@@ -1,6 +1,6 @@
 import React from 'react';
 import Link from 'next/link';
-import { Newspaper, Users, Settings, BarChart3, ArrowRight, ShieldCheck } from 'lucide-react';
+import { Newspaper, Users, Settings, BarChart3, ArrowRight, ShieldCheck, Clapperboard, Layout } from 'lucide-react';
 
 export default function AdminDashboard() {
     const modules = [
@@ -20,6 +20,13 @@ export default function AdminDashboard() {
             status: 'Prossimamente'
         },
         {
+            title: 'Cinema',
+            description: 'Gestisci i film in programmazione nel carosello pubblico.',
+            icon: Clapperboard,
+            href: '/admin/cinema',
+            color: 'bg-rose-50 text-rose-600',
+        },
+        {
             title: 'Analisi',
             description: 'Monitora le performance degli articoli e l\'engagement.',
             icon: BarChart3,
@@ -34,6 +41,14 @@ export default function AdminDashboard() {
             href: '#',
             color: 'bg-orange-50 text-orange-600',
             status: 'Prossimamente'
+        },
+        {
+            title: 'Template',
+            description: 'Sezione configurabile per future espansioni del sistema.',
+            icon: Layout,
+            href: '#',
+            color: 'bg-gray-50 text-gray-400',
+            status: 'Placeholder'
         }
     ];
 
@@ -49,30 +64,30 @@ export default function AdminDashboard() {
                 </div>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                {/* Status Column (Left) */}
-                <div className="md:row-span-2 bg-[#1a1a1a] text-white p-8 rounded-[30px] flex flex-col justify-between relative overflow-hidden min-h-[400px]">
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+                {/* Status Column (Left) - Narrower */}
+                <div className="md:row-span-2 bg-[#1a1a1a] text-white p-6 rounded-[30px] flex flex-col justify-between relative overflow-hidden min-h-[400px]">
                     <div className="relative z-10 space-y-8">
                         <div className="space-y-2">
                              <h4 className="font-['Fragment_Mono'] text-[10px] uppercase tracking-[0.3em] opacity-50">Stato Piattaforma</h4>
                              <div className="h-px w-8 bg-[var(--gold)]/30" />
                         </div>
                         
-                        <div className="space-y-8">
+                        <div className="space-y-6">
                             <div>
-                                <div className="text-2xl font-light italic font-serif">Ottimale</div>
+                                <div className="text-xl font-light italic font-serif">Ottimale</div>
                                 <div className="text-[9px] uppercase tracking-widest opacity-30 mt-1">Sistemi Cloud</div>
                             </div>
                             <div>
-                                <div className="text-2xl font-light italic font-serif">12ms</div>
+                                <div className="text-xl font-light italic font-serif">12ms</div>
                                 <div className="text-[9px] uppercase tracking-widest opacity-30 mt-1">Latenza Media</div>
                             </div>
                             <div>
-                                <div className="text-2xl font-light italic font-serif">Attiva</div>
+                                <div className="text-xl font-light italic font-serif">Attiva</div>
                                 <div className="text-[9px] uppercase tracking-widest opacity-30 mt-1">Redazione</div>
                             </div>
                             <div>
-                                <div className="text-2xl font-light italic font-serif">v1.2.4</div>
+                                <div className="text-xl font-light italic font-serif">v1.2.4</div>
                                 <div className="text-[9px] uppercase tracking-widest opacity-30 mt-1">Versione App</div>
                             </div>
                         </div>
@@ -81,12 +96,12 @@ export default function AdminDashboard() {
                     <div className="absolute top-0 right-0 w-64 h-64 bg-[var(--gold)]/10 blur-[90px] rounded-full -mr-32 -mt-32" />
                 </div>
 
-                {/* Modules Grid (Right) */}
+                {/* Modules Grid (Right) - 3 columns for cards */}
                 {modules.map((module, i) => (
                     <Link 
                         key={i} 
                         href={module.href}
-                        className={`group p-6 rounded-[28px] ring-1 ring-black/5 bg-white hover:shadow-2xl hover:shadow-black/5 transition-all duration-500 flex flex-col justify-between min-h-[190px] ${module.status ? 'opacity-60 cursor-not-allowed' : ''}`}
+                        className={`group p-6 rounded-[28px] ring-1 ring-black/5 bg-white hover:shadow-2xl hover:shadow-black/5 transition-all duration-500 flex flex-col justify-between min-h-[190px] ${module.status && module.status !== 'Placeholder' ? 'opacity-60 cursor-not-allowed' : ''}`}
                     >
                         <div className="space-y-4">
                             <div className={`w-10 h-10 ${module.color} rounded-xl flex items-center justify-center`}>
@@ -105,7 +120,7 @@ export default function AdminDashboard() {
                             </div>
                         </div>
                         
-                        {!module.status && (
+                        {(!module.status || module.status === 'Placeholder') && (
                             <div className="flex justify-end">
                                 <div className="w-8 h-8 rounded-full bg-black text-white flex items-center justify-center group-hover:translate-x-1 transition-transform">
                                     <ArrowRight size={14} />

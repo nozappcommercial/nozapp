@@ -2,6 +2,7 @@ export const dynamic = 'force-dynamic';
 
 import { getPersonalizedGraph } from "@/app/actions/graph";
 import { getPublishedArticles } from "@/app/actions/editorial";
+import { getCinemaMoviesPublic } from "@/app/actions/cinema";
 import SphereWithProfile from "@/components/profile/SphereWithProfile";
 import EditorialSection from "@/components/home/EditorialSection";
 import NowShowingCarousel from "@/components/home/NowShowingCarousel";
@@ -9,6 +10,9 @@ import Footer from "@/components/layout/Footer";
 
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
+import { Database } from "@/types/supabase";
+
+type CinemaMovie = Database['public']['Tables']['cinema_movies']['Row'];
 
 export default async function Home() {
   const cookieStore = await cookies();
@@ -18,9 +22,10 @@ export default async function Home() {
     redirect('/admin');
   }
 
-  const [{ nodes, edges, subscriptions }, articles] = await Promise.all([
+  const [{ nodes, edges, subscriptions }, articles, cinemaMoviesData] = await Promise.all([
     getPersonalizedGraph(),
-    getPublishedArticles()
+    getPublishedArticles(),
+    getCinemaMoviesPublic()
   ]);
 
   if (!nodes || nodes.length === 0) {
@@ -45,18 +50,15 @@ export default async function Home() {
   // Capped edges as fallback if DB edges are too sparse or for consistency
   const cappedEdges = edges.slice(0, 150);
 
-  // 3. CAROUSEL MOVIES (Most recent ones from our personalized set)
-  const carouselMovies = [...nodes]
-    .sort((a, b) => b.year - a.year) // sort by newest
-    .slice(0, 15) // take top 15
-    .map(n => ({
-      id: n.id,
-      title: n.title,
-      director: n.dir,
-      year: n.year,
-      themes: n.tags.slice(0, 3), // max 3 tags for UI constraints
-      poster: n.poster_url || undefined
-    }));
+  // 3. CAROUSEL MOVIES (Fetch from manual admin management)
+  const carouselMovies = (cinemaMoviesData || []).map((m: CinemaMovie) => ({
+    id: Number(m.id.split('-')[0]), // Dummy numeric ID if needed by Carousel, but uuid is safer. Carousel uses it for key.
+    title: m.title,
+    director: m.director,
+    year: m.year,
+    themes: m.themes.slice(0, 3), 
+    poster: m.poster_url || undefined
+  }));
 
   return (
     <main className="w-full min-h-screen m-0 p-0 relative">

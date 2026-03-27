@@ -137,6 +137,41 @@ export interface Database {
                     created_at?: string
                 }
             }
+            cinema_movies: {
+                Row: {
+                    id: string
+                    title: string
+                    director: string
+                    year: number
+                    poster_url: string | null
+                    themes: string[]
+                    expires_at: string
+                    created_at: string
+                    updated_at: string
+                }
+                Insert: {
+                    id?: string
+                    title: string
+                    director: string
+                    year: number
+                    poster_url?: string | null
+                    themes?: string[]
+                    expires_at: string
+                    created_at?: string
+                    updated_at?: string
+                }
+                Update: {
+                    id?: string
+                    title?: string
+                    director?: string
+                    year?: number
+                    poster_url?: string | null
+                    themes?: string[]
+                    expires_at?: string
+                    created_at?: string
+                    updated_at?: string
+                }
+            }
             user_pillars: {
                 Row: {
                     id: string
