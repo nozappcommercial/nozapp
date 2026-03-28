@@ -116,7 +116,7 @@ export default function ArticleForm({ initialData, isEditing = false }: ArticleF
                                 onChange={handleChange}
                                 required
                                 placeholder="titolo-articolo"
-                                className="bg-white/50 px-2 py-0.5 rounded border border-black/5 focus:outline-none focus:border-[var(--gold)]/30 min-w-[200px]"
+                                className="bg-white/50 px-2 py-0.5 rounded border border-black/5 focus:outline-none focus:border-[var(--gold)]/30 flex-1 min-w-0"
                             />
                         </div>
                     </div>
@@ -170,14 +170,14 @@ export default function ArticleForm({ initialData, isEditing = false }: ArticleF
                             </select>
                         </div>
 
-                        <div className="space-y-2">
+                        <div className="space-y-2 overflow-hidden">
                             <label className="font-['Fragment_Mono'] text-[10px] uppercase tracking-widest opacity-40 block">Programmazione</label>
                             <input
                                 type="datetime-local"
                                 name="published_at"
                                 value={formData.published_at}
                                 onChange={handleChange}
-                                className="w-full max-w-full bg-white border border-black/5 rounded-lg px-2 md:px-4 py-2 text-[13px] md:text-sm outline-none font-['Fragment_Mono'] min-w-0"
+                                className="w-full min-w-0 bg-white border border-black/5 rounded-lg px-2 md:px-4 py-2 text-[13px] md:text-sm outline-none font-['Fragment_Mono']"
                             />
                         </div>
 
