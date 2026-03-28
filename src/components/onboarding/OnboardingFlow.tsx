@@ -401,8 +401,8 @@ export default function OnboardingFlow({ films }: OnboardingFlowProps) {
                 </div>
 
                 {/* reaction buttons */}
-                {!stepDone && (
-                  <div className="ob-rxn-row">
+                {!stepDone && currentFilm && (
+                  <div className="ob-rxn-row" key={currentFilm.id}>
                     <button className="ob-rxn-btn loved" onClick={() => handleReaction("loved")}>
                       <span className="ob-rxn-icon" style={{ color: "var(--ob-gold)" }}>♥</span>
                       <span className="ob-rxn-lbl">L&apos;ho<br />amato</span>
@@ -469,32 +469,32 @@ export default function OnboardingFlow({ films }: OnboardingFlowProps) {
                 onClick={() => setIsSideboardOpen(!isSideboardOpen)}
                 title={isSideboardOpen ? "Chiudi galleria" : "Apri galleria film amati"}
               >
-                <span className="ob-side-toggle-icon">‹</span>
+                <span className="ob-side-toggle-icon">↑</span>
               </button>
 
-              {replacingPillar !== null && (
-                <div className="ob-rep-overlay">
+              {/* REPLACE SHEET (Bottom Sheet) */}
+              <div className={`ob-rep-sheet ${replacingPillar !== null ? 'active' : ''}`}>
+                <div className="ob-rep-header">
                   <h3 className="ob-rep-title">Scegli il <em>sostituto</em></h3>
-                  <div className="ob-rep-sub">Film che hai amato · non ancora nei pilastri</div>
-                  <div className="ob-rep-grid">
-                    {replacementCandidates.length === 0
-                      ? <p className="ob-rep-empty">Nessun candidato disponibile</p>
-                      : replacementCandidates.map(film => (
-                        <div key={film.id} className="ob-rep-card" onClick={() => handleReplace(replacingPillar, film)}>
-                          <div className="ob-rep-card-poster">
-                            <div style={{ ...filmGradient(film), width: "100%", height: "100%", display: "flex", alignItems: "flex-end", padding: "10px 8px" }}>
-                              <span style={{ fontFamily: "var(--ob-serif)", fontSize: "11px", color: "#fff", lineHeight: 1.3 }}>{film.title}</span>
-                            </div>
-                          </div>
-                          <div className="ob-rep-ct">{film.title}</div>
-                          <div className="ob-rep-cy">{film.year}</div>
-                        </div>
-                      ))
-                    }
-                  </div>
-                  <button className="ob-btn-g" onClick={() => setReplacingPillar(null)}>Annulla</button>
+                  <div className="ob-rep-sub">Film amati · non nei pilastri</div>
+                  <button className="ob-rep-close" onClick={() => setReplacingPillar(null)}>✕</button>
                 </div>
-              )}
+                <div className="ob-rep-grid">
+                  {replacementCandidates.length === 0
+                    ? <p className="ob-rep-empty">Nessun candidato disponibile</p>
+                    : replacementCandidates.map(film => (
+                      <div key={film.id} className="ob-rep-card" onClick={() => handleReplace(replacingPillar!, film)}>
+                        <div className="ob-rep-card-poster">
+                          <div style={{ ...filmGradient(film), width: "100%", height: "100%", display: "flex", alignItems: "flex-end", padding: "10px 8px" }}>
+                            <span style={{ fontFamily: "var(--ob-serif)", fontSize: "11px", color: "#fff", lineHeight: 1.2 }}>{film.title}</span>
+                          </div>
+                        </div>
+                        <div className="ob-rep-ct">{film.title}</div>
+                      </div>
+                    ))
+                  }
+                </div>
+              </div>
 
               <div className={`ob-confirm-container ${isSideboardOpen ? 'side-open' : ''}`}>
                 <div className="ob-pyramid-main">
@@ -562,7 +562,7 @@ export default function OnboardingFlow({ films }: OnboardingFlowProps) {
                   </div>
                 </div>
 
-                {/* Sidebar per altri film amati (Sliding) */}
+                {/* Sidebar per altri film amati (Bottom Sheet) */}
                 <div className={`ob-pyr-sidebar ${isSideboardOpen ? 'active' : ''}`}>
                   <div className="ob-side-header">
                     <h3 className="ob-side-title">Altri <em>preferiti</em></h3>
@@ -578,9 +578,7 @@ export default function OnboardingFlow({ films }: OnboardingFlowProps) {
                           className="ob-side-card"
                           draggable
                           onDragStart={() => {
-                            // logic to treat this as a "virtual" index or handle specifically
-                            setDragItem(-1); // special mark for sidebar items?
-                            // Actually, let's just make it possible to swap the dragged item with a pillar
+                            setDragItem(-1);
                             (window as any)._draggedSidebarFilm = film;
                           }}
                           onClick={() => setReplacingPillar(pillars.length - 1)}
@@ -659,10 +657,11 @@ export default function OnboardingFlow({ films }: OnboardingFlowProps) {
                     type="date" 
                     value={birthDate} 
                     onChange={(e) => setBirthDate(e.target.value)}
-                    className="ob-form-input"
+                    className="ob-form-input date-fix"
                     style={{ 
                       width: "100%", padding: "16px", borderRadius: "12px", border: "1px solid var(--ob-cream-dark)",
-                      background: "white", fontFamily: "var(--ob-mono)", fontSize: "14px", outline: "none"
+                      background: "white", fontFamily: "var(--ob-mono)", fontSize: "14px", outline: "none",
+                      minWidth: 0, WebkitAppearance: "none"
                     }}
                   />
                 </div>
@@ -771,12 +770,12 @@ const ONBOARDING_CSS = `
 }
 
 .ob-root {
-  min-height: 100vh;
+  height: 100vh;
   background: var(--ob-cream);
   font-family: var(--ob-serif);
   color: var(--ob-ink);
   position: relative;
-  overflow-x: hidden;
+  overflow: hidden;
   transition: opacity 0.28s ease;
 }
 .ob-root.ob-faded { opacity: 0; pointer-events: none; }
@@ -787,6 +786,15 @@ const ONBOARDING_CSS = `
   pointer-events: none; z-index: 0;
   background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
 }
+
+/* Fix datetime-local iOS overflow */
+input[type="date"], select {
+    width: 100%;
+    -webkit-appearance: none;
+    min-width: 0;
+}
+input[type="date"]::-webkit-datetime-edit { padding: 0; }
+input[type="date"]::-webkit-calendar-picker-indicator { flex-shrink: 0; }
 
 /* ── WELCOME ── */
 .ob-welcome {
@@ -1359,80 +1367,67 @@ const ONBOARDING_CSS = `
 
 .ob-side-toggle {
   position: fixed;
-  right: 20px;
-  top: 50%;
-  transform: translateY(-50%);
-  width: 44px; height: 44px;
+  right: 24px;
+  bottom: 120px;
+  width: 52px; height: 52px;
   border-radius: 50%;
   background: var(--ob-ink);
   color: #fff;
   border: none;
   cursor: pointer;
-  z-index: 110;
+  z-index: 1100;
   display: flex; align-items: center; justify-content: center;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-  transition: transform 0.4s cubic-bezier(0.19, 1, 0.22, 1);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+  transition: all 0.5s cubic-bezier(0.19, 1, 0.22, 1);
 }
 .ob-side-toggle.open {
-  transform: translateY(-50%) rotate(180deg) translateX(320px);
+  transform: translateY(-50vh) rotate(180deg);
+  background: var(--ob-gold);
 }
-.ob-side-toggle-icon { font-size: 24px; line-height: 1; }
+.ob-side-toggle-icon { font-size: 20px; line-height: 1; }
 
-/* ── SIDEBAR ── */
+/* ── SIDEBAR (Bottom Sheet) ── */
 .ob-pyr-sidebar {
-
-  position: fixed; top: 0; right: 0; bottom: 0;
-  width: 280px; background: rgba(242, 237, 227, 0.85);
-  backdrop-filter: blur(24px);
-  border-left: 1px solid var(--ob-cream-dark);
-  transform: translateX(100%);
+  position: fixed; left: 0; right: 0; bottom: 0;
+  height: 60vh; width: 100%;
+  background: rgba(242, 237, 227, 0.94);
+  backdrop-filter: blur(28px);
+  border-top: 1px solid var(--ob-cream-dark);
+  transform: translateY(100%);
   transition: transform 0.6s cubic-bezier(0.19, 1, 0.22, 1);
-  z-index: 1000;
+  z-index: 1050;
   display: flex; flex-direction: column;
+  border-radius: 40px 40px 0 0;
+  box-shadow: 0 -12px 40px rgba(0,0,0,0.12);
 }
-.ob-pyr-sidebar.active { transform: translateX(0); }
+.ob-pyr-sidebar.active { transform: translateY(0); }
 
-.ob-side-header { padding: 32px 24px 20px; border-bottom: 1px solid var(--ob-cream-dark); }
+.ob-side-header { padding: 32px 40px 20px; border-bottom: 1px solid var(--ob-cream-dark); }
 .ob-side-title  { font-size: 24px; font-weight: 300; margin: 0; }
 .ob-side-title em { font-style: italic; color: var(--ob-gold); }
 .ob-side-sub    { font-family: var(--ob-mono); font-size: 9px; text-transform: uppercase; letter-spacing: 0.1em; color: var(--ob-ink-faint); margin: 6px 0 0; }
 
 .ob-side-grid {
-  flex: 1; overflow-y: auto;
-  display: flex; flex-direction: column;
-  gap: 24px; padding: 32px 24px;
+  flex: 1; overflow-x: auto; overflow-y: hidden;
+  display: flex; flex-direction: row;
+  gap: 24px; padding: 40px;
+  align-items: flex-start;
 }
 .ob-side-card { 
+  flex-shrink: 0;
+  width: 100px;
   cursor: grab; transition: transform 0.2s; 
-  display: flex; flex-direction: column; gap: 10px;
+  display: flex; flex-direction: column; gap: 8px;
 }
 .ob-side-card:hover { transform: translateY(-4px); }
 .ob-side-poster { 
   width: 100%; aspect-ratio: 2/3; border-radius: 4px; overflow: hidden;
-  box-shadow: 0 12px 32px rgba(0,0,0,0.12);
-  display: flex; align-items: flex-end; padding: 12px;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.12);
+  display: flex; align-items: flex-end; padding: 10px;
 }
-.ob-side-poster-title { color: #fff; font-size: 14px; opacity: 0; transition: opacity 0.2s; }
+.ob-side-poster-title { color: #fff; font-size: 11px; opacity: 0; transition: opacity 0.2s; line-height: 1.2; }
 .ob-side-card:hover .ob-side-poster-title { opacity: 1; }
 
-.ob-side-name { font-size: 16px; font-weight: 400; line-height: 1.2; }
-.ob-side-year { font-family: var(--ob-mono); font-size: 9px; opacity: 0.5; margin-top: 2px; }
-
-.ob-side-empty { font-family: var(--ob-mono); font-size: 10px; opacity: 0.4; text-align: center; margin-top: 40px; }
-/* ── REPLACE OVERLAY ── */
-.ob-rep-overlay {
-  position: fixed; inset: 0;
-  background: rgba(242,237,227,0.96);
-  backdrop-filter: blur(6px);
-  z-index: 300;
-  display: flex; flex-direction: column;
-  align-items: center; justify-content: center;
-  padding: clamp(28px,5vw,56px); gap: 0;
-}
-.ob-rep-title { font-size:clamp(26px,5vw,44px); font-weight:300; text-align:center; margin:0 0 8px 0; }
-.ob-rep-title em { font-style:italic; color:var(--ob-gold); }
-.ob-rep-sub { font-family:var(--ob-mono); font-size:clamp(8px,1.1vw,10px); letter-spacing:0.2em; text-transform:uppercase; color:var(--ob-ink-faint); margin-bottom:clamp(24px,4vh,44px); }
-.ob-rep-grid { display:flex; gap:clamp(10px,2vw,18px); flex-wrap:wrap; justify-content:center; max-width:680px; margin-bottom:clamp(20px,3vh,36px); }
 .ob-rep-card { width:clamp(90px,13vw,130px); cursor:pointer; transition:transform 0.16s; }
 .ob-rep-card:hover { transform:translateY(-3px); }
 .ob-rep-card-poster { width:100%; aspect-ratio:2/3; border-radius:3px; overflow:hidden; margin-bottom:7px; border:2px solid transparent; transition:border-color 0.16s; }

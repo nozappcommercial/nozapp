@@ -74,3 +74,15 @@ status: active
 **Side effects**: Nessuno. La stabilità del sistema e le performance delle query rimangono ottimali.
 
 ---
+
+## 10:35 [tipo: bug-fix | refactor]
+
+**File toccati**:
+
+- `src/components/onboarding/OnboardingFlow.tsx` — Implementato il blocco dello scroll globale (`height: 100vh`) e risolto il problema della risoluzione dei campi data/select su iOS. Rifattorizzata la sidebar "Altri preferiti" e l'overlay di sostituzione film in **bottom sheets** (stile ProfileModal) per migliorare l'usabilità su mobile. Ridotte le dimensioni delle card dei film amati (100-120px) per una galleria più agile. Risolto inoltre il bug del pulsante "visto/non visto" che non si resettava (aggiunta `key={currentFilm.id}`).
+
+**Problema di partenza**: L'onboarding permetteva lo scroll verticale indesiderato, i campi data su iOS avevano problemi di visualizzazione e la sidebar laterale ingombrava troppo la piramide. Inoltre, dopo aver cliccato "visto", il pulsante rimaneva espanso anche per il film successivo (sticky hover/focus).
+**Soluzione applicata**: Applicato `overflow: hidden` alla root. Inseriti reset CSS per iOS. Convertite le sidebar in bottom sheets. Utilizzato il pattern delle `key` di React per resettare istantaneamente il pulsante di valutazione ad ogni nuovo film.
+**Side effects**: Migliorata la responsività e la precisione dell'interfaccia di valutazione.
+
+---
