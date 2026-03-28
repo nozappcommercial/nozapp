@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { ArrowLeft, Calendar, User, Clock } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
-import { motion } from 'framer-motion';
+import ScrollReveal from '@/components/animations/ScrollReveal';
 import { getArticleBySlug } from '@/app/actions/editorial';
 import Footer from '@/components/layout/Footer';
 
@@ -84,11 +84,7 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
 
             {/* Featured Image - Animated on scroll */}
             {article.cover_image && (
-                <motion.div 
-                    initial={{ opacity: 0, y: 30 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true, margin: "-100px" }}
-                    transition={{ duration: 1.2, ease: "easeOut" }}
+                <ScrollReveal 
                     className="w-full px-8 md:px-16 lg:px-24 max-w-7xl mx-auto mb-20"
                 >
                     <div className="relative aspect-[21/9] md:aspect-[21/8] overflow-hidden rounded-sm ring-1 ring-black/5">
@@ -100,7 +96,7 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
                             className="object-cover"
                         />
                     </div>
-                </motion.div>
+                </ScrollReveal>
             )}
 
             {/* Article Content */}

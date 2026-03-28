@@ -1,6 +1,7 @@
 import React from 'react';
 import Link from 'next/link';
 import { ArrowLeft, User, Mail, Globe, Sparkles } from 'lucide-react';
+import ScrollReveal from '@/components/animations/ScrollReveal';
 import Footer from '@/components/layout/Footer';
 
 const teamMembers = [
@@ -27,22 +28,29 @@ export default function RedazioneInfoPage() {
             {/* Intro Hero */}
             <section className="px-8 md:px-16 lg:px-24 max-w-7xl mx-auto py-20 md:py-32 space-y-12">
                 <div className="space-y-6">
-                    <h4 className="font-['Fragment_Mono'] text-[10px] md:text-[12px] uppercase tracking-[0.5em] text-[var(--gold)] animate-in fade-in slide-in-from-bottom-4 duration-1000">
-                        Dietro lo <span className="opacity-50 italic">Schermo</span>
-                    </h4>
-                    <h1 className="text-6xl md:text-8xl lg:text-9xl font-light leading-[0.85] tracking-tight text-[#1a1a1a] animate-in fade-in slide-in-from-bottom-8 duration-1000 delay-100">
-                        La nostra <br /> <em className="italic font-serif">Redazione.</em>
-                    </h1>
+                    <ScrollReveal delay={0.1}>
+                        <h4 className="font-['Fragment_Mono'] text-[10px] md:text-[12px] uppercase tracking-[0.5em] text-[var(--gold)]">
+                            Dietro lo <span className="opacity-50 italic">Schermo</span>
+                        </h4>
+                    </ScrollReveal>
+                    <ScrollReveal delay={0.2} y={50}>
+                        <h1 className="text-6xl md:text-8xl lg:text-9xl font-light leading-[0.85] tracking-tight text-[#1a1a1a]">
+                            La nostra <br /> <em className="italic font-serif">Redazione.</em>
+                        </h1>
+                    </ScrollReveal>
                 </div>
-                <p className="text-2xl md:text-4xl font-light leading-relaxed text-[#1a1a1a]/60 max-w-4xl animate-in fade-in slide-in-from-bottom-12 duration-1000 delay-300">
-                    Un collettivo di sognatori, critici e designer uniti da un'unica missione: restituire al cinema la sua dignità visiva.
-                </p>
+                <ScrollReveal delay={0.4} y={40}>
+                    <p className="text-2xl md:text-4xl font-light leading-relaxed text-[#1a1a1a]/60 max-w-4xl">
+                        Un collettivo di sognatori, critici e designer uniti da un'unica missione: restituire al cinema la sua dignità visiva.
+                    </p>
+                </ScrollReveal>
             </section>
 
             {/* Team Grid */}
-            <section className="px-8 md:px-16 lg:px-24 max-w-7xl mx-auto py-20 md:py-32 grid grid-cols-1 md:grid-cols-2 gap-x-16 gap-y-24 animate-in fade-in slide-in-from-bottom-16 duration-1000 delay-500">
+            <section className="px-8 md:px-16 lg:px-24 max-w-7xl mx-auto py-20 md:py-32 grid grid-cols-1 md:grid-cols-2 gap-x-16 gap-y-24">
                 {teamMembers.map((member, i) => (
-                    <div key={i} className="group space-y-8">
+                    <ScrollReveal key={i} delay={0.2 + (i * 0.1)} y={60}>
+                    <div className="group space-y-8">
                         <div className="relative aspect-[4/5] bg-black/5 rounded-sm overflow-hidden ring-1 ring-black/5 group-hover:ring-black/10 transition-all duration-700">
                             {/* Dummy Profile Overlay */}
                             <div className="absolute inset-0 flex items-center justify-center text-black/5 group-hover:scale-110 transition-transform duration-1000">
@@ -69,11 +77,12 @@ export default function RedazioneInfoPage() {
                             </div>
                         </div>
                     </div>
+                    </ScrollReveal>
                 ))}
             </section>
 
             {/* Call to action */}
-            <section className="px-8 md:px-16 lg:px-24 max-w-7xl mx-auto py-20 mb-20 text-center space-y-12">
+            <ScrollReveal className="px-8 md:px-16 lg:px-24 max-w-7xl mx-auto py-20 mb-20 text-center space-y-12">
                 <div className="flex justify-center">
                     <Sparkles className="text-[var(--gold)] opacity-40" size={32} strokeWidth={1} />
                 </div>
@@ -86,7 +95,7 @@ export default function RedazioneInfoPage() {
                         Invia la tua candidatura
                     </Link>
                 </div>
-            </section>
+            </ScrollReveal>
 
             <Footer />
         </main>

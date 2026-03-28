@@ -1,6 +1,7 @@
 import React from 'react';
 import Link from 'next/link';
-import { ArrowLeft, Sparkles } from 'lucide-react';
+import { ArrowLeft } from 'lucide-react';
+import ScrollReveal from '@/components/animations/ScrollReveal';
 import Footer from '@/components/layout/Footer';
 
 export default function ManifestoPage() {
@@ -20,15 +21,19 @@ export default function ManifestoPage() {
             {/* Content Section */}
             <section className="px-8 md:px-16 lg:px-24 max-w-5xl mx-auto py-20 md:py-32 space-y-24">
                 <div className="space-y-6">
-                    <h4 className="font-['Fragment_Mono'] text-[10px] md:text-[12px] uppercase tracking-[0.5em] text-[var(--gold)] animate-in fade-in slide-in-from-bottom-4 duration-1000">
-                        Il nostro <span className="opacity-50 italic">Manifesto</span>
-                    </h4>
-                    <h1 className="text-6xl md:text-8xl lg:text-9xl font-light leading-[0.85] tracking-tight text-[#1a1a1a] animate-in fade-in slide-in-from-bottom-8 duration-1000 delay-100">
-                        Oltre lo <br /> <em className="italic font-serif">Sguardo.</em>
-                    </h1>
+                    <ScrollReveal delay={0.1}>
+                        <h4 className="font-['Fragment_Mono'] text-[10px] md:text-[12px] uppercase tracking-[0.5em] text-[var(--gold)]">
+                            Il nostro <span className="opacity-50 italic">Manifesto</span>
+                        </h4>
+                    </ScrollReveal>
+                    <ScrollReveal delay={0.2} y={50}>
+                        <h1 className="text-6xl md:text-8xl lg:text-9xl font-light leading-[0.85] tracking-tight text-[#1a1a1a]">
+                            Oltre lo <br /> <em className="italic font-serif">Sguardo.</em>
+                        </h1>
+                    </ScrollReveal>
                 </div>
 
-                <div className="prose prose-2xl prose-stone max-w-none space-y-12 animate-in fade-in slide-in-from-bottom-12 duration-1000 delay-300">
+                <ScrollReveal delay={0.4} y={60} className="prose prose-2xl prose-stone max-w-none space-y-12">
                     <p className="text-3xl md:text-5xl font-light leading-snug text-[#1a1a1a]/80 first-letter:text-7xl first-letter:font-serif first-letter:mr-3 first-letter:float-left">
                         NoZapp nasce dal desiderio di rallentare. In un'epoca di consumo frenetico e visioni distratte, noi scegliamo la profondità.
                     </p>
@@ -63,7 +68,7 @@ export default function ManifestoPage() {
                             NoZapp è, in definitiva, un atto di resistenza culturale. Un ritorno a un web più lento, più bello e più umano.
                         </p>
                     </div>
-                </div>
+                </ScrollReveal>
 
                 <div className="flex justify-center pt-20">
                     <div className="w-px h-32 bg-gradient-to-b from-[var(--gold)] to-transparent" />

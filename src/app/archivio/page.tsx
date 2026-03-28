@@ -1,7 +1,8 @@
 import React from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { ArrowRight, Archive, Sparkles } from 'lucide-react';
+import { Archive, Sparkles } from 'lucide-react';
+import ScrollReveal from '@/components/animations/ScrollReveal';
 import { getArchivedArticles } from '@/app/actions/editorial';
 import Footer from '@/components/layout/Footer';
 
@@ -51,12 +52,15 @@ export default async function ArchivioPage() {
                             const isExpired = article.expires_at && new Date(article.expires_at) < new Date();
                             
                             return (
-                                <Link 
+                                <ScrollReveal 
                                     key={article.id}
-                                    href={`/redazione/${article.slug}`}
-                                    className={`group flex flex-col space-y-6 animate-in fade-in slide-in-from-bottom-12 duration-1000 ${isExpired ? 'opacity-70 grayscale-[0.3]' : ''}`}
-                                    style={{ animationDelay: `${index * 100}ms` }}
+                                    delay={index * 0.1}
+                                    className={isExpired ? 'opacity-70 grayscale-[0.3]' : ''}
                                 >
+                                    <Link 
+                                        href={`/redazione/${article.slug}`}
+                                        className="group flex flex-col space-y-6"
+                                    >
                                     <div className="relative aspect-[16/10] overflow-hidden rounded-sm bg-black/5">
                                         {article.cover_image ? (
                                             <Image
@@ -94,10 +98,11 @@ export default async function ArchivioPage() {
                                             </p>
                                         )}
                                         <div className="pt-4 flex items-center gap-2 text-[10px] font-['Fragment_Mono'] uppercase tracking-[0.2em] opacity-0 group-hover:opacity-100 transition-all duration-500 translate-x-[-10px] group-hover:translate-x-0">
-                                            Leggi il contenuto <ArrowRight size={12} />
+                                            Leggi il contenuto ⇢
                                         </div>
                                     </div>
-                                </Link>
+                                    </Link>
+                                </ScrollReveal>
                             );
                         })}
                     </div>
