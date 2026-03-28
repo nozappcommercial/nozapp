@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { ArrowRight, Sparkles } from 'lucide-react';
 import { getPublishedArticles } from '@/app/actions/editorial';
 import Footer from '@/components/layout/Footer';
+import BackToTop from '@/components/layout/BackToTop';
 
 export const dynamic = 'force-dynamic';
 
@@ -19,9 +20,9 @@ export default async function RedazioneListingPage() {
     const articles = await getPublishedArticles();
 
     return (
-        <main className="min-h-screen bg-[#faf7f2] font-['Cormorant_Garamond']">
+        <main className="min-h-screen bg-[#faf7f2] font-['Cormorant_Garamond'] relative">
             {/* Header / Intro */}
-            <header className="pt-32 pb-20 px-8 md:px-16 lg:px-24 max-w-7xl mx-auto space-y-12">
+            <header className="pt-12 pb-20 px-8 md:px-16 lg:px-24 max-w-7xl mx-auto space-y-12">
                 <Link 
                     href="/sphere" 
                     className="inline-flex items-center gap-2 text-[10px] font-['Fragment_Mono'] uppercase tracking-[0.4em] opacity-40 hover:opacity-100 transition-opacity group"
@@ -97,6 +98,7 @@ export default async function RedazioneListingPage() {
             </section>
 
             <Footer />
+            <BackToTop />
         </main>
     );
 }

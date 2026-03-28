@@ -3,12 +3,13 @@ import Link from 'next/link';
 import { ArrowLeft } from 'lucide-react';
 import ScrollReveal from '@/components/animations/ScrollReveal';
 import Footer from '@/components/layout/Footer';
+import BackToTop from '@/components/layout/BackToTop';
 
 export default function ManifestoPage() {
     return (
-        <main className="min-h-screen bg-[#faf7f2] font-['Cormorant_Garamond'] selection:bg-[var(--gold)]/20">
+        <main className="min-h-screen bg-[#faf7f2] font-['Cormorant_Garamond'] selection:bg-[var(--gold)]/20 relative">
             {/* Minimal Header */}
-            <header className="pt-24 pb-12 px-8 md:px-16 lg:px-24 max-w-7xl mx-auto">
+            <header className="pt-12 pb-12 px-8 md:px-16 lg:px-24 max-w-5xl mx-auto">
                 <Link 
                     href="/sphere" 
                     className="inline-flex items-center gap-2 text-[10px] font-['Fragment_Mono'] uppercase tracking-[0.4em] opacity-40 hover:opacity-100 transition-opacity group"
@@ -31,6 +32,10 @@ export default function ManifestoPage() {
                             Oltre lo <br /> <em className="italic font-serif">Sguardo.</em>
                         </h1>
                     </ScrollReveal>
+                </div>
+
+                <div className="flex justify-center -mt-12 mb-20">
+                    <div className="w-px h-32 bg-gradient-to-t from-[var(--gold)] to-transparent" />
                 </div>
 
                 <ScrollReveal delay={0.4} y={60} className="prose prose-2xl prose-stone max-w-none space-y-12">
@@ -76,6 +81,7 @@ export default function ManifestoPage() {
             </section>
 
             <Footer />
+            <BackToTop />
         </main>
     );
 }

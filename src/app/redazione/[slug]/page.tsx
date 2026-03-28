@@ -8,6 +8,7 @@ import remarkGfm from 'remark-gfm';
 import ScrollReveal from '@/components/animations/ScrollReveal';
 import { getArticleBySlug } from '@/app/actions/editorial';
 import Footer from '@/components/layout/Footer';
+import BackToTop from '@/components/layout/BackToTop';
 
 interface ArticlePageProps {
     params: {
@@ -41,9 +42,9 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
     const readingTime = getReadingTime(article.content);
 
     return (
-        <main className="min-h-screen bg-[#faf7f2] font-['Cormorant_Garamond'] selection:bg-[var(--gold)]/20">
+        <main className="min-h-screen bg-[#faf7f2] font-['Cormorant_Garamond'] selection:bg-[var(--gold)]/20 relative">
             {/* Clean Header Section */}
-            <header className="pt-32 pb-16 px-8 md:px-16 lg:px-24 max-w-7xl mx-auto space-y-12">
+            <header className="pt-16 pb-16 px-8 md:px-16 lg:px-24 max-w-6xl mx-auto space-y-12 text-left">
                 <nav className="flex flex-wrap items-center gap-8 text-[10px] font-['Fragment_Mono'] uppercase tracking-[0.4em] opacity-40">
                     <Link 
                         href="/sphere" 
@@ -149,6 +150,7 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
             </article>
 
             <Footer />
+            <BackToTop />
         </main>
     );
 }

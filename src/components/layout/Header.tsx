@@ -59,8 +59,16 @@ export default function Header() {
     // Determine if header should be hidden
     const isLoginOrOnboarding = pathname === '/login' || pathname === '/onboarding';
     const isAdminRoute = pathname?.startsWith('/admin');
-    const isArticleDetail = pathname?.startsWith('/redazione/') && pathname.split('/').filter(Boolean).length > 1;
-    const shouldHideHeader = isLoginOrOnboarding || isAdminRoute || isArticleDetail;
+    
+    // Hide header on all editorial and institutional pages
+    const isEditorialRoute = 
+        pathname?.startsWith('/redazione') || 
+        pathname === '/manifesto' || 
+        pathname === '/archivio' || 
+        pathname === '/contatti' || 
+        pathname === '/redazione-info';
+
+    const shouldHideHeader = isLoginOrOnboarding || isAdminRoute || isEditorialRoute;
 
     const handleLogout = async () => {
         if (isLoggingOut) return;

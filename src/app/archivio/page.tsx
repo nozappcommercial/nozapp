@@ -5,6 +5,7 @@ import { Archive, Sparkles } from 'lucide-react';
 import ScrollReveal from '@/components/animations/ScrollReveal';
 import { getArchivedArticles } from '@/app/actions/editorial';
 import Footer from '@/components/layout/Footer';
+import BackToTop from '@/components/layout/BackToTop';
 
 export const dynamic = 'force-dynamic';
 
@@ -20,9 +21,9 @@ export default async function ArchivioPage() {
     const articles = await getArchivedArticles();
 
     return (
-        <main className="min-h-screen bg-[#faf7f2] font-['Cormorant_Garamond'] selection:bg-[var(--gold)]/20">
+        <main className="min-h-screen bg-[#faf7f2] font-['Cormorant_Garamond'] selection:bg-[var(--gold)]/20 relative">
             {/* Header / Intro */}
-            <header className="pt-32 pb-20 px-8 md:px-16 lg:px-24 max-w-7xl mx-auto space-y-12">
+            <header className="pt-12 pb-20 px-8 md:px-16 lg:px-24 max-w-7xl mx-auto space-y-12">
                 <Link 
                     href="/sphere" 
                     className="inline-flex items-center gap-2 text-[10px] font-['Fragment_Mono'] uppercase tracking-[0.4em] opacity-40 hover:opacity-100 transition-opacity group"
@@ -114,6 +115,7 @@ export default async function ArchivioPage() {
             </section>
 
             <Footer />
+            <BackToTop />
         </main>
     );
 }

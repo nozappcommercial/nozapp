@@ -46,3 +46,18 @@ status: active
 **Side effects**: Nessuno. La navigazione globale tramite footer è ora pienamente operativa.
 
 ---
+
+## 18:35 [tipo: refactor | UI]
+
+**File toccati**:
+
+- `src/components/layout/Header.tsx` — Disabilitato l'header globale su tutte le rotte editoriali/istituzionali.
+- `src/components/layout/BackToTop.tsx` — [NEW] Componente per il ritorno a inizio pagina.
+- `src/app/redazione/[slug]/page.tsx`, `src/app/manifesto/page.tsx`, `src/app/archivio/page.tsx`, `src/app/redazione-info/page.tsx`, `src/app/contatti/page.tsx`, `src/app/redazione/page.tsx` — Allineamento breadcrumb, riduzione padding superiore e integrazione `BackToTop`.
+- `src/app/manifesto/page.tsx` — Aggiunta linea dorata verticale superiore per simmetria "pergamena".
+
+**Problema di partenza**: L'header globale disturbava l'immersività delle pagine editoriali; i breadcrumb erano disallineati e troppo distanti dal bordo superiore. Mancava un sistema di ritorno rapido a inizio pagina.
+**Soluzione applicata**: Rimosso l'header sulle rotte specifiche, ricalibrato il layout dei breadcrumb per allinearli ai contenuti e introdotto un pulsante "Torna Su" minimale e centrato.
+**Side effects**: Nessuno. L'esperienza di lettura è ora più pulita e focalizzata.
+
+---
