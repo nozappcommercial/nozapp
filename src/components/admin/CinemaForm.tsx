@@ -162,7 +162,7 @@ export default function CinemaForm({ initialData, isEditing = false }: CinemaFor
                             value={formData.expires_at}
                             onChange={handleChange}
                             required
-                            className="w-full max-w-full bg-white border border-black/5 rounded-lg px-3 md:px-4 py-2 text-sm outline-none font-['Fragment_Mono'] min-w-0"
+                            className="w-full max-w-full bg-white border border-black/5 rounded-lg px-2 md:px-4 py-2 text-[13px] md:text-sm outline-none font-['Fragment_Mono'] min-w-0"
                         />
                     </div>
                 </div>

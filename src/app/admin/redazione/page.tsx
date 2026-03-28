@@ -146,36 +146,41 @@ export default async function AdminRedazionePage() {
                             {articles.map((article) => {
                                 const statusObj = getStatusBadge(article.status, article.published_at, article.expires_at);
                                 return (
-                                    <div key={article.id} className="p-6 space-y-4 active:bg-black/5 transition-colors">
-                                        <div className="flex items-start justify-between gap-4">
-                                            <div className="space-y-1">
-                                                <span className={`flex items-center w-fit gap-1.5 px-2 py-0.5 rounded-full text-[9px] uppercase font-['Fragment_Mono'] ${statusObj.className}`}>
-                                                    {statusObj.icon} {statusObj.label}
-                                                </span>
-                                                <h3 className="text-xl font-medium leading-tight">{article.title}</h3>
-                                                <p className="text-[10px] opacity-40 font-['Fragment_Mono']">/{article.slug}</p>
-                                            </div>
-                                            <div className="flex flex-col gap-2">
-                                                <Link 
-                                                    href={`/admin/redazione/${article.id}`}
-                                                    className="w-10 h-10 flex items-center justify-center bg-black/5 rounded-full text-black/60"
-                                                >
-                                                    <Edit3 size={18} />
-                                                </Link>
-                                                <Link 
-                                                    href={`/redazione/${article.slug}`}
-                                                    target="_blank"
-                                                    className="w-10 h-10 flex items-center justify-center bg-black/5 rounded-full text-black/60"
-                                                >
-                                                    <ExternalLink size={18} />
-                                                </Link>
-                                            </div>
+                                <div key={article.id} className="p-5 md:p-6 space-y-4 active:bg-black/5 transition-colors group">
+                                    <div className="flex items-start justify-between gap-6">
+                                        <div className="space-y-2 flex-grow">
+                                            <span className={`flex items-center w-fit gap-1.5 px-2 py-0.5 rounded-full text-[9px] uppercase font-['Fragment_Mono'] ${statusObj.className}`}>
+                                                {statusObj.icon} {statusObj.label}
+                                            </span>
+                                            <h3 className="text-xl font-medium leading-tight group-hover:text-[var(--gold)] transition-colors line-clamp-2">{article.title}</h3>
+                                            <p className="text-[10px] opacity-40 font-['Fragment_Mono']">/{article.slug}</p>
                                         </div>
-                                        <div className="flex items-center justify-between text-[11px] opacity-40 font-['Fragment_Mono'] pt-2 border-t border-black/[0.03]">
-                                            <span>{(article.author as any)?.display_name || 'Anonimo'}</span>
-                                            <span>{article.published_at ? formatDate(article.published_at).split(',')[0] : '-'}</span>
+                                        <div className="flex flex-col gap-3 py-1 flex-shrink-0">
+                                            <Link 
+                                                href={`/admin/redazione/${article.id}`}
+                                                className="w-8 h-8 flex items-center justify-center bg-black/5 rounded-full text-black/60 hover:bg-black/10 transition-colors"
+                                                title="Modifica"
+                                            >
+                                                <Edit3 size={15} />
+                                            </Link>
+                                            <Link 
+                                                href={`/redazione/${article.slug}`}
+                                                target="_blank"
+                                                className="w-8 h-8 flex items-center justify-center bg-black/5 rounded-full text-black/60 hover:bg-black/10 transition-colors"
+                                                title="Anteprima"
+                                            >
+                                                <ExternalLink size={15} />
+                                            </Link>
                                         </div>
                                     </div>
+                                    <div className="flex items-center justify-between text-[10px] opacity-40 font-['Fragment_Mono'] pt-3 border-t border-black/[0.04] mt-2">
+                                        <div className="flex items-center gap-1.5">
+                                            <span className="w-1 h-1 rounded-full bg-[var(--gold)]" />
+                                            <span className="truncate max-w-[120px]">{(article.author as any)?.display_name || 'Anonimo'}</span>
+                                        </div>
+                                        <span>{article.published_at ? formatDate(article.published_at).split(',')[0] : '-'}</span>
+                                    </div>
+                                </div>
                                 );
                             })}
                         </div>
