@@ -18,10 +18,13 @@ Il workflow si basa su uno stato binario (`draft` | `published`) e sulla program
 - **Pubblicazione**: L'articolo diventa visibile al pubblico solo se `status = published` e la data corrente è compresa tra `published_at` e `expires_at`.
 
 ## Dashboard Admin (`/admin`)
-La dashboard centrale funge da hub per:
-- **Redazione**: Lista articoli con indicatori di stato (Bozza/Pubblicato/Scaduto).
+La dashboard centrale è stata evoluta in un sistema gestionale completo che include:
+- **Redazione**: CRUD articoli con indicatori di stato (Bozza/Pubblicato/Scaduto) e vista responsive a card per mobile.
+- **Utenti**: Monitoraggio degli iscritti, filtri demografici (età, provenienza, sesso) e gestione permessi admin con possibilità di eliminazione account.
+- **Analisi**: Dashboard dinamica con grafici statistici sull'engagement e sulla distribuzione demografica degli utenti.
+- **System Vitals**: Modulo avanzato per il monitoraggio tecnico in tempo reale (latenza API, stato cache, indicatori di build success).
 - **Cinema**: Gestione manuale del carosello pubblico "Ora al Cinema" con supporto per le date di scadenza.
-- **Sicurezza**: Gestione del profilo e sessione MFA.
+- **Sicurezza**: Gestione del profilo e sessione MFA via Email OTP.
 
 ## Gestione Cinema (Manuale)
 A differenza del resto della Sfera Semantica (che è dinamica), la sezione Cinema è curata manualmente dagli amministratori per garantire il lancio di titoli specifici o promozioni.
@@ -59,6 +62,10 @@ Tutti gli eventi critici per la sicurezza della piattaforma vengono tracciati tr
 
 ## Database Schema
 Vedere [[database]] per il dettaglio della tabella `articles` e le nuove colonne MFA nella tabella `users`.
+
+---
+🔄 **Aggiornato il 2026-03-28**: Espansa la Dashboard Admin con i moduli Utenti, Analisi e System Vitals. Integrata la gestione dei dati demografici (età, sesso, provenienza) e l'ottimizzazione mobile per le tabelle redazionali (vista a card). Risolto overflow campi data su iOS.
+File modificati: `src/app/admin/utenti/page.tsx`, `src/app/admin/analisi/page.tsx`, `src/components/admin/PlatformStatus.tsx`, `src/app/admin/redazione/page.tsx`, `src/components/admin/ArticleForm.tsx`
 
 ---
 🔄 **Aggiornato il 2026-03-27**: Introdotto il supporto Markdown (react-markdown), il nuovo template immersivo per gli articoli e il sistema di gestione manuale del Cinema. Perfezionato il flusso MFA con codici a 8 cifre.

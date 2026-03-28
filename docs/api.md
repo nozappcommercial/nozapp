@@ -10,7 +10,7 @@ agent: aggiornatore
 I Route Handlers gestiscono richieste HTTP esterne o operazioni di sistema che non rientrano nelle Server Actions.
 
 ### Onboarding
-- **`POST /api/onboarding/complete`**: Valida e salva i risultati finali dell'onboarding (pilastri, abbonamenti, feedback). Utilizza **Zod** per la validazione dello schema.
+- **`POST /api/onboarding/complete`**: Valida e salva i risultati finali dell'onboarding (pilastri, abbonamenti, feedback, **birth_date**, **country**, **gender**). Utilizza **Zod** per la validazione dello schema.
 - **`POST /api/onboarding/reset`**: Resetta i dati dell'utente loggato, permettendogli di rifare il flusso iniziale.
 
 ### Admin & Cron
@@ -28,12 +28,16 @@ Le Server Actions sono funzioni asincrone eseguite sul server, ma chiamate diret
 - **`upsertMovieInteraction`**: Salva o aggiorna un feedback dell'utente (Like, Dislike, Seen, Ignore) su un determinato film.
 - **`getPersonalizedGraph`**: Recupera i nodi e gli archi che compongono la sfera personalizzata dell'utente, basandosi sui suoi pilastri e affinità.
 - **`updateUserStreaming`**: Aggiorna l'elenco delle piattaforme streaming sottoscritte.
+- **`updateUserProfile`**: Aggiorna i dati demografici dell'utente (età, stato, sesso).
 
-### Sistema Editoriale — `editorial.ts`
+### Sistema Editoriale & Admin — `editorial.ts`, `admin_users.ts`, `admin_analytics.ts`
 - **`upsertArticle`**: Crea o aggiorna un articolo della redazione.
 - **`deleteArticle`**: Rimuove un articolo dal database.
 - **`getPublishedArticles`**: Recupera gli articoli visibili al pubblico.
 - **`getArticleBySlug`**: Recupera un articolo specifico tramite lo slug URL (include bypass per preview admin).
+- **`deleteUser`**: Eliminazione definitiva di un account utente (Auth + Database).
+- **`updateUserPermissions`**: Toggle dei permessi amministrativi per un utente specifico.
+- **`getAdminAnalytics`**: Calcolo delle statistiche aggregate (età, provenienza, genere, interazioni).
 
 ### Autenticazione Admin (MFA) — `admin_auth.ts`
 - **`generateAdminOTP`**: Richiede a Supabase di inviare un codice OTP via Email all'amministratore loggato.

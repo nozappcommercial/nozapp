@@ -25,7 +25,8 @@ nozapp/
 │   └── *.py              # Script Python (Merge, Seed, Extract)
 ├── public/               # Asset statici (loghi, manifest, icone)
 ├── scripts/              # Utility e script di manutenzione (JS/Py)
-│   └── title-it.py       # Script di arricchimento titoli (TMDB/Wikidata)
+├── utility/              # Script Python e tool esterni spostati fuori da src
+│   └── *.py              # Script di arricchimento titoli (TMDB/Wikidata/Scrapers)
 ├── src/
 │   ├── components/       # Componenti React
 │   │   ├── auth/         # Gestione UI autenticazione
@@ -68,4 +69,7 @@ Non è solo una cartella di asset: contiene l'intelligenza di pre-processing del
 > [!IMPORTANT]
 > Il workspace principale si trova in `/Volumes/Crucial/workspace/web/nozapp`. Evita di scrivere file al di fuori di questo percorso a meno che non sia strettamente necessario per la cache locale.
 
+🔄 **Aggiornato il 2026-03-28**: Riorganizzazione degli script Python nella cartella `/utility` per alleggerire il watcher di Next.js e migliorare la pulizia del workspace.
+
+---
 🔄 **Aggiornato il 2026-03-26**: Inserite le nuove cartelle per l'area amministrativa e la gestione redazionale.

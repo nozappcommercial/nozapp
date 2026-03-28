@@ -42,7 +42,7 @@ graph TB
     subgraph Server_NextJS
         SA[Server Actions]
         RH[Route Handlers / API]
-        Middleware[Auth Middleware / Session Refresh]
+        Proxy[Auth Proxy / Session Refresh]
     end
 
     subgraph Data
@@ -56,11 +56,11 @@ graph TB
     SA --> Supabase
     RH --> Supabase
     SA --> CSV
-    Middleware --> Supabase
+    Proxy --> Supabase
 ```
 
 ## Flusso Generale dei Dati
-1. Il **Middleware** intercetta la richiesta e valida la sessione.
+1. L'**Auth Proxy** (ex middleware) intercetta la richiesta e valida la sessione.
 2. La **Server Page** recupera il profilo utente e i dati del grafo da Supabase/CSV.
 3. Lo **Sphere Engine** riceve i dati iniziali come props e costruisce la scena 3D.
 4. Ogni interazione (like/seen) attiva una **Server Action** che aggiorna Supabase in tempo reale.
@@ -72,6 +72,9 @@ NoZapp adotta un approccio a più livelli per proteggere i dati e le funzionalit
 1. **Role-Based Access Control (RBAC)**: Utilizzo del flag `is_admin` nella tabella `users` per distinguere gli amministratori.
 2. **Row-Level Security (RLS)**: Le policy di Supabase garantiscono che solo gli admin possano modificare gli articoli (`articles`), mentre il pubblico può solo leggerli.
 3. **Multi-Factor Authentication (MFA)**: Un secondo livello di verifica tramite OTP (One-Time Password) è richiesto per accedere a qualsiasi risorsa sotto il path `/admin`. La sessione MFA è gestita tramite cookie sicuri `httpOnly`.
+
+---
+🔄 **Aggiornato il 2026-03-28**: Migrazione dal middleware tradizionale alla nuova convenzione **Proxy** di Next.js 16 (`src/proxy.ts`). Ristrutturazione del diagramma dei layer.
 
 ---
 > [!TIP]

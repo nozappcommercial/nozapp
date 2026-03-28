@@ -47,8 +47,8 @@ I componenti di NoZapp sono suddivisi in **UI atomici** (Shadcn), **Layout** (st
 ### `ProfileModal` — `src/components/profile/ProfileModal.tsx`
 **Scopo**: Interfaccia per la gestione del profilo utente e accesso alle impostazioni.
 **Caratteristiche**:
+- **Sezione Dati Personali**: Aggiunta sezione per visualizzare e modificare età, stato (paese) e sesso con persistenza automatica.
 - **Centratura**: Implementata tramite flex-container dedicato per evitare conflitti tra CSS `transform` e animazioni Framer Motion.
-- **Micro-interazioni**: Animazione di ingresso/uscita sulla scala e opacità.
 - **Responsiveness**: Allineata al breakpoint di 768px per coerenza con l'header.
 
 ---
@@ -74,11 +74,20 @@ I componenti di NoZapp sono suddivisi in **UI atomici** (Shadcn), **Layout** (st
 ### `AdminHeader` — `src/components/admin/AdminHeader.tsx`
 **Scopo**: Header dinamico per l'area amministrativa.
 **Responsabilità**:
-- Mostrare il titolo contestuale (Dashboard, Redazione, Verifica).
+- Mostrare il titolo contestuale (Dashboard, Redazione, Utenti, Analisi, Verifica).
 - Fornire il link di ritorno alla Dashboard nelle sottopagine.
 - Gestire il logout globale dell'area admin.
-- **Torna alla Sfera**: Include un pulsante rapido per tornare all'esperienza 3D pubblica.
+- **Ottimizzazione Mobile**: Aggiunto padding per il notch (`safe-area-inset-top`) e trasformati i pulsanti in icone circolari per massimizzare lo spazio su schermi piccoli.
 **Comportamento**: Utilizza `usePathname` per determinare lo stato della navigazione in tempo reale.
+
+---
+
+### `PlatformStatus` — `src/components/admin/PlatformStatus.tsx`
+**Scopo**: Dashboard di monitoraggio tecnico ribattezzata "System Vitals".
+**Caratteristiche**:
+- **Estetica Premium**: Design in stile Vercel con indicatori LED di build success e metriche di latenza reale.
+- **Responsiveness**: Implementato effetto accordion su mobile per ridurre l'ingombro verticale.
+- **Real-time Data**: Visualizza trend di engagement e totali utenti in tempo reale.
 
 ---
 
@@ -113,5 +122,9 @@ Questi componenti si trovano in `src/components/ui/` e seguono le specifiche di 
 > [!NOTE]
 > Tutti i componenti utilizzano tipicamente `framer-motion` per micro-interazioni e transizioni di stato.
 
+🔄 **Aggiornato il 2026-03-28**: Ottimizzazione mobile dell'AdminHeader e evoluzione del modulo PlatformStatus in "System Vitals". Estensione del ProfileModal con i nuovi campi demografici.
+File modificati: `src/components/admin/AdminHeader.tsx`, `src/components/admin/PlatformStatus.tsx`, `src/components/profile/ProfileModal.tsx`
+
+---
 🔄 **Aggiornato il 2026-03-27**: Decomposizione dei componenti della Sfera (`MovieDetailPanel`, `SphereUIOverlays`) e integrazione utility globali nell'Header.
 File modificati: `src/components/sphere/MovieDetailPanel.tsx`, `src/components/sphere/SphereUIOverlays.tsx`, `src/components/layout/Header.tsx`, `src/components/admin/AdminHeader.tsx`

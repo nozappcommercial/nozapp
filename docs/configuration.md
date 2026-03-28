@@ -49,4 +49,7 @@ Per avviare il progetto da zero:
 5. Avvia il server di sviluppo: `npm run dev`.
 
 ---
+🔄 **Aggiornato il 2026-03-28**: Aumentato il limite di memoria heap di Node a 8GB per ottimizzare le performance di build in locale. Pulizia delle chiavi sperimentali deprecate in `next.config.mjs`.
+
+---
 🔄 **Aggiornato il 2026-03-27**: L'infrastruttura MFA ora utilizza il servizio Email nativo di Supabase. Non è più richiesto il setup di provider SMS esterni per l'area Admin.

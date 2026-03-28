@@ -1,0 +1,101 @@
+.
+├── components.json
+├── dataset
+│   ├── __pycache__
+│   ├── actors.csv
+│   ├── apply_migration.py
+│   ├── avaiability
+│   ├── countries.csv
+│   ├── extractor.py
+│   ├── genres.csv
+│   ├── languages.csv
+│   ├── merge_dataset.py
+│   ├── movies_with_italian_titles_test30.csv
+│   ├── output
+│   ├── posters.csv
+│   ├── seed_supabase.py
+│   ├── studios.csv
+│   └── themes.csv
+├── docs
+│   ├── _memory
+│   ├── api.md
+│   ├── architecture.md
+│   ├── components.md
+│   ├── configuration.md
+│   ├── data-flow.md
+│   ├── dataset.md
+│   ├── dependencies.md
+│   ├── editorial-system.md
+│   ├── hooks-and-utilities.md
+│   ├── known-issues.md
+│   ├── onboarding-guide.md
+│   ├── pages-and-routing.md
+│   ├── progetto.md
+│   ├── project-structure.md
+│   ├── scripts.md
+│   ├── security.md
+│   ├── three-js.md
+│   ├── todo.md
+│   └── types.md
+├── next-env.d.ts
+├── next.config.mjs
+├── package-lock.json
+├── package.json
+├── postcss.config.mjs
+├── public
+│   ├── apple-touch-icon-120x120.png
+│   ├── apple-touch-icon-152x152.png
+│   ├── apple-touch-icon-180x180.png
+│   ├── apple-touch-icon-precomposed.png
+│   ├── apple-touch-icon.png
+│   ├── logo.png
+│   ├── logos
+│   └── manifest.json
+├── sandbox
+│   ├── button-test
+│   ├── data-visualizzation
+│   ├── emails
+│   ├── header
+│   ├── onboarding
+│   ├── opening
+│   ├── profile-card
+│   └── ticket-cut
+├── scripts
+│   ├── bundle_for_ai.py
+│   ├── check_probes.mjs
+│   ├── check_schema.mjs
+│   ├── convert_to_react.js
+│   ├── debug_onboarding.mjs
+│   ├── replace-colors.js
+│   ├── reset_user.mjs
+│   ├── seed_onboarding.py
+│   ├── test_api.js
+│   ├── test_db.js
+│   ├── test_db.mjs
+│   ├── test_db2.mjs
+│   ├── test_onboarding.js
+│   ├── title-conversion
+│   ├── title-it.py
+│   ├── update_mock_colors.js
+│   ├── venv
+│   └── wikidata_cache.json
+├── src
+│   ├── app
+│   ├── components
+│   ├── hooks
+│   ├── lib
+│   ├── proxy.ts
+│   └── types
+├── structure.txt
+├── supabase
+│   ├── config.toml
+│   └── migrations
+├── supabase_reset_users.sql
+├── tailwind.config.ts
+├── tsconfig.json
+├── tsconfig.tsbuildinfo
+└── utility
+    ├── fix_sphere.py
+    └── implement_shell_nav.py
+
+30 directories, 69 files

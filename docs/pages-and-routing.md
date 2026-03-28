@@ -16,11 +16,10 @@ NoZapp utilizza l'**App Router** di Next.js 14 per gestire la navigazione. La ma
 | `/onboarding`| `app/onboarding/page.tsx` | Dynamic | Root | Wizard iniziale di selezione dei pilastri del gusto. |
 | `/redazione` | `app/redazione/page.tsx` | Dynamic | Root | Archivio editoriale con griglia animata dei contenuti. |
 | `/redazione/[slug]` | `app/redazione/[slug]/page.tsx` | Dynamic | Root | Visualizzazione articolo singolo (Markdown + Design Immersivo). |
-| `/admin` | `app/admin/page.tsx` | SSR | Admin | Dashboard gestionale per amministratori. |
-| `/admin/redazione` | `app/admin/redazione/page.tsx` | SSR | Admin | Lista articoli e gestione contenuti. |
-| `/admin/cinema` | `app/admin/cinema/page.tsx` | SSR | Admin | Lista film in programmazione (manuale). |
-| `/admin/cinema/nuovo` | `app/admin/cinema/nuovo/page.tsx` | SSR | Admin | Form creazione nuovo film. |
-| `/admin/cinema/[id]` | `app/admin/cinema/[id]/page.tsx` | SSR | Admin | Form modifica film esistente. |
+| `/admin` | `app/admin/page.tsx` | SSR | Admin | Dashboard gestionale con System Vitals. |
+| `/admin/redazione` | `app/admin/redazione/page.tsx` | SSR | Admin | Lista articoli (vista responsive card/tabella). |
+| `/admin/utenti` | `app/admin/utenti/page.tsx` | SSR | Admin | Gestione iscritti, filtri demografici e permessi. |
+| `/admin/analisi` | `app/admin/analisi/page.tsx` | SSR | Admin | Dashboard analytics (engagement, demografica). |
 | `/admin/verify` | `app/admin/verify/page.tsx` | CSR | Root | Verifica MFA (Multi-Factor Authentication). |
 
 ## Strategie di Rendering
@@ -70,5 +69,8 @@ graph TD
 > [!TIP]
 > Il middleware in `src/lib/supabase/middleware.ts` è il centro di controllo del routing basato sullo stato di onboarding dell'utente e sui permessi amministrativi (MFA).
 
+🔄 **Aggiornato il 2026-03-28**: Incluse nuove rotte amministrative per la gestione utenti e il motore di analytics. Ottimizzata la Dashboard principale con il modulo System Vitals.
+
+---
 🔄 **Aggiornato il 2026-03-27**: Ottimizzazione layout admin e transizioni sicure tra contesti (public/admin) via SSR.
 File modificati: `app/admin/layout.tsx`

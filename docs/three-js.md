@@ -53,6 +53,7 @@ Il sistema utilizza un `Raycaster` per rilevare l'interazione del mouse con i no
 - **Frustum Culling**: Three.js gestisce nativamente la rimozione degli oggetti fuori campo.
 - **Instanced Mesh (da implementare)**: Attualmente i nodi sono oggetti singoli; per dataset > 1000 nodi è previsto il passaggio alle instanced meshes.
 - **Raycast Throttling**: Il calcolo delle interazioni è ottimizzato per non saturare la CPU ad ogni frame.
+- **Cleanup Risorse**: Implementato metodo `dispose()` per geometrie, materiali e renderer per prevenire leak di memoria GPU durante l'HMR e i cambi di rotta.
 
 ---
 
@@ -67,5 +68,9 @@ Nel codice sono presenti variabili chiave per il fine-tuning della scena:
 > [!NOTE]
 > Il componente `SemanticSphere.tsx` è stato refatorizzato per eliminare `@ts-nocheck`. Ora utilizza interfacce TypeScript rigorose e una struttura decomposta per una manutenzione più sicura.
 
+🔄 **Aggiornato il 2026-03-28**: Implementato il cleanup rigoroso delle risorse Three.js (`dispose`) per eliminare i leak di memoria rilevati durante lo sviluppo.
+File modificati: `src/hooks/useSphereEngine.ts`
+
+---
 🔄 **Aggiornato il 2026-03-27**: Decomposizione del componente in orchestratore e hook `useSphereEngine.ts`. Rimozione `@ts-nocheck`.
 File modificati: `src/components/SemanticSphere.tsx`, `src/hooks/useSphereEngine.ts`

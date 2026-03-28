@@ -50,3 +50,17 @@ agent: scrittore
 ---
 > [!WARNING]
 > La variabile `CRON_SECRET` è critica per la sincronizzazione dei dati. Non utilizzarla per scopi diversi dalla protezione degli endpoint di amministrazione.
+
+## Bug Risolti (Fix Recenti)
+
+### Overflow campi Data su iOS
+I campi `datetime-local` nei form amministrativi strabordavano dai container su dispositivi Apple.
+- **Soluzione**: Applicato blocco `<style>` locale con `-webkit-appearance: none` e `min-width: 0` specifico per iOS.
+
+### Memory Leak GPU (Three.js)
+L'HMR (Hot Module Replacement) causava la duplicazione di geometrie e texture nella memoria video, saturando la RAM dopo pochi salvataggi.
+- **Soluzione**: Implementato pattern di distruzione esplicita con `dispose()` richiamato al dismount dello Sphere Engine.
+
+---
+🔄 **Aggiornato il 2026-03-28**: Risolto problema critico di overflow UI su iOS e stabilizzata la memoria del motore 3D (leak GPU risolto).
+ File modificati: `src/components/admin/ArticleForm.tsx`, `src/hooks/useSphereEngine.ts`
