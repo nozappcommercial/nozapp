@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { Newspaper, Users, Settings, BarChart3, TrendingUp, Globe, Calendar, ArrowLeft, RefreshCw, Activity, MousePointerClick, Search, Filter, Shield, User, MoreVertical } from 'lucide-react';
-import { getDashboardUsers, toggleAdminStatus, type DashboardUser } from '@/app/actions/admin_users';
+import { getDashboardUsers, toggleAdminStatus, deleteUser, type DashboardUser } from '@/app/actions/admin_users';
 
 export default function AdminUsersPage() {
     const [users, setUsers] = useState<DashboardUser[]>([]);
@@ -39,6 +39,19 @@ export default function AdminUsersPage() {
         }
     };
 
+    const handleDeleteUser = async (userId: string) => {
+        if (!confirm(`Sei sicuro di voler eliminare definitivamente questo utente? L'azione è irreversibile.`)) return;
+        setLoading(true);
+        try {
+            await deleteUser(userId);
+            setUsers(prev => prev.filter(u => u.id !== userId));
+        } catch (err: any) {
+            alert('Errore nell\'eliminazione: ' + err.message);
+        } finally {
+            setLoading(false);
+        }
+    };
+
     const calculateAge = (birthDate: string | null) => {
         if (!birthDate) return 'N/A';
         const birth = new Date(birthDate);
@@ -61,21 +74,18 @@ export default function AdminUsersPage() {
         <div className="space-y-8 animate-in fade-in duration-500">
             {/* Header section */}
             <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 pb-6 border-b border-black/5">
-                <div className="space-y-1">
-                    <Link href="/admin" className="flex items-center gap-1 text-[10px] uppercase tracking-widest text-[var(--gold)] mb-2 hover:opacity-70 transition-opacity">
-                        <ArrowLeft size={10} /> Torna alla dashboard
-                    </Link>
-                    <h1 className="text-4xl font-light tracking-tight">Gestione <span className="italic font-serif">Utenti</span></h1>
-                    <p className="text-black/40">Visualizza e gestisci tutti gli iscritti alla piattaforma.</p>
-                </div>
-                <div className="flex gap-2">
+                <div className="space-y-6">
                     <button 
                         onClick={fetchUsers}
-                        className="px-4 py-2 bg-black/5 rounded-full hover:bg-black/10 transition-colors flex items-center gap-2 text-[10px] uppercase tracking-widest font-mono"
+                        className="w-10 h-10 bg-black/5 rounded-full flex items-center justify-center hover:bg-black/10 transition-all hover:rotate-180 duration-500"
+                        title="Ricarica utenti"
                     >
                         <RefreshCw size={14} className={loading ? 'animate-spin' : ''} />
-                        Ricarica
                     </button>
+                    <div className="space-y-1">
+                        <h1 className="text-4xl font-light tracking-tight">Gestione <span className="italic font-serif">Utenti</span></h1>
+                        <p className="text-black/40">Visualizza e gestisci tutti gli iscritti alla piattaforma.</p>
+                    </div>
                 </div>
             </div>
 
@@ -88,7 +98,7 @@ export default function AdminUsersPage() {
                         placeholder="Cerca per email o nome..."
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
-                        className="w-100% pl-11 pr-4 py-3 bg-black/5 rounded-2xl border-none outline-none focus:ring-1 ring-[var(--gold)]/30 transition-shadow transition-all"
+                        className="w-full pl-11 pr-4 py-3 bg-black/5 rounded-2xl border-none outline-none focus:ring-1 ring-[var(--gold)]/30 transition-shadow transition-all"
                     />
                 </div>
                 <div className="flex gap-2">
@@ -96,7 +106,7 @@ export default function AdminUsersPage() {
                         onClick={() => setFilterAdmin(prev => prev === true ? null : true)}
                         className={`px-6 py-3 rounded-2xl border transition-all flex items-center gap-2 text-xs ${filterAdmin === true ? 'bg-black text-white border-black' : 'bg-white border-black/5 text-black/60 hover:bg-black/5'}`}
                     >
-                        <Shield size={14} /> Sollo Admin
+                        <Shield size={14} /> Solo Admin
                     </button>
                     <button 
                         onClick={() => setFilterAdmin(prev => prev === false ? null : false)}
@@ -119,15 +129,15 @@ export default function AdminUsersPage() {
             ) : (
                 <div className="bg-white rounded-[32px] ring-1 ring-black/5 overflow-hidden shadow-2xl shadow-black/5">
                     <div className="overflow-x-auto">
-                        <table className="w-100% text-left border-collapse min-w-[800px]">
+                        <table className="w-full text-left border-collapse min-w-[800px]">
                             <thead>
-                                <tr className="bg-black/2 font-mono text-[9px] uppercase tracking-widest text-black/40">
-                                    <th className="px-8 py-5 border-b border-black/5">Utente</th>
-                                    <th className="px-6 py-5 border-b border-black/5">Stato & Età</th>
-                                    <th className="px-6 py-5 border-b border-black/5">Sesso</th>
-                                    <th className="px-6 py-5 border-b border-black/5">Creato il</th>
-                                    <th className="px-6 py-5 border-b border-black/5">Ruolo</th>
-                                    <th className="px-8 py-5 border-b border-black/5 text-right">Azioni</th>
+                                <tr className="bg-black font-mono text-[9px] uppercase tracking-widest text-white/50">
+                                    <th className="px-8 py-5">Utente</th>
+                                    <th className="px-6 py-5">Stato & Età</th>
+                                    <th className="px-6 py-5">Sesso</th>
+                                    <th className="px-6 py-5">Creato il</th>
+                                    <th className="px-6 py-5">Ruolo</th>
+                                    <th className="px-8 py-5 text-right">Azioni</th>
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-black/5">
@@ -137,6 +147,7 @@ export default function AdminUsersPage() {
                                             <td className="px-8 py-6"><div className="h-4 bg-black/5 rounded w-32" /></td>
                                             <td className="px-6 py-6"><div className="h-4 bg-black/5 rounded w-24" /></td>
                                             <td className="px-6 py-6"><div className="h-4 bg-black/5 rounded w-20" /></td>
+                                            <td className="px-6 py-6"><div className="h-4 bg-black/5 rounded w-16" /></td>
                                             <td className="px-6 py-6"><div className="h-4 bg-black/5 rounded w-16" /></td>
                                             <td className="px-8 py-6"><div className="h-4 bg-black/5 rounded w-8 ml-auto" /></td>
                                         </tr>
@@ -185,14 +196,23 @@ export default function AdminUsersPage() {
                                                     </span>
                                                 )}
                                             </td>
-                                            <td className="px-8 py-6 text-right">
-                                                <button 
-                                                    onClick={() => handleToggleAdmin(user.id, user.is_admin)}
-                                                    className={`p-2 rounded-full transition-all ${user.is_admin ? 'text-black hover:bg-black hover:text-white' : 'text-black/20 hover:text-black hover:bg-black/5'}`}
-                                                    title={user.is_admin ? "Rimuovi privilegi admin" : "Promuovi ad admin"}
-                                                >
-                                                    <Shield size={16} />
-                                                </button>
+                                            <td className="px-8 py-6 text-right whitespace-nowrap">
+                                                <div className="flex justify-end gap-2">
+                                                    <button 
+                                                        onClick={() => handleToggleAdmin(user.id, user.is_admin)}
+                                                        className={`p-2 rounded-full transition-all ${user.is_admin ? 'text-black bg-black/10' : 'text-black/20 hover:text-black hover:bg-black/5'}`}
+                                                        title={user.is_admin ? "Rimuovi privilegi admin" : "Promuovi ad admin"}
+                                                    >
+                                                        <Shield size={16} />
+                                                    </button>
+                                                    <button 
+                                                        onClick={() => handleDeleteUser(user.id)}
+                                                        className="p-2 text-rose-200 hover:text-rose-600 hover:bg-rose-50 rounded-full transition-all"
+                                                        title="Elimina utente"
+                                                    >
+                                                        <User size={16} />
+                                                    </button>
+                                                </div>
                                             </td>
                                         </tr>
                                     ))

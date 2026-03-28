@@ -43,19 +43,19 @@ export default function AdminAnalysisPage() {
         <div className="space-y-12 animate-in fade-in duration-700">
             {/* Header section */}
             <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 pb-6 border-b border-black/5">
-                <div className="space-y-1">
-                    <Link href="/admin" className="flex items-center gap-1 text-[10px] uppercase tracking-widest text-[var(--gold)] mb-2 hover:opacity-70 transition-opacity">
-                        <ArrowLeft size={10} /> Dashboard
-                    </Link>
-                    <h1 className="text-4xl font-light tracking-tight">Modulo <span className="italic font-serif">Analisi</span></h1>
-                    <p className="text-black/40 max-w-md">Statistiche aggregate e dati demografici reali tratti dall&apos;ecosistema NoZapp.</p>
+                <div className="space-y-6">
+                    <button 
+                        onClick={fetchStats}
+                        className="w-10 h-10 bg-black/5 rounded-full flex items-center justify-center hover:bg-black/10 transition-all hover:rotate-180 duration-500"
+                        title="Aggiorna statistiche"
+                    >
+                        <RefreshCw size={14} className={loading ? 'animate-spin' : ''} />
+                    </button>
+                    <div className="space-y-1">
+                        <h1 className="text-4xl font-light tracking-tight">Modulo <span className="italic font-serif">Analisi</span></h1>
+                        <p className="text-black/40 max-w-md">Statistiche aggregate e dati demografici reali tratti dall&apos;ecosistema NoZapp.</p>
+                    </div>
                 </div>
-                <button 
-                    onClick={fetchStats}
-                    className="p-3 bg-black/5 rounded-full hover:bg-black/10 transition-colors"
-                >
-                    <RefreshCw size={16} className={loading ? 'animate-spin' : ''} />
-                </button>
             </div>
 
             {/* Top Cards: Total Metrics */}

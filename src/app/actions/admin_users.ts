@@ -45,13 +45,14 @@ export async function getDashboardUsers(): Promise<DashboardUser[]> {
     if (publicError) throw publicError;
 
     // Fetch auth emails (using admin client to access auth schema)
-    const { data: { users: authUsers }, error: authError } = await adminSupabase.auth.admin.listUsers();
+    const { data: authData, error: authError } = await adminSupabase.auth.admin.listUsers();
     
     if (authError) {
-        console.warn("[Admin] Could not fetch auth emails, falling back to public data only.");
+        console.warn("[Admin] Could not fetch auth emails:", authError.message);
     }
 
-    const authMap = new Map(authUsers?.map(u => [u.id, u.email]) || []);
+    const authUsers = authData?.users || [];
+    const authMap = new Map(authUsers.map(u => [u.id, u.email]) || []);
 
     return publicUsers.map(u => ({
         id: u.id,
@@ -77,4 +78,33 @@ export async function toggleAdminStatus(userId: string, currentStatus: boolean):
         .eq('id', userId);
 
     if (error) throw error;
+}
+
+/**
+ * Delete a user from both auth and public schema
+ */
+export async function deleteUser(userId: string): Promise<void> {
+    const supabase = await createClient();
+    const { data: { user: adminUser } } = await supabase.auth.getUser();
+    
+    // Safety check: only admins can delete
+    const { data: adminCheck } = await supabase
+        .from('users')
+        .select('is_admin')
+        .eq('id', adminUser?.id)
+        .single();
+    if (!adminCheck?.is_admin) throw new Error("Unauthorized");
+
+    const adminSupabase = createAdminClient();
+    
+    // 1. Delete from auth.users
+    const { error: authError } = await adminSupabase.auth.admin.deleteUser(userId);
+    if (authError) throw authError;
+
+    // 2. Explicitly remove from public.users
+    const { error: publicError } = await adminSupabase
+        .from('users')
+        .delete()
+        .eq('id', userId);
+    if (publicError) throw publicError;
 }
