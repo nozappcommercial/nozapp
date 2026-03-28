@@ -177,7 +177,7 @@ export default function ArticleForm({ initialData, isEditing = false }: ArticleF
                                 name="published_at"
                                 value={formData.published_at}
                                 onChange={handleChange}
-                                className="w-full bg-white border border-black/5 rounded-lg px-4 py-2 text-sm outline-none font-['Fragment_Mono']"
+                                className="w-full max-w-full bg-white border border-black/5 rounded-lg px-3 md:px-4 py-2 text-sm outline-none font-['Fragment_Mono'] min-w-0"
                             />
                         </div>
 
@@ -188,7 +188,7 @@ export default function ArticleForm({ initialData, isEditing = false }: ArticleF
                                 name="expires_at"
                                 value={formData.expires_at}
                                 onChange={handleChange}
-                                className="w-full bg-white border border-black/5 rounded-lg px-4 py-2 text-sm outline-none font-['Fragment_Mono']"
+                                className="w-full max-w-full bg-white border border-black/5 rounded-lg px-3 md:px-4 py-2 text-sm outline-none font-['Fragment_Mono'] min-w-0"
                             />
                         </div>
 

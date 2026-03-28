@@ -1,6 +1,7 @@
 import React from 'react';
 import Link from 'next/link';
 import { Newspaper, Users, Settings, BarChart3, ArrowRight, ShieldCheck, Clapperboard, Layout } from 'lucide-react';
+import PlatformStatus from '@/components/admin/PlatformStatus';
 
 export default function AdminDashboard() {
     const modules = [
@@ -65,36 +66,7 @@ export default function AdminDashboard() {
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-                {/* Status Column (Left) - Narrower */}
-                <div className="md:row-span-2 bg-[#1a1a1a] text-white p-6 rounded-[30px] flex flex-col justify-between relative overflow-hidden min-h-[400px]">
-                    <div className="relative z-10 space-y-8">
-                        <div className="space-y-2">
-                             <h4 className="font-['Fragment_Mono'] text-[10px] uppercase tracking-[0.3em] opacity-50">Stato Piattaforma</h4>
-                             <div className="h-px w-8 bg-[var(--gold)]/30" />
-                        </div>
-                        
-                        <div className="space-y-6">
-                            <div>
-                                <div className="text-xl font-light italic font-serif">Ottimale</div>
-                                <div className="text-[9px] uppercase tracking-widest opacity-30 mt-1">Sistemi Cloud</div>
-                            </div>
-                            <div>
-                                <div className="text-xl font-light italic font-serif">12ms</div>
-                                <div className="text-[9px] uppercase tracking-widest opacity-30 mt-1">Latenza Media</div>
-                            </div>
-                            <div>
-                                <div className="text-xl font-light italic font-serif">Attiva</div>
-                                <div className="text-[9px] uppercase tracking-widest opacity-30 mt-1">Redazione</div>
-                            </div>
-                            <div>
-                                <div className="text-xl font-light italic font-serif">v1.2.4</div>
-                                <div className="text-[9px] uppercase tracking-widest opacity-30 mt-1">Versione App</div>
-                            </div>
-                        </div>
-                    </div>
-                    {/* Abstract light effect */}
-                    <div className="absolute top-0 right-0 w-64 h-64 bg-[var(--gold)]/10 blur-[90px] rounded-full -mr-32 -mt-32" />
-                </div>
+                <PlatformStatus />
 
                 {/* Modules Grid (Right) - 3 columns for cards */}
                 {modules.map((module, i) => (

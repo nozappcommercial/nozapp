@@ -35,43 +35,44 @@ export default function AdminHeader() {
     };
 
     return (
-        <header className="h-16 border-b border-black/5 bg-white/50 backdrop-blur-md sticky top-0 z-50 px-8 flex items-center justify-between">
-            {/* Left side: Back to Dashboard if not on root */}
-            <div className="w-1/3 flex items-center">
+        <header className="h-auto min-h-16 border-b border-black/5 bg-white/50 backdrop-blur-md sticky top-0 z-50 px-4 md:px-8 flex items-center justify-between pt-[env(safe-area-inset-top,12px)] pb-2 md:pb-0">
+            <div className="w-1/4 md:w-1/3 flex items-center">
                 {!isRootAdmin && !isVerifyPage && (
                     <Link 
                         href="/admin" 
                         className="flex items-center gap-2 text-[10px] font-['Fragment_Mono'] uppercase tracking-widest text-black/40 hover:text-black transition-colors group"
                     >
-                        <LayoutDashboard size={14} className="group-hover:scale-110 transition-transform" />
-                        Torna alla Dashboard
+                        <div className="w-10 h-10 md:w-auto md:h-auto rounded-full bg-black/5 flex items-center justify-center md:bg-transparent transition-all">
+                            <LayoutDashboard size={14} className="group-hover:scale-110 transition-transform" />
+                        </div>
+                        <span className="hidden md:inline">Torna alla Dashboard</span>
                     </Link>
                 )}
             </div>
 
-            {/* Center: Dynamic Title */}
-            <div className="w-1/3 flex justify-center">
-                <h1 className="text-xl font-medium tracking-tight whitespace-nowrap">
+            <div className="w-2/4 md:w-1/3 flex justify-center text-center">
+                <h1 className="text-lg md:text-xl font-medium tracking-tight whitespace-nowrap overflow-hidden text-ellipsis">
                     NoZapp <span className="text-[var(--gold)] italic">{getPageTitle()}</span>
                 </h1>
             </div>
 
-            {/* Right side: Logout */}
-            <nav className="w-1/3 flex items-center justify-end gap-3 font-['Fragment_Mono'] text-[10px] uppercase tracking-widest">
+            <nav className="w-1/4 md:w-1/3 flex items-center justify-end gap-2 md:gap-3 font-['Fragment_Mono'] text-[10px] uppercase tracking-widest">
                 <Link 
                     href="/sphere"
-                    className="px-4 py-2 border border-black/5 rounded-full hover:bg-black/5 transition-all flex items-center gap-2 text-black/60 hover:text-black"
+                    className="w-10 h-10 md:w-auto md:h-auto md:px-4 md:py-2 border border-black/5 rounded-full hover:bg-black/5 transition-all flex items-center justify-center md:gap-2 text-black/60 hover:text-black"
+                    title="Torna alla Sfera"
                 >
                     <Globe size={14} />
-                    Sfera
+                    <span className="hidden md:inline">Sfera</span>
                 </Link>
                 <button 
                     onClick={handleLogout}
                     disabled={isLoggingOut}
-                    className="px-4 py-2 bg-black text-white rounded-full hover:bg-black/80 transition-all flex items-center gap-2 disabled:opacity-50"
+                    className="w-10 h-10 md:w-auto md:h-auto md:px-4 md:py-2 bg-black text-white rounded-full hover:bg-black/80 transition-all flex items-center justify-center md:gap-2 disabled:opacity-50"
+                    title="Logout"
                 >
                     {isLoggingOut ? <Loader2 size={14} className="animate-spin" /> : <ArrowLeft size={14} />}
-                    LOGOUT
+                    <span className="hidden md:inline">LOGOUT</span>
                 </button>
             </nav>
         </header>
