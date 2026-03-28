@@ -23,6 +23,9 @@ export interface LovedFilm {
 export interface ProfileData {
     email: string;
     memberSince: string;
+    birthDate: string | null;
+    country: string | null;
+    gender: string | null;
     pillars: PillarFilm[];
     lovedFilms: LovedFilm[];
     streamingServices: string[];
@@ -57,10 +60,10 @@ export async function getProfileData(): Promise<ProfileData> {
             .eq('user_id', user.id)
             .eq('interaction_type', 'liked'),
 
-        // 3. User profile (streaming subscriptions)
+        // 3. User profile (streaming subscriptions, birth_date, country, gender)
         supabase
             .from('users')
-            .select('streaming_subscriptions')
+            .select('streaming_subscriptions, birth_date, country, gender')
             .eq('id', user.id)
             .single(),
 
@@ -155,11 +158,35 @@ export async function getProfileData(): Promise<ProfileData> {
     return {
         email: user.email || '',
         memberSince: createdAt,
+        birthDate: userRes.data?.birth_date || null,
+        country: userRes.data?.country || null,
+        gender: userRes.data?.gender || null,
         pillars,
         lovedFilms,
         streamingServices,
         sphereStats: { affinita, scoperta },
     };
+}
+
+/* ─── SAVE PROFILE METADATA ───────────────────────────────────── */
+/**
+ * Update the user's demographic metadata.
+ */
+export async function saveProfileMetadata(birthDate: string | null, country: string | null, gender: string | null): Promise<void> {
+    const supabase = await createClient();
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) throw new Error("Unauthorized");
+
+    const { error } = await supabase
+        .from('users')
+        .update({ 
+            birth_date: birthDate || null, 
+            country: country || null,
+            gender: gender || null
+        })
+        .eq('id', user.id);
+
+    if (error) throw error;
 }
 
 /* ─── REORDER PILLARS ─────────────────────────────────────────── */

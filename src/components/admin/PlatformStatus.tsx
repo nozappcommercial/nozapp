@@ -4,14 +4,21 @@ import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronDown, ChevronUp } from 'lucide-react';
 
+import { getDashboardAnalytics, type DashboardStats } from '@/app/actions/admin_analytics';
+
 export default function PlatformStatus() {
     const [isExpanded, setIsExpanded] = useState(false);
+    const [realStats, setRealStats] = useState<DashboardStats | null>(null);
+
+    React.useEffect(() => {
+        getDashboardAnalytics().then(setRealStats).catch(console.error);
+    }, []);
 
     const stats = [
-        { label: 'Sistemi Cloud', value: 'Ottimale' },
-        { label: 'Latenza Media', value: '12ms' },
-        { label: 'Redazione', value: 'Attiva' },
-        { label: 'Versione App', value: 'v1.2.4' },
+        { label: 'Utenti Iscritti', value: realStats ? realStats.totalUsers.toString() : '...' },
+        { label: 'Engagement Clic', value: realStats ? realStats.totalClicks.toString() : '...' },
+        { label: 'Stato Cloud', value: 'Ottimale' },
+        { label: 'Versione App', value: 'vSphere 2.4' },
     ];
 
     return (

@@ -12,6 +12,9 @@ const OnboardingSchema = z.object({
     })).min(1),
     reactions: z.record(z.string(), z.any()).optional(),
     streaming_subscriptions: z.array(z.string()).optional(),
+    birth_date: z.string().optional(),
+    country: z.string().optional(),
+    gender: z.string().optional(),
     timestamp: z.string().optional()
 });
 
@@ -73,7 +76,15 @@ export async function POST(request: Request) {
             return NextResponse.json({ error: "Invalid payload", details: parsed.error.format() }, { status: 400 });
         }
 
-        const { pillars, reactions, streaming_subscriptions, timestamp } = parsed.data;
+        const { 
+            pillars, 
+            reactions, 
+            streaming_subscriptions, 
+            birth_date, 
+            country, 
+            gender,
+            timestamp 
+        } = parsed.data;
 
         // 2. Delete old pillars and insert new ones
         console.log(`[Onboarding] Saving ${pillars.length} pillars for user ${user.id}`);
@@ -131,7 +142,10 @@ export async function POST(request: Request) {
             .upsert({ 
                 id: user.id, 
                 onboarding_complete: true,
-                streaming_subscriptions: streaming_subscriptions || []
+                streaming_subscriptions: streaming_subscriptions || [],
+                birth_date: birth_date || null,
+                country: country || null,
+                gender: gender || null
             }, { onConflict: "id" })
             .select());
 

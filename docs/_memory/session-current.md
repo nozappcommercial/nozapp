@@ -34,3 +34,43 @@ status: active
 **Side effects**: La RAM si è stabilizzata a circa 1.03 GB. Rimossi avvisi di invalidità in console.
 
 ---
+
+## 10:17 [tipo: feature]
+
+**File toccati**:
+
+- `src/app/api/onboarding/complete/route.ts` — Aggiornata l'API per salvare `birth_date` e `country` nella tabella utenti.
+- `src/components/onboarding/OnboardingFlow.tsx` — Aggiunta una nuova fase "demographics" per raccogliere età e stato durante l'iscrizione.
+- `src/lib/actions/profile_actions.ts` — Estese le azioni del profilo per gestire i nuovi campi demografici.
+- `src/components/profile/ProfileModal.tsx` — Aggiunta sezione "Dati Personali" per visualizzare e modificare età e stato con auto-save.
+- `src/app/actions/admin_users.ts` & `src/app/actions/admin_analytics.ts` — Create nuove azioni server per la gestione amministrativa e il calcolo delle statistiche reali.
+- `src/app/admin/utenti/page.tsx` — Creata pagina di gestione utenti con filtri e toggle permessi admin.
+- `src/app/admin/analisi/page.tsx` — Creata dashboard di analisi con grafici per età, provenienza e click sugli articoli.
+- `src/app/admin/impostazioni/page.tsx` — Creata pagina impostazioni dimostrativa (dummy).
+- `src/app/admin/page.tsx` — Attivati i link ai nuovi moduli e rimosso lo stato "Prossimamente".
+- `src/components/admin/PlatformStatus.tsx` — Integrati dati reali di utenti ed engagement nella dashboard.
+
+**Problema di partenza**: La dashboard admin era statica e priva di funzionalità reali. Mancava la raccolta di dati demografici per l'analisi dell'engagement.
+**Soluzione applicata**: Implementato un sistema end-to-end per la raccolta, visualizzazione e analisi dei dati utente (età, stato, click). Creata un'area admin completa e funzionale con estetica premium.
+**Side effects**: Nessuno notato. La stabilità della memoria è mantenuta.
+
+---
+
+## 10:23 [tipo: feature]
+
+**File toccati**:
+
+- `src/app/api/onboarding/complete/route.ts` — Aggiunto `gender` allo schema Zod e all'upsert del database.
+- `src/components/onboarding/OnboardingFlow.tsx` — Implementata la selezione del sesso ("Uomo", "Donna", "Altro", "Non specificato") nella fase demografica.
+- `src/lib/actions/profile_actions.ts` — Aggiornate le interfacce e le server action per supportare il caricamento e il salvataggio del sesso.
+- `src/components/profile/ProfileModal.tsx` — Aggiunto selettore di genere nella sezione "Dati Personali" con persistenza automatica.
+- `src/app/actions/admin_analytics.ts` — Implementata l'aggregazione statistica della distribuzione per sesso.
+- `src/app/actions/admin_users.ts` — Incluso il campo sesso nel fetching dei dati utente per l'elenco amministrativo.
+- `src/app/admin/utenti/page.tsx` — Aggiunta la colonna "Sesso" nella tabella di gestione utenti.
+- `src/app/admin/analisi/page.tsx` — Inserito un nuovo grafico dinamico nella dashboard admin per visualizzare la distribuzione per sesso degli iscritti.
+
+**Problema di partenza**: Mancava la raccolta e l'analisi del dato relativo al sesso degli utenti, utile per una profilazione demografica completa.
+**Soluzione applicata**: Esteso il sistema demografico end-to-end integrando il campo "sesso" dall'onboarding fino alle analytics della dashboard admin, garantendo la sicurezza dei dati tramite controlli server-side.
+**Side effects**: Nessuno. La stabilità del sistema e le performance delle query rimangono ottimali.
+
+---

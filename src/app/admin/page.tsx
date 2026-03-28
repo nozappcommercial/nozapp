@@ -16,9 +16,8 @@ export default function AdminDashboard() {
             title: 'Utenti',
             description: 'Visualizza e gestisci i permessi degli utenti della piattaforma.',
             icon: Users,
-            href: '#',
+            href: '/admin/utenti',
             color: 'bg-purple-50 text-purple-600',
-            status: 'Prossimamente'
         },
         {
             title: 'Cinema',
@@ -31,17 +30,15 @@ export default function AdminDashboard() {
             title: 'Analisi',
             description: 'Monitora le performance degli articoli e l\'engagement.',
             icon: BarChart3,
-            href: '#',
+            href: '/admin/analisi',
             color: 'bg-green-50 text-green-600',
-            status: 'Prossimamente'
         },
         {
             title: 'Impostazioni',
             description: 'Configura i parametri globali della Sfera Semantica.',
             icon: Settings,
-            href: '#',
+            href: '/admin/impostazioni',
             color: 'bg-orange-50 text-orange-600',
-            status: 'Prossimamente'
         },
         {
             title: 'Template',

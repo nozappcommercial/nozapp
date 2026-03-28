@@ -227,6 +227,75 @@ export default function ProfileModal({ isOpen, onClose }: ProfileModalProps) {
                                     onChange={handleStreamingChange}
                                 />
 
+                                {/* Dati Personali */}
+                                <div className="prf-section prf-anim-2">
+                                    <div className="prf-section-label">Dati Personali</div>
+                                </div>
+                                <div className="prf-demo-form prf-anim-2" style={{ 
+                                    background: 'rgba(0,0,0,0.02)', padding: '20px', borderRadius: '20px', 
+                                    display: 'flex', flexDirection: 'column', gap: '16px', marginBottom: '32px' 
+                                }}>
+                                    <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                                        <label style={{ fontSize: '9px', textTransform: 'uppercase', letterSpacing: '0.1em', opacity: 0.4 }}>Data di Nascita</label>
+                                        <input 
+                                            type="date" 
+                                            value={data.birthDate || ''} 
+                                            onChange={async (e) => {
+                                                const val = e.target.value;
+                                                setData(prev => prev ? { ...prev, birthDate: val } : prev);
+                                                const { saveProfileMetadata } = await import('@/lib/actions/profile_actions');
+                                                await saveProfileMetadata(val, data.country, data.gender);
+                                            }}
+                                            style={{ 
+                                                border: 'none', background: 'transparent', padding: '0', 
+                                                fontFamily: 'var(--font-mono)', fontSize: '13px', outline: 'none' 
+                                            }}
+                                        />
+                                    </div>
+                                    <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                                        <label style={{ fontSize: '9px', textTransform: 'uppercase', letterSpacing: '0.1em', opacity: 0.4 }}>Genere</label>
+                                        <select 
+                                            value={data.gender || 'Non specificato'} 
+                                            onChange={async (e) => {
+                                                const val = e.target.value;
+                                                setData(prev => prev ? { ...prev, gender: val } : prev);
+                                                const { saveProfileMetadata } = await import('@/lib/actions/profile_actions');
+                                                await saveProfileMetadata(data.birthDate, data.country, val);
+                                            }}
+                                            style={{ 
+                                                border: 'none', background: 'transparent', padding: '0', 
+                                                fontFamily: 'var(--font-mono)', fontSize: '13px', outline: 'none',
+                                                appearance: 'none', width: '100%' 
+                                            }}
+                                        >
+                                            {["Uomo", "Donna", "Altro", "Non specificato"].map(g => (
+                                                <option key={g} value={g}>{g}</option>
+                                            ))}
+                                        </select>
+                                    </div>
+                                    <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                                        <label style={{ fontSize: '9px', textTransform: 'uppercase', letterSpacing: '0.1em', opacity: 0.4 }}>Stato</label>
+                                        <select 
+                                            value={data.country || 'Italia'} 
+                                            onChange={async (e) => {
+                                                const val = e.target.value;
+                                                setData(prev => prev ? { ...prev, country: val } : prev);
+                                                const { saveProfileMetadata } = await import('@/lib/actions/profile_actions');
+                                                await saveProfileMetadata(data.birthDate, val, data.gender);
+                                            }}
+                                            style={{ 
+                                                border: 'none', background: 'transparent', padding: '0', 
+                                                fontFamily: 'var(--font-mono)', fontSize: '13px', outline: 'none',
+                                                appearance: 'none', width: '100%' 
+                                            }}
+                                        >
+                                            {["Italia", "Stati Uniti", "Regno Unito", "Francia", "Germania", "Spagna", "Giappone", "Canada", "Australia", "Altro"].map(c => (
+                                                <option key={c} value={c}>{c}</option>
+                                            ))}
+                                        </select>
+                                    </div>
+                                </div>
+
                                 {/* Loved Films */}
                                 <ProfileLovedFilms films={data.lovedFilms} />
                             </div>

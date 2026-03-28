@@ -9,7 +9,7 @@ const FONTS_URL = "https://fonts.googleapis.com/css2?family=Cormorant+Garamond:i
 const MAX_PILLARS = 6;
 
 type Reaction = "loved" | "disliked" | "seen" | "unseen";
-type Phase = "welcome" | "step" | "confirm" | "streaming" | "done";
+type Phase = "welcome" | "step" | "confirm" | "streaming" | "demographics" | "done";
 
 const STREAMING_PLATFORMS = [
   { id: "Netflix", name: "Netflix" },
@@ -47,6 +47,9 @@ export default function OnboardingFlow({ films }: OnboardingFlowProps) {
   const [reactions, setReactions] = useState<Record<number, Reaction>>({});
   const [pillars, setPillars] = useState<OnboardingFilm[]>([]);
   const [subscriptions, setSubscriptions] = useState<string[]>([]);
+  const [birthDate, setBirthDate] = useState("");
+  const [country, setCountry] = useState("Italia");
+  const [gender, setGender] = useState("Non specificato");
   const [cardAnim, setCardAnim] = useState("idle");
   const [stepDone, setStepDone] = useState(false);
   const [replacingPillar, setReplacingPillar] = useState<number | null>(null);
@@ -188,6 +191,9 @@ export default function OnboardingFlow({ films }: OnboardingFlowProps) {
         })),
         reactions, // Use the raw object {id: reaction}
         streaming_subscriptions: subscriptions,
+        birth_date: birthDate,
+        country: country,
+        gender: gender,
         timestamp: new Date().toISOString(),
       };
 
@@ -627,12 +633,84 @@ export default function OnboardingFlow({ films }: OnboardingFlowProps) {
               </div>
 
               <div className="ob-streaming-foot" style={{ marginTop: "40px", display: "flex", flexDirection: "column", alignItems: "center", gap: "16px" }}>
-                <button className="ob-btn-p" onClick={handleConfirm} disabled={saving}>
-                  {saving ? "Creando la tua Sfera..." : "Entra nella Sfera →"}
+                <button className="ob-btn-p" onClick={() => pageTransition(() => setPhase("demographics"))}>
+                  Prosegui →
                 </button>
                 <div style={{ fontFamily: "var(--ob-mono)", fontSize: "9px", letterSpacing: "0.1em", opacity: 0.5, textTransform: "uppercase" }}>
                   I bottoni "Guarda ora su" si illumineranno per farti sapere quando un film è incluso.
                 </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* ═══ DEMOGRAPHICS ═══ */}
+        {phase === "demographics" && (
+          <div className="ob-streaming-shell">
+            <div className="ob-welcome">
+              <div className="ob-eyebrow">Quasi finito</div>
+              <h2 className="ob-w-title" style={{ fontSize: "clamp(36px, 8vw, 64px)", marginBottom: "20px" }}>Un tocco di <em>realtà</em></h2>
+              <p className="ob-w-sub">Per offrirti analisi più precise,<br />abbiamo bisogno di conoscerti un po&apos; meglio.</p>
+              
+              <div className="ob-demo-form" style={{ marginTop: "40px", display: "flex", flexDirection: "column", gap: "24px", width: "100%", maxWidth: "400px" }}>
+                <div className="ob-form-group" style={{ display: "flex", flexDirection: "column", gap: "8px", textAlign: "left" }}>
+                  <label style={{ fontFamily: "var(--ob-mono)", fontSize: "10px", letterSpacing: "0.1em", textTransform: "uppercase", opacity: 0.6 }}>Data di Nascita</label>
+                  <input 
+                    type="date" 
+                    value={birthDate} 
+                    onChange={(e) => setBirthDate(e.target.value)}
+                    className="ob-form-input"
+                    style={{ 
+                      width: "100%", padding: "16px", borderRadius: "12px", border: "1px solid var(--ob-cream-dark)",
+                      background: "white", fontFamily: "var(--ob-mono)", fontSize: "14px", outline: "none"
+                    }}
+                  />
+                </div>
+
+                <div className="ob-form-group" style={{ display: "flex", flexDirection: "column", gap: "8px", textAlign: "left" }}>
+                  <label style={{ fontFamily: "var(--ob-mono)", fontSize: "10px", letterSpacing: "0.1em", textTransform: "uppercase", opacity: 0.6 }}>Genere</label>
+                  <select 
+                    value={gender} 
+                    onChange={(e) => setGender(e.target.value)}
+                    className="ob-form-input"
+                    style={{ 
+                      width: "100%", padding: "16px", borderRadius: "12px", border: "1px solid var(--ob-cream-dark)",
+                      background: "white", fontFamily: "var(--ob-mono)", fontSize: "14px", outline: "none",
+                      appearance: "none", backgroundImage: "url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2224%22%20height%3D%2224%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%231A1614%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpolyline%20points%3D%226%209%2012%2015%2018%209%22%3E%3C%2Fpolyline%3E%3C%2Fsvg%3E')",
+                      backgroundRepeat: "no-repeat", backgroundPosition: "right 16px center", backgroundSize: "16px"
+                    }}
+                  >
+                    <option value="Uomo">Uomo</option>
+                    <option value="Donna">Donna</option>
+                    <option value="Altro">Altro</option>
+                    <option value="Non specificato">Non specificato</option>
+                  </select>
+                </div>
+
+                <div className="ob-form-group" style={{ display: "flex", flexDirection: "column", gap: "8px", textAlign: "left" }}>
+                  <label style={{ fontFamily: "var(--ob-mono)", fontSize: "10px", letterSpacing: "0.1em", textTransform: "uppercase", opacity: 0.6 }}>Stato di Residenza</label>
+                  <select 
+                    value={country} 
+                    onChange={(e) => setCountry(e.target.value)}
+                    className="ob-form-input"
+                    style={{ 
+                      width: "100%", padding: "16px", borderRadius: "12px", border: "1px solid var(--ob-cream-dark)",
+                      background: "white", fontFamily: "var(--ob-mono)", fontSize: "14px", outline: "none",
+                      appearance: "none", backgroundImage: "url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2224%22%20height%3D%2224%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%231A1614%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpolyline%20points%3D%226%209%2012%2015%2018%209%22%3E%3C%2Fpolyline%3E%3C%2Fsvg%3E')",
+                      backgroundRepeat: "no-repeat", backgroundPosition: "right 16px center", backgroundSize: "16px"
+                    }}
+                  >
+                    {["Italia", "Stati Uniti", "Regno Unito", "Francia", "Germania", "Spagna", "Giappone", "Canada", "Australia", "Altro"].map(c => (
+                      <option key={c} value={c}>{c}</option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+
+              <div className="ob-streaming-foot" style={{ marginTop: "48px", display: "flex", flexDirection: "column", alignItems: "center", gap: "16px" }}>
+                <button className="ob-btn-p" onClick={handleConfirm} disabled={saving}>
+                  {saving ? "Creando la tua Sfera..." : "Entra nella Sfera →"}
+                </button>
               </div>
             </div>
           </div>

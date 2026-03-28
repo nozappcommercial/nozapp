@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import { ArrowLeft, LayoutDashboard, Loader2, Globe } from 'lucide-react';
+import { ArrowLeft, LayoutDashboard, Loader2, Globe, LogOut } from 'lucide-react';
 import { signOutAction } from '@/app/actions/admin_auth';
 
 export default function AdminHeader() {
@@ -68,10 +68,10 @@ export default function AdminHeader() {
                 <button 
                     onClick={handleLogout}
                     disabled={isLoggingOut}
-                    className="w-10 h-10 md:w-auto md:h-auto md:px-4 md:py-2 bg-black text-white rounded-full hover:bg-black/80 transition-all flex items-center justify-center md:gap-2 disabled:opacity-50"
+                    className="w-10 h-10 md:w-auto md:h-auto md:px-4 md:py-2 bg-red-50 text-red-600 border border-red-200 rounded-full hover:bg-red-600 hover:text-white transition-all flex items-center justify-center md:gap-2 disabled:opacity-50"
                     title="Logout"
                 >
-                    {isLoggingOut ? <Loader2 size={14} className="animate-spin" /> : <ArrowLeft size={14} />}
+                    {isLoggingOut ? <Loader2 size={14} className="animate-spin" /> : <LogOut size={14} />}
                     <span className="hidden md:inline">LOGOUT</span>
                 </button>
             </nav>
