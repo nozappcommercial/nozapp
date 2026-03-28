@@ -44,11 +44,11 @@ export default function ContattiPage() {
                     <div className="space-y-8 pt-8">
                         <ScrollReveal delay={0.5} y={20} className="group space-y-2">
                             <p className="font-['Fragment_Mono'] text-[9px] uppercase tracking-[0.3em] opacity-40">Email Generale</p>
-                            <a href="mailto:info@nozapp.com" className="text-3xl md:text-4xl font-light hover:text-[var(--gold)] transition-colors duration-500">info@nozapp.com</a>
+                            <a href="mailto:info@nozapp.com" className="text-3xl md:text-4xl font-light hover:text-[var(--gold)] transition-colors duration-500">nozapp.comemrcial@gmail.com</a>
                         </ScrollReveal>
                         <ScrollReveal delay={0.6} y={20} className="group space-y-2">
                             <p className="font-['Fragment_Mono'] text-[9px] uppercase tracking-[0.3em] opacity-40">Proposte Editoriali</p>
-                            <a href="mailto:redazione@nozapp.com" className="text-3xl md:text-4xl font-light hover:text-[var(--gold)] transition-colors duration-500">redazione@nozapp.com</a>
+                            <a href="mailto:redazione@nozapp.com" className="text-3xl md:text-4xl font-light hover:text-[var(--gold)] transition-colors duration-500">nozapp.redazione@gmail.com</a>
                         </ScrollReveal>
                     </div>
                 </div>

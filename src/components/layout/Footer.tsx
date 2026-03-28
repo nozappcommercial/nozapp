@@ -14,7 +14,7 @@ export default function Footer() {
 
     const footerLinks = [
         { name: 'Manifesto', href: '/manifesto' },
-        { name: 'Redazione', href: '/redazione-info' },
+        { name: 'Redazione', href: '/redazione' },
         { name: 'Archivio', href: '/archivio' },
         { name: 'Contatti', href: '/contatti' },
     ];

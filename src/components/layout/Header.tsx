@@ -66,7 +66,7 @@ export default function Header() {
         pathname === '/manifesto' || 
         pathname === '/archivio' || 
         pathname === '/contatti' || 
-        pathname === '/redazione-info';
+        pathname === '/redazione';
 
     const shouldHideHeader = isLoginOrOnboarding || isAdminRoute || isEditorialRoute;
 

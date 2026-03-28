@@ -1,101 +1,102 @@
 import React from 'react';
-import Image from 'next/image';
 import Link from 'next/link';
-import { ArrowRight, Sparkles } from 'lucide-react';
-import { getPublishedArticles } from '@/app/actions/editorial';
+import { ArrowLeft, User, Mail, Globe, Sparkles } from 'lucide-react';
+import ScrollReveal from '@/components/animations/ScrollReveal';
 import Footer from '@/components/layout/Footer';
 import BackToTop from '@/components/layout/BackToTop';
 
-export const dynamic = 'force-dynamic';
+const teamMembers = [
+    { name: 'Nome Cognome', role: 'Direttore Creativo & Tech Lead', bio: 'Visionario digitale, appassionato di linguaggi visuali e architetture semantiche. Guida lo sviluppo tecnologico di NoZapp con un occhio alla bellezza pura.' },
+    { name: 'Nome Cognome', role: 'Caporedattrice Editoriale', bio: 'Critica cinematografica con oltre dieci anni di esperienza. Cura la selezione dei contenuti e la profondità dell\'analisi critica.' },
+    { name: 'Nome Cognome', role: 'Curatore della Sfera', bio: 'Esperto di catalogazione cinematografica. Si occupa delle connessioni tematiche e dei metadati che rendono viva la nostra sfera.' },
+    { name: 'Nome Cognome', role: 'Design & Visual Experience', bio: 'Cura l\'estetica del progetto, assicurandosi che ogni pixel trasmetta l\'eleganza e il silenzio visivo che ci contraddistingue.' },
+];
 
-const formatDate = (dateStr: string) => {
-    return new Intl.DateTimeFormat('it-IT', {
-        day: '2-digit',
-        month: 'long',
-        year: 'numeric'
-    }).format(new Date(dateStr));
-};
-
-export default async function RedazioneListingPage() {
-    const articles = await getPublishedArticles();
-
+export default function RedazionePage() {
     return (
-        <main className="min-h-screen bg-[#faf7f2] font-['Cormorant_Garamond'] relative">
-            {/* Header / Intro */}
-            <header className="pt-12 pb-20 px-8 md:px-16 lg:px-24 max-w-7xl mx-auto space-y-12">
+        <main className="min-h-screen bg-[#faf7f2] font-['Cormorant_Garamond'] selection:bg-[var(--gold)]/20 relative">
+            {/* Minimal Header */}
+            <header className="pt-12 pb-12 px-8 md:px-16 lg:px-24 max-w-7xl mx-auto">
                 <Link 
                     href="/sphere" 
                     className="inline-flex items-center gap-2 text-[10px] font-['Fragment_Mono'] uppercase tracking-[0.4em] opacity-40 hover:opacity-100 transition-opacity group"
                 >
-                    ⇠ Torna alla Sfera
+                    <ArrowLeft size={12} className="group-hover:-translate-x-1 transition-transform" /> 
+                    Torna alla Sfera
                 </Link>
-                
-                <div className="space-y-6">
-                    <div className="flex items-center gap-3 text-[var(--gold)]">
-                        <Sparkles size={16} strokeWidth={1.5} />
-                        <span className="font-['Fragment_Mono'] text-[10px] uppercase tracking-[0.3em]">Archivio Editoriale</span>
-                    </div>
-                    <h1 className="text-7xl md:text-9xl font-light leading-[0.8] tracking-tighter">
-                        La <em className="italic text-[var(--gold)]">Redazione</em>
-                    </h1>
-                    <p className="text-2xl md:text-3xl font-light opacity-60 max-w-2xl leading-relaxed">
-                        Esplorazioni critiche, interviste e riflessioni sul cinema che abita la nostra sfera semantica.
-                    </p>
-                </div>
             </header>
 
-            {/* Articles Grid */}
-            <section className="px-8 md:px-16 lg:px-24 max-w-7xl mx-auto pb-32">
-                {articles.length > 0 ? (
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-24">
-                        {articles.map((article: any, index: number) => (
-                            <Link 
-                                key={article.id}
-                                href={`/redazione/${article.slug}`}
-                                className="group flex flex-col space-y-6 animate-in fade-in slide-in-from-bottom-12 duration-1000"
-                                style={{ animationDelay: `${index * 150}ms` }}
-                            >
-                                <div className="relative aspect-[16/10] overflow-hidden rounded-sm bg-black/5">
-                                    {article.cover_image ? (
-                                        <Image
-                                            src={article.cover_image}
-                                            alt={article.title}
-                                            fill
-                                            className="object-cover transition-all duration-1000 mix-blend-multiply group-hover:scale-105 group-hover:mix-blend-normal"
-                                        />
-                                    ) : (
-                                        <div className="w-full h-full bg-[#1a1a1a]/5" />
-                                    )}
-                                    <div className="absolute inset-0 bg-black/5 group-hover:bg-transparent transition-colors duration-500" />
-                                </div>
-                                
-                                <div className="space-y-4">
-                                    <div className="flex items-center gap-4 font-['Fragment_Mono'] text-[9px] uppercase tracking-[0.2em] opacity-40">
-                                        <span>{article.published_at ? formatDate(article.published_at) : ''}</span>
-                                        <span className="h-px w-8 bg-black/10" />
-                                        <span>{article.author?.display_name || 'Redazione'}</span>
-                                    </div>
-                                    <h2 className="text-4xl md:text-5xl font-light leading-[0.9] tracking-tight group-hover:text-[var(--gold)] transition-colors duration-500">
-                                        {article.title}
-                                    </h2>
-                                    {article.excerpt && (
-                                        <p className="text-lg md:text-xl font-light opacity-60 leading-relaxed line-clamp-3">
-                                            {article.excerpt}
-                                        </p>
-                                    )}
-                                    <div className="pt-4 flex items-center gap-2 text-[10px] font-['Fragment_Mono'] uppercase tracking-[0.2em] opacity-0 group-hover:opacity-100 transition-all duration-500 translate-x-[-10px] group-hover:translate-x-0">
-                                        Continua a leggere <ArrowRight size={12} />
-                                    </div>
-                                </div>
-                            </Link>
-                        ))}
-                    </div>
-                ) : (
-                    <div className="py-20 text-center border-t border-black/5 opacity-40">
-                        <p className="font-['Fragment_Mono'] text-sm uppercase tracking-widest">Nessun articolo pubblicato al momento.</p>
-                    </div>
-                )}
+            {/* Intro Hero */}
+            <section className="px-8 md:px-16 lg:px-24 max-w-7xl mx-auto py-20 md:py-32 space-y-12">
+                <div className="space-y-6">
+                    <ScrollReveal delay={0.1}>
+                        <h4 className="font-['Fragment_Mono'] text-[10px] md:text-[12px] uppercase tracking-[0.5em] text-[var(--gold)]">
+                            Dietro lo <span className="opacity-50 italic">Schermo</span>
+                        </h4>
+                    </ScrollReveal>
+                    <ScrollReveal delay={0.2} y={50}>
+                        <h1 className="text-6xl md:text-8xl lg:text-9xl font-light leading-[0.85] tracking-tight text-[#1a1a1a]">
+                            La nostra <br /> <em className="italic font-serif">Redazione.</em>
+                        </h1>
+                    </ScrollReveal>
+                </div>
+                <ScrollReveal delay={0.4} y={40}>
+                    <p className="text-2xl md:text-4xl font-light leading-relaxed text-[#1a1a1a]/60 max-w-4xl">
+                        Un collettivo di sognatori, critici e designer uniti da un'unica missione: restituire al cinema la sua dignità visiva.
+                    </p>
+                </ScrollReveal>
             </section>
+
+            {/* Team Grid */}
+            <section className="px-8 md:px-16 lg:px-24 max-w-7xl mx-auto py-20 md:py-32 grid grid-cols-1 md:grid-cols-2 gap-x-16 gap-y-24">
+                {teamMembers.map((member, i) => (
+                    <ScrollReveal key={i} delay={0.2 + (i * 0.1)} y={60}>
+                    <div className="group space-y-8">
+                        <div className="relative aspect-[4/5] bg-black/5 rounded-sm overflow-hidden ring-1 ring-black/5 group-hover:ring-black/10 transition-all duration-700">
+                            {/* Dummy Profile Overlay */}
+                            <div className="absolute inset-0 flex items-center justify-center text-black/5 group-hover:scale-110 transition-transform duration-1000">
+                                <User size={200} strokeWidth={0.5} />
+                            </div>
+                            <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
+                        </div>
+                        
+                        <div className="space-y-4">
+                            <div className="space-y-1">
+                                <h3 className="text-3xl md:text-5xl font-light group-hover:text-[var(--gold)] transition-colors duration-500">{member.name}</h3>
+                                <p className="font-['Fragment_Mono'] text-[10px] uppercase tracking-[0.3em] opacity-40">{member.role}</p>
+                            </div>
+                            <p className="text-xl leading-relaxed text-[#1a1a1a]/70 max-w-md">
+                                {member.bio}
+                            </p>
+                            <div className="flex gap-4 pt-4">
+                                <Link href="#" className="w-10 h-10 rounded-full border border-black/5 flex items-center justify-center hover:bg-black hover:text-white transition-all duration-300">
+                                    <Mail size={16} strokeWidth={1.5} />
+                                </Link>
+                                <Link href="#" className="w-10 h-10 rounded-full border border-black/5 flex items-center justify-center hover:bg-black hover:text-white transition-all duration-300">
+                                    <Globe size={16} strokeWidth={1.5} />
+                                </Link>
+                            </div>
+                        </div>
+                    </div>
+                    </ScrollReveal>
+                ))}
+            </section>
+
+            {/* Call to action */}
+            <ScrollReveal className="px-8 md:px-16 lg:px-24 max-w-7xl mx-auto py-20 mb-20 text-center space-y-12">
+                <div className="flex justify-center">
+                    <Sparkles className="text-[var(--gold)] opacity-40" size={32} strokeWidth={1} />
+                </div>
+                <h2 className="text-3xl md:text-5xl font-light">Vuoi unirti alla nostra visione?</h2>
+                <div className="flex justify-center">
+                    <Link 
+                        href="/contatti" 
+                        className="px-12 py-4 bg-black text-white text-[10px] font-['Fragment_Mono'] uppercase tracking-[0.4em] rounded-full hover:bg-[var(--gold)] transition-all duration-500"
+                    >
+                        Invia la tua candidatura
+                    </Link>
+                </div>
+            </ScrollReveal>
 
             <Footer />
             <BackToTop />

@@ -43,8 +43,8 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
 
     return (
         <main className="min-h-screen bg-[#faf7f2] font-['Cormorant_Garamond'] selection:bg-[var(--gold)]/20 relative">
-            {/* Clean Header Section */}
-            <header className="pt-16 pb-16 px-8 md:px-16 lg:px-24 max-w-6xl mx-auto space-y-12 text-left">
+            {/* Full viewport Hero section */}
+            <section className="min-h-[90vh] flex flex-col justify-between px-8 md:px-16 lg:px-24 py-12 md:py-16 max-w-7xl mx-auto">
                 <nav className="flex flex-wrap items-center gap-8 text-[10px] font-['Fragment_Mono'] uppercase tracking-[0.4em] opacity-40">
                     <Link 
                         href="/sphere" 
@@ -55,14 +55,14 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
                     </Link>
                     <span className="opacity-20">/</span>
                     <Link 
-                        href="/redazione" 
+                        href="/archivio" 
                         className="inline-flex items-center gap-2 hover:opacity-100 transition-opacity"
                     >
-                        Redazione NoZapp
+                        Archivio NoZapp
                     </Link>
                 </nav>
                 
-                <div className="space-y-8 animate-in fade-in slide-in-from-bottom-8 duration-1000">
+                <div className="space-y-8 animate-in fade-in slide-in-from-bottom-8 duration-1000 max-w-6xl">
                     <div className="flex flex-wrap items-center gap-x-6 gap-y-2 font-['Fragment_Mono'] text-[10px] uppercase tracking-[0.3em] text-[var(--gold)]">
                         <span className="flex items-center gap-2">
                             <Calendar size={12} strokeWidth={1.5} />
@@ -77,11 +77,15 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
                         <span>{article.author?.display_name || 'Redazione'}</span>
                     </div>
                     
-                    <h1 className="text-6xl md:text-8xl lg:text-9xl font-light leading-[0.85] tracking-tight text-[#1a1a1a] text-balance max-w-6xl">
+                    <h1 className="text-6xl md:text-8xl lg:text-9xl font-light leading-[0.85] tracking-tight text-[#1a1a1a] text-balance">
                         {article.title}
                     </h1>
                 </div>
-            </header>
+
+                <div className="flex justify-start animate-bounce opacity-20">
+                    <span className="font-['Fragment_Mono'] text-[8px] uppercase tracking-[0.4em]">Esplora il contenuto ⇢</span>
+                </div>
+            </section>
 
             {/* Featured Image - Animated on scroll */}
             {article.cover_image && (
@@ -122,10 +126,10 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
                     </ReactMarkdown>
                 </div>
 
-                <div className="pt-2">
+                <div className="pt-12">
                     <hr className="border-black/5" />
 
-                    <footer className="flex flex-col md:flex-row md:items-center justify-between gap-12 py-16">
+                    <footer className="flex flex-col md:flex-row md:items-center justify-between gap-12 py-12">
                         <div className="flex items-center gap-6">
                             <div className="relative w-16 h-16 rounded-full ring-1 ring-black/10 overflow-hidden bg-black/5 flex items-center justify-center">
                                 <User size={24} strokeWidth={1} className="opacity-40" />

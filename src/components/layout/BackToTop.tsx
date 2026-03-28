@@ -35,7 +35,7 @@ export default function BackToTop() {
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: 20 }}
                     onClick={scrollToTop}
-                    className="fixed bottom-12 left-1/2 -translate-x-1/2 z-[100] flex flex-col items-center gap-2 group"
+                    className="fixed bottom-12 left-1/2 -translate-x-1/2 z-[100] flex flex-col items-center gap-2 group w-max"
                 >
                     <div className="w-10 h-10 rounded-full bg-black text-white flex items-center justify-center hover:bg-[var(--gold)] transition-all duration-500 shadow-xl group-active:scale-90">
                         <ChevronUp size={16} strokeWidth={1.5} />

@@ -61,3 +61,20 @@ status: active
 **Side effects**: Nessuno. L'esperienza di lettura è ora più pulita e focalizzata.
 
 ---
+
+## 19:45 [tipo: feature | refactor]
+
+**File toccati**:
+
+- `src/app/redazione/page.tsx` — Migrazione dei contenuti dalla rotta `/redazione-info` e rimozione della vecchia lista articoli.
+- `src/components/layout/RouteProgress.tsx` — [NEW] Componente globale per feedback di caricamento e reset dello scroll su ogni cambio pagina.
+- `src/app/layout.tsx` — Integrazione di `RouteProgress` all'interno di un Suspense boundary.
+- `src/app/redazione/[slug]/page.tsx` e `src/app/manifesto/page.tsx` — Implementazione delle sezioni Hero "Title-first" con altezza `min-h-[90vh]` e indicatori di scroll.
+- `src/components/layout/BackToTop.tsx` — Ottimizzato il centramento tramite `w-max` e allineamento all'asse centrale.
+- `src/components/layout/Footer.tsx` e `src/components/layout/Header.tsx` — Aggiornati i link e la logica di visibilità per riflettere le nuove rotte.
+
+**Problema di partenza**: Necessità di feedback visivo immediato durante la navigazione, desiderio di un impatto visivo più monumentale nei titoli di apertura e pulizia delle rotte editoriali.
+**Soluzione applicata**: Riprogettate le sezioni Hero per bloccare la visuale iniziale sul solo titolo, introdotta una barra di avanzamento dorata superiore e consolidata la rotta `/redazione` eliminando i ridondanti.
+**Side effects**: Nessuno. La navigazione risulta ora più "intenzionale" e gratificante.
+
+---

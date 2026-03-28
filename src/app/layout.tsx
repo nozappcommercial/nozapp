@@ -4,6 +4,8 @@ import { Analytics } from "@vercel/analytics/react";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import AppLoader from "@/components/layout/AppLoader";
 import AuthHandler from "@/components/auth/AuthHandler";
+import RouteProgress from "@/components/layout/RouteProgress";
+import { Suspense } from "react";
 import "./globals.css";
 
 const cormorantGaramond = Cormorant_Garamond({
@@ -62,6 +64,9 @@ export default function RootLayout({
         className={`${cormorantGaramond.variable} ${fragmentMono.variable} antialiased`}
       >
         <AppLoader />
+        <Suspense fallback={null}>
+          <RouteProgress />
+        </Suspense>
         <AuthHandler />
         <Header />
         {children}

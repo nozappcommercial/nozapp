@@ -8,8 +8,8 @@ import BackToTop from '@/components/layout/BackToTop';
 export default function ManifestoPage() {
     return (
         <main className="min-h-screen bg-[#faf7f2] font-['Cormorant_Garamond'] selection:bg-[var(--gold)]/20 relative">
-            {/* Minimal Header */}
-            <header className="pt-12 pb-12 px-8 md:px-16 lg:px-24 max-w-5xl mx-auto">
+            {/* Full viewport Hero section */}
+            <section className="min-h-[90vh] flex flex-col justify-between px-8 md:px-16 lg:px-24 py-12 md:py-16 max-w-7xl mx-auto">
                 <Link 
                     href="/sphere" 
                     className="inline-flex items-center gap-2 text-[10px] font-['Fragment_Mono'] uppercase tracking-[0.4em] opacity-40 hover:opacity-100 transition-opacity group"
@@ -17,10 +17,7 @@ export default function ManifestoPage() {
                     <ArrowLeft size={12} className="group-hover:-translate-x-1 transition-transform" /> 
                     Torna alla Sfera
                 </Link>
-            </header>
 
-            {/* Content Section */}
-            <section className="px-8 md:px-16 lg:px-24 max-w-5xl mx-auto py-20 md:py-32 space-y-24">
                 <div className="space-y-6">
                     <ScrollReveal delay={0.1}>
                         <h4 className="font-['Fragment_Mono'] text-[10px] md:text-[12px] uppercase tracking-[0.5em] text-[var(--gold)]">
@@ -34,6 +31,12 @@ export default function ManifestoPage() {
                     </ScrollReveal>
                 </div>
 
+                <div className="flex justify-start animate-bounce opacity-20">
+                    <span className="font-['Fragment_Mono'] text-[8px] uppercase tracking-[0.4em]">Il perché della Sfera ⇢</span>
+                </div>
+            </section>
+            {/* Content Section */}
+            <section className="px-8 md:px-16 lg:px-24 max-w-5xl mx-auto py-20 md:py-32 space-y-24">
                 <div className="flex justify-center -mt-12 mb-20">
                     <div className="w-px h-32 bg-gradient-to-t from-[var(--gold)] to-transparent" />
                 </div>
