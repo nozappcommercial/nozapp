@@ -39,7 +39,7 @@ export async function getDashboardUsers(): Promise<DashboardUser[]> {
     
     const { data: publicUsers, error: publicError } = await adminSupabase
         .from('users')
-        .select('id, display_name, email, is_admin, birth_date, country, gender, onboarding_complete, created_at')
+        .select('id, display_name, is_admin, birth_date, country, gender, onboarding_complete, created_at')
         .order('created_at', { ascending: false });
 
     if (publicError) throw publicError;
