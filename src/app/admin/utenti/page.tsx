@@ -141,85 +141,97 @@ export default function AdminUsersPage() {
             ) : (
                 <div className="bg-white rounded-[32px] ring-1 ring-black/5 overflow-hidden shadow-2xl shadow-black/5">
                     <div className="overflow-x-auto">
-                        <table className="w-full text-left border-collapse min-w-[800px]">
+                        <table className="w-full text-left border-collapse min-w-[900px]">
                             <thead>
-                                <tr className="bg-black font-mono text-[9px] uppercase tracking-widest text-white/50">
-                                    <th className="px-8 py-5">Utente</th>
-                                    <th className="px-6 py-5">Stato & Età</th>
-                                    <th className="px-6 py-5">Sesso</th>
-                                    <th className="px-6 py-5">Creato il</th>
-                                    <th className="px-6 py-5">Ruolo</th>
-                                    <th className="px-8 py-5 text-right">Azioni</th>
+                                <tr className="bg-[#0a0a0a] font-mono text-[9px] uppercase tracking-[0.2em] text-white/40">
+                                    <th className="px-10 py-6 border-b border-white/5">Utente</th>
+                                    <th className="px-8 py-6 border-b border-white/5">Bio & Area</th>
+                                    <th className="px-8 py-6 border-b border-white/5">Genere</th>
+                                    <th className="px-8 py-6 border-b border-white/5">Creato il</th>
+                                    <th className="px-8 py-6 border-b border-white/5">Livello</th>
+                                    <th className="px-10 py-6 border-b border-white/5 text-right">Controlli</th>
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-black/5">
                                 {loading && users.length === 0 ? (
                                     Array(5).fill(0).map((_, i) => (
                                         <tr key={i} className="animate-pulse">
-                                            <td className="px-8 py-6"><div className="h-4 bg-black/5 rounded w-32" /></td>
-                                            <td className="px-6 py-6"><div className="h-4 bg-black/5 rounded w-24" /></td>
-                                            <td className="px-6 py-6"><div className="h-4 bg-black/5 rounded w-20" /></td>
-                                            <td className="px-6 py-6"><div className="h-4 bg-black/5 rounded w-16" /></td>
-                                            <td className="px-6 py-6"><div className="h-4 bg-black/5 rounded w-16" /></td>
-                                            <td className="px-8 py-6"><div className="h-4 bg-black/5 rounded w-8 ml-auto" /></td>
+                                            <td className="px-10 py-8"><div className="h-4 bg-black/5 rounded w-32" /></td>
+                                            <td className="px-8 py-8"><div className="h-4 bg-black/5 rounded w-24" /></td>
+                                            <td className="px-8 py-8"><div className="h-4 bg-black/5 rounded w-20" /></td>
+                                            <td className="px-8 py-8"><div className="h-4 bg-black/5 rounded w-16" /></td>
+                                            <td className="px-8 py-8"><div className="h-4 bg-black/5 rounded w-16" /></td>
+                                            <td className="px-10 py-8"><div className="h-4 bg-black/5 rounded w-8 ml-auto" /></td>
                                         </tr>
                                     ))
                                 ) : (
                                     filteredUsers.map((user) => (
-                                        <tr key={user.id} className="group hover:bg-black/[0.01] transition-colors">
-                                            <td className="px-8 py-6">
-                                                <div className="flex items-center gap-4">
-                                                    <div className="w-10 h-10 rounded-full bg-[var(--gold)]/10 text-[var(--gold)] flex items-center justify-center font-serif italic text-lg shadow-inner">
+                                        <tr key={user.id} className="group hover:bg-black/[0.02] transition-all duration-300">
+                                            <td className="px-10 py-8">
+                                                <div className="flex items-center gap-5">
+                                                    <div className="w-12 h-12 rounded-2xl bg-black/[0.03] border border-black/5 flex items-center justify-center font-serif italic text-xl text-black/40 group-hover:bg-black group-hover:text-white transition-all duration-500 shadow-sm">
                                                         {(user.display_name || user.email || 'A')[0].toUpperCase()}
                                                     </div>
-                                                    <div className="space-y-0.5">
-                                                        <div className="font-medium text-black/80">{user.display_name || 'Utente anonimo'}</div>
-                                                        <div className="text-[11px] font-mono text-black/30 flex items-center gap-1.5">
+                                                    <div className="space-y-1">
+                                                        <div className="font-medium text-black/80 tracking-tight group-hover:text-black transition-colors">{user.display_name || 'Utente anonimo'}</div>
+                                                        <div className="text-[11px] font-mono text-black/30 flex items-center gap-2">
                                                             {user.email} 
-                                                            {user.onboarding_complete && <span className="text-[var(--gold)]">· ONBOARDED</span>}
+                                                            {user.onboarding_complete && (
+                                                                <span className="flex items-center gap-1 text-[8px] bg-[var(--gold)]/10 text-[var(--gold)] px-1.5 py-0.5 rounded-sm font-bold uppercase tracking-tighter">
+                                                                    Verified
+                                                                </span>
+                                                            )}
                                                         </div>
                                                     </div>
                                                 </div>
                                             </td>
-                                            <td className="px-6 py-6">
-                                                <div className="flex flex-col gap-1.5">
-                                                    <div className="flex items-center gap-1.5 text-xs text-black/60 capitalize">
-                                                        <Globe size={12} className="opacity-40" /> {user.country || 'Sconosciuto'}
+                                            <td className="px-8 py-8">
+                                                <div className="flex flex-col gap-2">
+                                                    <div className="flex items-center gap-2 text-xs text-black/60 capitalize font-medium">
+                                                        <div className="w-5 h-5 rounded-full bg-blue-50 flex items-center justify-center">
+                                                            <Globe size={11} className="text-blue-500" />
+                                                        </div>
+                                                        {user.country || 'Sconosciuto'}
                                                     </div>
-                                                    <div className="flex items-center gap-1.5 text-xs text-black/60">
-                                                        <Calendar size={12} className="opacity-40" /> {calculateAge(user.birth_date)} anni
+                                                    <div className="flex items-center gap-2 text-xs text-black/40">
+                                                        <div className="w-5 h-5 rounded-full bg-orange-50 flex items-center justify-center">
+                                                            <Calendar size={11} className="text-orange-500" />
+                                                        </div>
+                                                        {calculateAge(user.birth_date)} anni
                                                     </div>
                                                 </div>
                                             </td>
-                                            <td className="px-6 py-6 text-xs text-black/60 capitalize">
-                                                {user.gender || '—'}
+                                            <td className="px-8 py-8">
+                                                <span className="text-[10px] font-mono uppercase tracking-widest text-black/40 bg-black/5 px-3 py-1.5 rounded-lg border border-black/5 whitespace-nowrap">
+                                                    {user.gender || '—'}
+                                                </span>
                                             </td>
-                                            <td className="px-6 py-6 font-mono text-[10px] text-black/40">
+                                            <td className="px-8 py-8 font-mono text-[11px] text-black/30 whitespace-nowrap">
                                                 {formatDate(user.created_at)}
                                             </td>
-                                            <td className="px-6 py-6">
+                                            <td className="px-8 py-8">
                                                 {user.is_admin ? (
-                                                    <span className="px-2.5 py-1 bg-black text-white text-[9px] font-mono uppercase tracking-widest rounded-full flex items-center gap-1.5 w-fit">
-                                                        <Shield size={10} /> Admin
-                                                    </span>
+                                                    <div className="px-3 py-1.5 bg-black text-white text-[9px] font-mono uppercase tracking-[0.2em] rounded-xl flex items-center gap-2 w-fit shadow-lg shadow-black/10">
+                                                        <Shield size={10} className="text-[var(--gold)]" /> Admin
+                                                    </div>
                                                 ) : (
-                                                    <span className="px-2.5 py-1 bg-black/5 text-black/40 text-[9px] font-mono uppercase tracking-widest rounded-full w-fit">
+                                                    <div className="px-3 py-1.5 bg-black/5 text-black/40 text-[9px] font-mono uppercase tracking-[0.2em] rounded-xl w-fit border border-black/5">
                                                         User
-                                                    </span>
+                                                    </div>
                                                 )}
                                             </td>
-                                            <td className="px-8 py-6 text-right whitespace-nowrap">
-                                                <div className="flex justify-end gap-2">
+                                            <td className="px-10 py-8 text-right whitespace-nowrap">
+                                                <div className="flex justify-end gap-3 translate-x-4 opacity-0 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-500">
                                                     <button 
                                                         onClick={() => handleToggleAdmin(user.id, user.is_admin)}
-                                                        className={`p-2 rounded-full transition-all ${user.is_admin ? 'text-black bg-black/10' : 'text-black/20 hover:text-black hover:bg-black/5'}`}
+                                                        className={`p-2.5 rounded-xl border transition-all ${user.is_admin ? 'text-black bg-[var(--gold)]/10 border-[var(--gold)]/30' : 'text-black/20 border-black/5 hover:text-black hover:bg-black/5'}`}
                                                         title={user.is_admin ? "Rimuovi privilegi admin" : "Promuovi ad admin"}
                                                     >
                                                         <Shield size={16} />
                                                     </button>
                                                     <button 
                                                         onClick={() => handleDeleteUser(user.id)}
-                                                        className="p-2 text-rose-200 hover:text-rose-600 hover:bg-rose-50 rounded-full transition-all"
+                                                        className="p-2.5 text-rose-300 border border-rose-100 hover:text-white hover:bg-rose-500 hover:border-rose-500 rounded-xl transition-all shadow-sm"
                                                         title="Elimina utente"
                                                     >
                                                         <User size={16} />

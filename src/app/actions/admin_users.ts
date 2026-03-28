@@ -71,6 +71,17 @@ export async function getDashboardUsers(): Promise<DashboardUser[]> {
  * Toggle admin status for a user
  */
 export async function toggleAdminStatus(userId: string, currentStatus: boolean): Promise<void> {
+    const supabase = await createClient();
+    const { data: { user: adminUser } } = await supabase.auth.getUser();
+    
+    // Safety check: only admins can toggle status
+    const { data: adminCheck } = await supabase
+        .from('users')
+        .select('is_admin')
+        .eq('id', adminUser?.id)
+        .single();
+    if (!adminCheck?.is_admin) throw new Error("Unauthorized");
+
     const adminSupabase = createAdminClient();
     const { error } = await adminSupabase
         .from('users')
