@@ -779,7 +779,35 @@ export function useSphereEngine({
             document.getElementById('btn-left')?.removeEventListener('click', handleLeft);
             document.getElementById('btn-right')?.removeEventListener('click', handleRight);
 
+            // Correct Three.js Disposal
+            nodeMeshes.forEach(m => {
+                m.geometry.dispose();
+                innerDisposeMaterial(m.material);
+                group.remove(m);
+            });
+            glowMeshes.forEach(m => {
+                m.geometry.dispose();
+                innerDisposeMaterial(m.material);
+                group.remove(m);
+            });
+            edgeLines.forEach(l => {
+                l.geometry.dispose();
+                innerDisposeMaterial(l.material);
+                group.remove(l);
+            });
+
+            renderer.dispose();
+            scene.clear();
+            
             mounted.current = false;
         };
-    }, []); 
+
+        function innerDisposeMaterial(mat: THREE.Material | THREE.Material[]) {
+            if (Array.isArray(mat)) {
+                mat.forEach(m => m.dispose());
+            } else {
+                mat.dispose();
+            }
+        }
+    }, [files, edges]); // Re-init engine if data changes to ensure stability
 }

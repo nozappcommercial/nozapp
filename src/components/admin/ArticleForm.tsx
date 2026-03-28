@@ -32,7 +32,6 @@ export default function ArticleForm({ initialData, isEditing = false }: ArticleF
         const { name, value } = e.target;
         setFormData(prev => ({ ...prev, [name]: value }));
 
-        // Auto-generate slug from title if it's empty and we are typing title
         if (name === 'title' && !isEditing && !formData.slug) {
             const suggestedSlug = value
                 .toLowerCase()
@@ -63,7 +62,7 @@ export default function ArticleForm({ initialData, isEditing = false }: ArticleF
 
     const handleDelete = async () => {
         if (!window.confirm('Sei sicuro di voler eliminare questo articolo?')) return;
-        
+
         setIsDeleting(true);
         try {
             await deleteArticle(formData.id);
@@ -76,7 +75,21 @@ export default function ArticleForm({ initialData, isEditing = false }: ArticleF
     };
 
     return (
-        <form onSubmit={handleSubmit} className="space-y-12 animate-in fade-in duration-700 pb-20">
+        <>
+            <style>{`
+                input[type="datetime-local"] {
+                    width: 100%;
+                    -webkit-appearance: none;
+                    min-width: 0;
+                }
+                input[type="datetime-local"]::-webkit-datetime-edit {
+                    padding: 0;
+                }
+                input[type="datetime-local"]::-webkit-calendar-picker-indicator {
+                    flex-shrink: 0;
+                }
+            `}</style>
+            <form onSubmit={handleSubmit} className="space-y-12 animate-in fade-in duration-700 pb-20">
             {error && (
                 <div className="p-4 bg-red-50 border border-red-100 text-red-600 rounded-xl text-sm font-['Fragment_Mono']">
                     {error}
@@ -85,7 +98,7 @@ export default function ArticleForm({ initialData, isEditing = false }: ArticleF
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
                 {/* Main Content Areas */}
-                <div className="lg:col-span-2 space-y-8">
+                <div className="lg:col-span-2 space-y-8 min-w-0">
                     {/* Title */}
                     <div className="space-y-2">
                         <label className="flex items-center gap-2 font-['Fragment_Mono'] text-[10px] uppercase tracking-widest opacity-40">
@@ -107,8 +120,8 @@ export default function ArticleForm({ initialData, isEditing = false }: ArticleF
                         <label className="flex items-center gap-2 font-['Fragment_Mono'] text-[10px] uppercase tracking-widest opacity-40">
                             <LinkIcon size={12} /> Slug (URL)
                         </label>
-                        <div className="flex items-center gap-2 text-[var(--gold)] font-['Fragment_Mono'] text-sm">
-                            <span>nozapp.it/redazione/</span>
+                        <div className="flex items-center gap-2 text-[var(--gold)] font-['Fragment_Mono'] text-sm overflow-hidden">
+                            <span className="shrink-0">nozapp.it/redazione/</span>
                             <input
                                 type="text"
                                 name="slug"
@@ -116,7 +129,7 @@ export default function ArticleForm({ initialData, isEditing = false }: ArticleF
                                 onChange={handleChange}
                                 required
                                 placeholder="titolo-articolo"
-                                className="bg-white/50 px-2 py-0.5 rounded border border-black/5 focus:outline-none focus:border-[var(--gold)]/30 flex-1 min-w-0"
+                                className="flex-1 min-w-0 bg-white/50 px-2 py-0.5 rounded border border-black/5 focus:outline-none focus:border-[var(--gold)]/30"
                             />
                         </div>
                     </div>
@@ -154,9 +167,9 @@ export default function ArticleForm({ initialData, isEditing = false }: ArticleF
                 </div>
 
                 {/* Sidebar / Settings */}
-                <div className="space-y-8">
-                    {/* Status & Actions */}
+                <div className="space-y-8 min-w-0">
                     <div className="bg-white/60 p-6 rounded-2xl ring-1 ring-black/5 space-y-6 sticky top-24">
+                        {/* Status */}
                         <div className="space-y-2">
                             <label className="font-['Fragment_Mono'] text-[10px] uppercase tracking-widest opacity-40 block">Stato Pubblicazione</label>
                             <select
@@ -170,17 +183,19 @@ export default function ArticleForm({ initialData, isEditing = false }: ArticleF
                             </select>
                         </div>
 
-                        <div className="space-y-2 overflow-hidden">
+                        {/* Programmazione */}
+                        <div className="space-y-2">
                             <label className="font-['Fragment_Mono'] text-[10px] uppercase tracking-widest opacity-40 block">Programmazione</label>
                             <input
                                 type="datetime-local"
                                 name="published_at"
                                 value={formData.published_at}
                                 onChange={handleChange}
-                                className="w-full min-w-0 bg-white border border-black/5 rounded-lg px-2 md:px-4 py-2 text-[13px] md:text-sm outline-none font-['Fragment_Mono']"
+                                className="w-full max-w-full min-w-0 bg-white border border-black/5 rounded-lg px-2 py-2 text-[13px] outline-none font-['Fragment_Mono']"
                             />
                         </div>
 
+                        {/* Scadenza */}
                         <div className="space-y-2">
                             <label className="font-['Fragment_Mono'] text-[10px] uppercase tracking-widest opacity-40 block">Scadenza (Opzionale)</label>
                             <input
@@ -188,12 +203,13 @@ export default function ArticleForm({ initialData, isEditing = false }: ArticleF
                                 name="expires_at"
                                 value={formData.expires_at}
                                 onChange={handleChange}
-                                className="w-full max-w-full bg-white border border-black/5 rounded-lg px-2 md:px-4 py-2 text-[13px] md:text-sm outline-none font-['Fragment_Mono'] min-w-0"
+                                className="w-full max-w-full min-w-0 bg-white border border-black/5 rounded-lg px-2 py-2 text-[13px] outline-none font-['Fragment_Mono']"
                             />
                         </div>
 
                         <hr className="border-black/5" />
 
+                        {/* Cover Image */}
                         <div className="space-y-2">
                             <label className="flex items-center gap-2 font-['Fragment_Mono'] text-[10px] uppercase tracking-widest opacity-40">
                                 <ImageIcon size={12} /> URL Immagine Copertina
@@ -213,6 +229,7 @@ export default function ArticleForm({ initialData, isEditing = false }: ArticleF
                             )}
                         </div>
 
+                        {/* Actions */}
                         <div className="pt-4 flex flex-col gap-3">
                             <button
                                 type="submit"
@@ -222,7 +239,7 @@ export default function ArticleForm({ initialData, isEditing = false }: ArticleF
                                 {isLoading ? <Loader2 className="animate-spin" size={18} /> : <Save size={18} />}
                                 {isEditing ? 'Salva Modifiche' : 'Crea Articolo'}
                             </button>
-                            
+
                             <button
                                 type="button"
                                 onClick={() => router.back()}
@@ -247,5 +264,6 @@ export default function ArticleForm({ initialData, isEditing = false }: ArticleF
                 </div>
             </div>
         </form>
+    </>
     );
 }

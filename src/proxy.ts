@@ -4,9 +4,9 @@ import { checkRateLimit } from '@/lib/rate-limit';
 import { logSecurityEvent } from '@/lib/logger';
 
 /**
- * Global Middleware
- * -----------------
- * This middleware handles:
+ * Global Proxy (Next.js 16 Convention)
+ * -----------------------------------
+ * This proxy handles:
  * 1. Bot Filtering: Blocks known aggressive scrapers and AI crawlers.
  * 2. Rate Limiting: Applies IP-based throttling to API and Auth routes.
  * 3. Session Management: Refreshes Supabase sessions and handles protected route redirects.
@@ -21,9 +21,12 @@ const BANNED_BOT_USER_AGENTS = [
     'AhrefsBot',
     'Baiduspider',
     'DotBot',
+    'YandexBot',
+    'bytespider',
+    'claudebot',
 ];
 
-export async function middleware(request: NextRequest) {
+export async function proxy(request: NextRequest) {
     const { pathname } = request.nextUrl;
     const userAgent = request.headers.get('user-agent') || '';
     
