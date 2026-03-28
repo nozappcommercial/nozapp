@@ -206,3 +206,28 @@ export async function getArticleBySlug(slug: string) {
 
     return data as any;
 }
+
+/**
+ * Fetch non-scheduled articles for the archive (includes expired)
+ */
+export async function getArchivedArticles() {
+    const supabase = await createClient();
+    const now = new Date().toISOString();
+    
+    const { data, error } = await supabase
+        .from('articles')
+        .select(`
+            id, title, slug, excerpt, cover_image, published_at, expires_at,
+            author:users(display_name)
+        `)
+        .eq('status', 'published')
+        .lte('published_at', now)
+        .order('published_at', { ascending: false });
+
+    if (error) {
+        console.error('Error fetching archived articles:', error);
+        return [];
+    }
+
+    return data as any;
+}

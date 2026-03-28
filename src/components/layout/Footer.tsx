@@ -13,10 +13,10 @@ export default function Footer() {
     ];
 
     const footerLinks = [
-        { name: 'Manifesto', href: '#' },
-        { name: 'Redazione', href: '#' },
-        { name: 'Archivio', href: '#' },
-        { name: 'Contatti', href: '#' },
+        { name: 'Manifesto', href: '/manifesto' },
+        { name: 'Redazione', href: '/redazione-info' },
+        { name: 'Archivio', href: '/archivio' },
+        { name: 'Contatti', href: '/contatti' },
     ];
 
     // Intersection Observer to hide/show header on mobile when footer is in view

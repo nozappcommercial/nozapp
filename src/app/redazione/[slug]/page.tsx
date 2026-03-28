@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { ArrowLeft, Calendar, User, Clock } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
+import { motion } from 'framer-motion';
 import { getArticleBySlug } from '@/app/actions/editorial';
 import Footer from '@/components/layout/Footer';
 
@@ -40,7 +41,7 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
     const readingTime = getReadingTime(article.content);
 
     return (
-        <main className="min-h-screen bg-[#faf7f2] font-['Cormorant_Garamond'] selection:bg-[var(--gold)]/20 pb-20">
+        <main className="min-h-screen bg-[#faf7f2] font-['Cormorant_Garamond'] selection:bg-[var(--gold)]/20">
             {/* Clean Header Section */}
             <header className="pt-32 pb-16 px-8 md:px-16 lg:px-24 max-w-7xl mx-auto space-y-12">
                 <nav className="flex flex-wrap items-center gap-8 text-[10px] font-['Fragment_Mono'] uppercase tracking-[0.4em] opacity-40">
@@ -81,9 +82,15 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
                 </div>
             </header>
 
-            {/* Featured Image - Moved from hero to content-top */}
+            {/* Featured Image - Animated on scroll */}
             {article.cover_image && (
-                <div className="w-full px-8 md:px-16 lg:px-24 max-w-7xl mx-auto mb-20 animate-in fade-in duration-1000 delay-300">
+                <motion.div 
+                    initial={{ opacity: 0, y: 30 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true, margin: "-100px" }}
+                    transition={{ duration: 1.2, ease: "easeOut" }}
+                    className="w-full px-8 md:px-16 lg:px-24 max-w-7xl mx-auto mb-20"
+                >
                     <div className="relative aspect-[21/9] md:aspect-[21/8] overflow-hidden rounded-sm ring-1 ring-black/5">
                         <Image
                             src={article.cover_image}
@@ -93,7 +100,7 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
                             className="object-cover"
                         />
                     </div>
-                </div>
+                </motion.div>
             )}
 
             {/* Article Content */}
@@ -118,29 +125,31 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
                     </ReactMarkdown>
                 </div>
 
-                <hr className="border-black/5 pt-12" />
+                <div className="pt-2">
+                    <hr className="border-black/5" />
 
-                <footer className="flex flex-col md:flex-row md:items-center justify-between gap-12 pt-8">
-                    <div className="flex items-center gap-6">
-                        <div className="relative w-16 h-16 rounded-full ring-1 ring-black/10 overflow-hidden bg-black/5 flex items-center justify-center">
-                            <User size={24} strokeWidth={1} className="opacity-40" />
+                    <footer className="flex flex-col md:flex-row md:items-center justify-between gap-12 py-16">
+                        <div className="flex items-center gap-6">
+                            <div className="relative w-16 h-16 rounded-full ring-1 ring-black/10 overflow-hidden bg-black/5 flex items-center justify-center">
+                                <User size={24} strokeWidth={1} className="opacity-40" />
+                            </div>
+                            <div className="flex flex-col">
+                                <span className="font-['Fragment_Mono'] text-[9px] uppercase tracking-[0.2em] opacity-40 mb-1">Collaboratore Redazionale</span>
+                                <span className="text-2xl lowercase italic">{article.author?.display_name || 'Redazione NoZapp'}</span>
+                            </div>
                         </div>
-                        <div className="flex flex-col">
-                            <span className="font-['Fragment_Mono'] text-[9px] uppercase tracking-[0.2em] opacity-40 mb-1">Collaboratore Redazionale</span>
-                            <span className="text-2xl lowercase italic">{article.author?.display_name || 'Redazione NoZapp'}</span>
-                        </div>
-                    </div>
 
-                    <div className="flex gap-4">
-                        <Link 
-                            href="/sphere"
-                            className="flex items-center gap-3 px-8 py-3 bg-black text-white text-[10px] font-['Fragment_Mono'] uppercase tracking-[0.2em] rounded-full hover:bg-[var(--gold)] transition-all duration-500 group"
-                        >
-                            <ArrowLeft size={12} className="group-hover:-translate-x-1 transition-transform" />
-                            Esplora la Sfera
-                        </Link>
-                    </div>
-                </footer>
+                        <div className="flex gap-4">
+                            <Link 
+                                href="/sphere"
+                                className="flex items-center gap-3 px-8 py-3 bg-black text-white text-[10px] font-['Fragment_Mono'] uppercase tracking-[0.2em] rounded-full hover:bg-[var(--gold)] transition-all duration-500 group"
+                            >
+                                <ArrowLeft size={12} className="group-hover:-translate-x-1 transition-transform" />
+                                TORNA ALLA SFERA
+                            </Link>
+                        </div>
+                    </footer>
+                </div>
             </article>
 
             <Footer />
