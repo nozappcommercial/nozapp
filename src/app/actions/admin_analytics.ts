@@ -1,6 +1,7 @@
 "use server";
 
 import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
 
 export interface DashboardStats {
     totalUsers: number;
@@ -29,20 +30,26 @@ export interface DashboardStats {
  */
 export async function getDashboardAnalytics(): Promise<DashboardStats> {
     const supabase = await createClient();
+    const { data: { user: currentUser } } = await supabase.auth.getUser();
 
-    // 1. Basic counts
-    const { count: userCount } = await supabase.from('users').select('*', { count: 'exact', head: true });
-    const { count: clickCount } = await supabase.from('article_analytics').select('*', { count: 'exact', head: true });
+    // 1. Safety Check: Only admins can view analytics
+    const { data: adminCheck } = await supabase
+        .from('users')
+        .select('is_admin')
+        .eq('id', currentUser?.id)
+        .single();
 
-    // 2. Top articles (Group by article_id)
-    // Supabase JS doesn't support GROUP BY directly in the same way as SQL.
-    // We fetch and aggregate or use a RPC if performance is an issue.
-    // Given the small/medium scale, we'll fetch recently and count or assume a RPC exists.
-    // Let's assume we can fetch the last 1000 clicks and group them.
-    
-    // For a cleaner solution, we ideally want a VIEW or RPC.
-    // I will use a simple fetch for now.
-    const { data: recentClicks } = await supabase
+    if (!adminCheck?.is_admin) throw new Error("Unauthorized access to analytics");
+
+    // 2. Use Admin Client to bypass RLS for aggregate statistics
+    const adminSupabase = createAdminClient();
+
+    // 3. Basic counts
+    const { count: userCount } = await adminSupabase.from('users').select('*', { count: 'exact', head: true });
+    const { count: clickCount } = await adminSupabase.from('article_analytics').select('*', { count: 'exact', head: true });
+
+    // 4. Top articles (Group by article_id)
+    const { data: recentClicks } = await adminSupabase
         .from('article_analytics')
         .select('article_id, articles(title)')
         .limit(1000);
@@ -59,8 +66,8 @@ export async function getDashboardAnalytics(): Promise<DashboardStats> {
         .sort((a, b) => b.clicks - a.clicks)
         .slice(0, 5);
 
-    // 3. Demographics (Age, Country, Gender)
-    const { data: usersData } = await supabase.from('users').select('birth_date, country, gender');
+    // 5. Demographics (Age, Country, Gender)
+    const { data: usersData } = await adminSupabase.from('users').select('birth_date, country, gender');
     
     const ageGroups = {
         '18-24': 0, '25-34': 0, '35-44': 0, '45-54': 0, '55+': 0, 'N/A': 0

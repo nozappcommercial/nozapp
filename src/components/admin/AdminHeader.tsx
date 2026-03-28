@@ -35,9 +35,12 @@ export default function AdminHeader() {
     };
 
     const handleGlobalRefresh = () => {
-        // Dispatch custom event to let pages know they should refresh
+        // Dispatch custom event to let Client components know they should re-fetch
         const event = new CustomEvent('nozapp-admin-refresh');
         window.dispatchEvent(event);
+        
+        // Refresh the current route to revalidate Server components
+        router.refresh();
     };
 
     return (

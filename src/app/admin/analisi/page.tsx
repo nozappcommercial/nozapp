@@ -25,6 +25,11 @@ export default function AdminAnalysisPage() {
 
     useEffect(() => {
         fetchStats();
+
+        // Global refresh listener
+        const handleRefresh = () => fetchStats();
+        window.addEventListener('nozapp-admin-refresh', handleRefresh);
+        return () => window.removeEventListener('nozapp-admin-refresh', handleRefresh);
     }, []);
 
     if (loading && !stats) {

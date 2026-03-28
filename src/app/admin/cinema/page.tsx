@@ -14,6 +14,11 @@ export default function CinemaListPage() {
 
     useEffect(() => {
         fetchMovies();
+
+        // Global refresh listener
+        const handleRefresh = () => fetchMovies();
+        window.addEventListener('nozapp-admin-refresh', handleRefresh);
+        return () => window.removeEventListener('nozapp-admin-refresh', handleRefresh);
     }, []);
 
     const fetchMovies = async () => {
