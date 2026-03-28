@@ -49,9 +49,6 @@ export default function AdminSettingsPage() {
             {/* Header section */}
             <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 pb-6 border-b border-black/5">
                 <div className="space-y-1">
-                    <Link href="/admin" className="flex items-center gap-1 text-[10px] uppercase tracking-widest text-[var(--gold)] mb-2 hover:opacity-70 transition-opacity">
-                        <ArrowLeft size={10} /> Dashboard
-                    </Link>
                     <h1 className="text-4xl font-light tracking-tight">Impostazioni <span className="italic font-serif">Sistema</span></h1>
                     <p className="text-black/40 max-w-md">Pannello di configurazione per i parametri globali della Sfera Semantica.</p>
                 </div>

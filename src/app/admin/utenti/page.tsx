@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { Newspaper, Users, Settings, BarChart3, TrendingUp, Globe, Calendar, ArrowLeft, RefreshCw, Activity, MousePointerClick, Search, Filter, Shield, User, MoreVertical } from 'lucide-react';
+import { Globe, Calendar, RefreshCw, Search, Shield, User } from 'lucide-react';
 import { getDashboardUsers, toggleAdminStatus, deleteUser, type DashboardUser } from '@/app/actions/admin_users';
 
 export default function AdminUsersPage() {
@@ -16,7 +16,7 @@ export default function AdminUsersPage() {
         setLoading(true);
         try {
             const data = await getDashboardUsers();
-            setUsers(data);
+            setUsers(data || []);
         } catch (err: any) {
             console.error('[Admin] Failed to fetch users:', err);
             setError(err.message || 'Errore durante il caricamento degli utenti.');
@@ -27,7 +27,23 @@ export default function AdminUsersPage() {
 
     useEffect(() => {
         fetchUsers();
+
+        // Global refresh listener
+        const handleRefresh = () => fetchUsers();
+        window.addEventListener('nozapp-admin-refresh', handleRefresh);
+        return () => window.removeEventListener('nozapp-admin-refresh', handleRefresh);
     }, []);
+
+    const formatDate = (dateString: string | null) => {
+        if (!dateString) return '—';
+        try {
+            const date = new Date(dateString);
+            if (isNaN(date.getTime())) return 'Format Errato';
+            return date.toLocaleDateString();
+        } catch (e) {
+            return 'Errore data';
+        }
+    };
 
     const handleToggleAdmin = async (userId: string, current: boolean) => {
         if (!confirm(`Vuoi procedere col cambio permessi?`)) return;
@@ -54,12 +70,17 @@ export default function AdminUsersPage() {
 
     const calculateAge = (birthDate: string | null) => {
         if (!birthDate) return 'N/A';
-        const birth = new Date(birthDate);
-        const today = new Date();
-        let age = today.getFullYear() - birth.getFullYear();
-        const m = today.getMonth() - birth.getMonth();
-        if (m < 0 || (m === 0 && today.getDate() < birth.getDate())) age--;
-        return age;
+        try {
+            const birth = new Date(birthDate);
+            if (isNaN(birth.getTime())) return 'N/A';
+            const today = new Date();
+            let age = today.getFullYear() - birth.getFullYear();
+            const m = today.getMonth() - birth.getMonth();
+            if (m < 0 || (m === 0 && today.getDate() < birth.getDate())) age--;
+            return age;
+        } catch (e) {
+            return 'N/A';
+        }
     };
 
     const filteredUsers = users.filter(u => {
@@ -74,18 +95,9 @@ export default function AdminUsersPage() {
         <div className="space-y-8 animate-in fade-in duration-500">
             {/* Header section */}
             <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 pb-6 border-b border-black/5">
-                <div className="space-y-6">
-                    <button 
-                        onClick={fetchUsers}
-                        className="w-10 h-10 bg-black/5 rounded-full flex items-center justify-center hover:bg-black/10 transition-all hover:rotate-180 duration-500"
-                        title="Ricarica utenti"
-                    >
-                        <RefreshCw size={14} className={loading ? 'animate-spin' : ''} />
-                    </button>
-                    <div className="space-y-1">
-                        <h1 className="text-4xl font-light tracking-tight">Gestione <span className="italic font-serif">Utenti</span></h1>
-                        <p className="text-black/40">Visualizza e gestisci tutti gli iscritti alla piattaforma.</p>
-                    </div>
+                <div className="space-y-1">
+                    <h1 className="text-4xl font-light tracking-tight">Gestione <span className="italic font-serif">Utenti</span></h1>
+                    <p className="text-black/40">Visualizza e gestisci tutti gli iscritti alla piattaforma.</p>
                 </div>
             </div>
 
@@ -183,7 +195,7 @@ export default function AdminUsersPage() {
                                                 {user.gender || '—'}
                                             </td>
                                             <td className="px-6 py-6 font-mono text-[10px] text-black/40">
-                                                {new Date(user.created_at).toLocaleDateString()}
+                                                {formatDate(user.created_at)}
                                             </td>
                                             <td className="px-6 py-6">
                                                 {user.is_admin ? (

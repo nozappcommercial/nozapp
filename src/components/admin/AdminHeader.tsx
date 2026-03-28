@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import { ArrowLeft, LayoutDashboard, Loader2, Globe, LogOut } from 'lucide-react';
+import { ArrowLeft, LayoutDashboard, Loader2, Globe, LogOut, RefreshCw } from 'lucide-react';
 import { signOutAction } from '@/app/actions/admin_auth';
 
 export default function AdminHeader() {
@@ -34,19 +34,36 @@ export default function AdminHeader() {
         }
     };
 
+    const handleGlobalRefresh = () => {
+        // Dispatch custom event to let pages know they should refresh
+        const event = new CustomEvent('nozapp-admin-refresh');
+        window.dispatchEvent(event);
+    };
+
     return (
         <header className="h-auto min-h-16 border-b border-black/5 bg-white/50 backdrop-blur-md sticky top-0 z-50 px-4 md:px-8 flex items-center justify-between pt-[env(safe-area-inset-top,12px)] pb-2 md:pb-0">
-            <div className="w-1/4 md:w-1/3 flex items-center">
+            <div className="w-1/4 md:w-1/3 flex items-center gap-2">
                 {!isRootAdmin && !isVerifyPage && (
-                    <Link 
-                        href="/admin" 
-                        className="flex items-center gap-2 text-[10px] font-['Fragment_Mono'] uppercase tracking-widest text-black/40 hover:text-black transition-colors group"
-                    >
-                        <div className="w-10 h-10 md:w-auto md:h-auto rounded-full bg-black/5 flex items-center justify-center md:bg-transparent transition-all">
-                            <LayoutDashboard size={14} className="group-hover:scale-110 transition-transform" />
-                        </div>
-                        <span className="hidden md:inline">Torna alla Dashboard</span>
-                    </Link>
+                    <>
+                        <Link 
+                            href="/admin" 
+                            className="flex items-center gap-2 text-[10px] font-['Fragment_Mono'] uppercase tracking-widest text-black/40 hover:text-black transition-colors group"
+                            title="Torna alla Dashboard"
+                        >
+                            <div className="w-10 h-10 md:w-auto md:h-auto rounded-full bg-black/5 flex items-center justify-center md:bg-transparent transition-all">
+                                <LayoutDashboard size={14} className="group-hover:scale-110 transition-transform" />
+                            </div>
+                            <span className="hidden md:inline">Dashboard</span>
+                        </Link>
+                        
+                        <button 
+                            onClick={handleGlobalRefresh}
+                            className="w-10 h-10 rounded-full bg-black/5 flex items-center justify-center text-black/40 hover:text-black hover:bg-black/10 transition-all group"
+                            title="Ricarica Pagina"
+                        >
+                            <RefreshCw size={14} className="group-active:rotate-180 transition-transform duration-500" />
+                        </button>
+                    </>
                 )}
             </div>
 
