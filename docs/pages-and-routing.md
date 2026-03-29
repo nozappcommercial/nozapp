@@ -1,4 +1,4 @@
-updated: 2026-03-26
+updated: 2026-03-28
 agent: aggiornatore
 ---
 
@@ -14,12 +14,16 @@ NoZapp utilizza l'**App Router** di Next.js 14 per gestire la navigazione. La ma
 | `/` | `app/page.tsx` | SSR | Root | Landing page o redirect automatico alla sfera. |
 | `/login` | `app/(auth)/login/page.tsx` | CSR | Root | Autenticazione utente (Email/Password + Magic Link). |
 | `/onboarding`| `app/onboarding/page.tsx` | Dynamic | Root | Wizard iniziale di selezione dei pilastri del gusto. |
-| `/redazione` | `app/redazione/page.tsx` | Dynamic | Root | Archivio editoriale con griglia animata dei contenuti. |
-| `/redazione/[slug]` | `app/redazione/[slug]/page.tsx` | Dynamic | Root | Visualizzazione articolo singolo (Markdown + Design Immersivo). |
+| `/redazione` | `app/redazione/page.tsx` | Dynamic | Root | Informazioni redazionali e visione del progetto. |
+| `/redazione/[slug]` | `app/redazione/[slug]/page.tsx` | Dynamic | Root | Visualizzazione articolo singolo (Hero Title-first + Design Immersivo). |
+| `/archivio` | `app/archivio/page.tsx` | Dynamic | Root | Biblioteca digitale completa degli articoli pubblicati. |
+| `/manifesto` | `app/manifesto/page.tsx` | Static | Root | Pagina dedicata alla visione "slow" e curatoriale. |
+| `/contatti` | `app/contatti/page.tsx` | Static | Root | Pagina minimale per feedback e canali social. |
 | `/admin` | `app/admin/page.tsx` | SSR | Admin | Dashboard gestionale con System Vitals. |
 | `/admin/redazione` | `app/admin/redazione/page.tsx` | SSR | Admin | Lista articoli (vista responsive card/tabella). |
 | `/admin/utenti` | `app/admin/utenti/page.tsx` | SSR | Admin | Gestione iscritti, filtri demografici e permessi. |
 | `/admin/analisi` | `app/admin/analisi/page.tsx` | SSR | Admin | Dashboard analytics (engagement, demografica). |
+| `/admin/cinema` | `app/admin/cinema/page.tsx` | SSR | Admin | Gestione manuale del carosello "Ora al Cinema". |
 | `/admin/verify` | `app/admin/verify/page.tsx` | CSR | Root | Verifica MFA (Multi-Factor Authentication). |
 
 ## Strategie di Rendering
@@ -54,9 +58,9 @@ graph TD
 ```
 
 ### 2. Layouts
-- **RootLayout (`app/layout.tsx`)**: Contiene il font (`Cormorant Garamond`), lo `SplashScreen`, l'header globale e il setup delle analytics.
-- **AdminLayout (`app/admin/layout.tsx`)**: Layout specifico per l'area gestionale. Utilizza il componente dinamico `AdminHeader` per mostrare il titolo della pagina corrente ("Dashboard" vs "Redazione") e fornire pulsanti di navigazione contestuali (es. "Torna alla Dashboard", "Sfera"). Garantisce la stabilità del middleware tramite l'uso di link standard (`<a>`) per le transizioni area pubblica/admin.
-- **Auth Routes**: Utilizzano un layout semplificato che nasconde l'header globale per focalizzare l'utente sul form.
+- **RootLayout (`app/layout.tsx`)**: Contiene il font (`Cormorant Garamond`), lo `SplashScreen`, l'header globale, il setup delle analytics e il componente `RouteProgress` (avvolto in `Suspense`) per il feedback visivo di caricamento e il reset automatico dello scroll.
+- **AdminLayout (`app/admin/layout.tsx`)**: Layout specifico per l'area gestionale. Utilizza il componente dinamico `AdminHeader` per mostrare il titolo della pagina corrente ("Dashboard" vs "Redazione") e fornire pulsanti di navigazione contestuali. Garantisce la stabilità del middleware tramite l'uso di link standard (`<a>`) per le transizioni area pubblica/admin.
+- **Editorial Routes**: Le pagine sotto `/redazione`, `/manifesto`, `/archivio`, `/contatti` utilizzano un design "Hero Title-first" che nasconde l'header globale per favorire l'immersività. Includono il componente `BackToTop`.
 
 ---
 
@@ -69,8 +73,5 @@ graph TD
 > [!TIP]
 > Il middleware in `src/lib/supabase/middleware.ts` è il centro di controllo del routing basato sullo stato di onboarding dell'utente e sui permessi amministrativi (MFA).
 
-🔄 **Aggiornato il 2026-03-28**: Incluse nuove rotte amministrative per la gestione utenti e il motore di analytics. Ottimizzata la Dashboard principale con il modulo System Vitals.
-
----
-🔄 **Aggiornato il 2026-03-27**: Ottimizzazione layout admin e transizioni sicure tra contesti (public/admin) via SSR.
-File modificati: `app/admin/layout.tsx`
+🔄 **Aggiornato il 2026-03-28**: Consolidate le rotte editoriali ed introdotte le sezioni istituzionali (`/manifesto`, `/archivio`, `/contatti`). Implementato `RouteProgress` nel layout globale per feedback di navigazione e reset dello scroll.
+File modificati: `src/app/layout.tsx`, `src/app/redazione/page.tsx`, `src/app/manifesto/page.tsx`, `src/app/archivio/page.tsx`, `src/app/contatti/page.tsx`, `src/components/layout/RouteProgress.tsx`

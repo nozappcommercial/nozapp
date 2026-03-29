@@ -1,4 +1,4 @@
-updated: 2026-03-26
+updated: 2026-03-28
 agent: aggiornatore
 ---
 
@@ -33,11 +33,12 @@ Le Server Actions sono funzioni asincrone eseguite sul server, ma chiamate diret
 ### Sistema Editoriale & Admin — `editorial.ts`, `admin_users.ts`, `admin_analytics.ts`
 - **`upsertArticle`**: Crea o aggiorna un articolo della redazione.
 - **`deleteArticle`**: Rimuove un articolo dal database.
-- **`getPublishedArticles`**: Recupera gli articoli visibili al pubblico.
+- **`getPublishedArticles`**: Recupera gli articoli visibili al pubblico (attivi e non scaduti).
+- **`getArchivedArticles`**: Recupera lo storico completo di tutti gli articoli (inclusi quelli scaduti) per la sezione Archivio.
 - **`getArticleBySlug`**: Recupera un articolo specifico tramite lo slug URL (include bypass per preview admin).
 - **`deleteUser`**: Eliminazione definitiva di un account utente (Auth + Database).
 - **`updateUserPermissions`**: Toggle dei permessi amministrativi per un utente specifico.
-- **`getAdminAnalytics`**: Calcolo delle statistiche aggregate (età, provenienza, genere, interazioni).
+- **`getDashboardAnalytics`**: Calcolo delle statistiche aggregate (età, provenienza, genere, interazioni). Utilizza `createAdminClient` per bypassare le policy RLS.
 
 ### Autenticazione Admin (MFA) — `admin_auth.ts`
 - **`generateAdminOTP`**: Richiede a Supabase di inviare un codice OTP via Email all'amministratore loggato.
@@ -67,5 +68,5 @@ Tutte le API e le Actions implementano:
 > [!IMPORTANT]
 > Non esporre mai le API Key (`TMDB_API_KEY`, `RAPIDAPI_KEY`) sul lato client. Devono essere utilizzate esclusivamente in ambiente server.
 
-🔄 **Aggiornato il 2026-03-27**: Rifattorizzate Server Actions MFA per supporto Email e codici a 8 cifre.
-File modificato: `src/app/actions/admin_auth.ts`
+🔄 **Aggiornato il 2026-03-28**: Introdotta l'azione `getArchivedArticles`. Aggiornata `getDashboardAnalytics` per utilizzare il Service Role (Admin Client) garantendo statistiche precise su tutto il database.
+File modificati: `src/app/actions/editorial.ts`, `src/app/actions/admin_analytics.ts`

@@ -1,7 +1,7 @@
 ---
 tags: [#logic, #admin, #status/complete]
 created: 2026-03-26
-updated: 2026-03-26
+updated: 2026-03-28
 ---
 
 # Sistema Editoriale e Gestione Admin
@@ -13,8 +13,10 @@ Il workflow si basa su uno stato binario (`draft` | `published`) e sulla program
 
 - **Creazione**: Attraverso il form in `/admin/redazione/nuovo`. Viene generato automaticamente uno slug URL. Supporta la sintassi **Markdown** (Gfm) per gli stili e le immagini.
 - **Preview**: Gli amministratori possono visualizzare l'articolo in anteprima all'indirizzo `/redazione/[slug]` anche se è in bozza.
-- **Archive Page**: La pagina `/redazione` elenca tutti gli articoli pubblicati con un layout dinamico a griglia immersiva.
-- **Reading Experience**: La pagina `/redazione/[slug]` visualizza l'articolo con rendering Markdown, design "clean" senza hero background (massima leggibilità), stili tipografici in `Cormorant Garamond` e `Fragment Mono`, e stima automatica del tempo di lettura.
+- **Archive Page**: La pagina `/archivio` elenca lo storico completo di tutti gli articoli pubblicati (inclusi quelli scaduti), fungendo da biblioteca digitale del progetto.
+- **Redazione Information**: La rotta `/redazione` è stata consolidata per presentare la visione curatoriale del team e le informazioni istituzionali, migrando i contenuti dalla precedente rotta separata.
+- **Reading Experience**: La pagina `/redazione/[slug]` adotta un design **Hero Title-first** ad alto impatto visivo (`min-h-[90vh]`). Il titolo occupa l'intero viewport iniziale con indicatori di scroll, svelando il contenuto solo tramite interazione consapevole. Il layout mantiene l'estetica "slow-web" con rendering Markdown, tipografia `Cormorant Garamond` e animazioni fade-in allo scroll per i media.
+- **Navigazione**: Introdotto il componente `BackToTop` per facilitare il ritorno a inizio pagina dopo la lettura.
 - **Pubblicazione**: L'articolo diventa visibile al pubblico solo se `status = published` e la data corrente è compresa tra `published_at` e `expires_at`.
 
 ## Dashboard Admin (`/admin`)
@@ -64,9 +66,5 @@ Tutti gli eventi critici per la sicurezza della piattaforma vengono tracciati tr
 Vedere [[database]] per il dettaglio della tabella `articles` e le nuove colonne MFA nella tabella `users`.
 
 ---
-🔄 **Aggiornato il 2026-03-28**: Espansa la Dashboard Admin con i moduli Utenti, Analisi e System Vitals. Integrata la gestione dei dati demografici (età, sesso, provenienza) e l'ottimizzazione mobile per le tabelle redazionali (vista a card). Risolto overflow campi data su iOS.
-File modificati: `src/app/admin/utenti/page.tsx`, `src/app/admin/analisi/page.tsx`, `src/components/admin/PlatformStatus.tsx`, `src/app/admin/redazione/page.tsx`, `src/components/admin/ArticleForm.tsx`
-
----
-🔄 **Aggiornato il 2026-03-27**: Introdotto il supporto Markdown (react-markdown), il nuovo template immersivo per gli articoli e il sistema di gestione manuale del Cinema. Perfezionato il flusso MFA con codici a 8 cifre.
-File modificati: `src/app/redazione/[slug]/page.tsx`, `src/app/redazione/page.tsx`, `src/app/actions/cinema.ts`, `src/app/admin/verify/page.tsx`
+🔄 **Aggiornato il 2026-03-28**: Riprogettato il template articolo con sezioni Hero a tutto schermo e indicatori di scroll. Consolidata la rotta `/redazione` e implementata l'azione `getArchivedArticles` per la nuova pagina Archivio. Ottimizzato il refresh dei dati nell'area admin.
+File modificati: `src/app/redazione/[slug]/page.tsx`, `src/app/redazione/page.tsx`, `src/app/archivio/page.tsx`, `src/app/actions/editorial.ts`, `src/components/admin/AdminHeader.tsx`

@@ -1,6 +1,6 @@
 ---
 tags: [#security, #status/complete]
-created: 2026-03-27
+updated: 2026-03-28
 agent: scrittore
 ---
 
@@ -25,6 +25,9 @@ Ogni evento critico (autenticazione, errori di sistema, superamento rate-limit) 
 ### Politiche di Accesso (RLS)
 - **SELECT**: Consentito solo agli utenti con `is_admin = true`.
 - **INSERT**: Consentito al sistema (Service Role) per la scrittura dei log.
+
+> [!IMPORTANT]
+> Per le statistiche aggregate (es. totale utenti, engagement), le Server Actions utilizzano `createAdminClient()` (Service Role) per bypassare le restrizioni RLS che limiterebbero la vista ai soli dati dell'utente corrente. L'integrità è garantita da un controllo manuale del ruolo admin sull'utente che effettua la richiesta.
 
 ## Flusso di Autenticazione Admin
 
@@ -54,5 +57,5 @@ await logSecurityEvent('auth_success', {
 ```
 
 ---
-🔄 **Aggiornato il 2026-03-27**: Perfezionamento feedback visivi OTP e gestione flussi di errore UX.
-File modificati: `src/app/admin/verify/page.tsx`
+🔄 **Aggiornato il 2026-03-28**: Implementato bypass RLS sicuro tramite Service Role per il calcolo delle statistiche aggregate nella Dashboard Admin.
+File modificati: `src/app/actions/admin_analytics.ts`

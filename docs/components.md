@@ -1,4 +1,4 @@
-updated: 2026-03-26
+updated: 2026-03-28
 agent: aggiornatore
 ---
 
@@ -59,7 +59,7 @@ I componenti di NoZapp sono suddivisi in **UI atomici** (Shadcn), **Layout** (st
 - **Sticky / Collapsible**: Si riduce di dimensione durante lo scroll.
 - **Utility Centralizzate**: Utilizza l'hook globale `useIsMobile` e le utility `scroll-utils` per una gestione pulita delle interazioni.
 - **Bubble Effect**: Un indicatore circolare (orb/bubble) insegue l'icona attiva.
-- **Visibilità**: L'header è nascosto automaticamente in tutte le rotte che iniziano con `/admin` (Dashboard Redazione) o quando un film è selezionato nella sfera.
+- **Visibilità**: L'header è nascosto automaticamente in tutte le rotte che iniziano con `/admin` (Dashboard Redazione), nelle rotte editoriali/istituzionali (`/redazione`, `/manifesto`, `/archivio`, `/contatti`) o quando un film è selezionato nella sfera.
 
 | Sezione | ID | Icona | Ruolo |
 | :--- | :--- | :--- | :--- |
@@ -78,7 +78,7 @@ I componenti di NoZapp sono suddivisi in **UI atomici** (Shadcn), **Layout** (st
 - Fornire il link di ritorno alla Dashboard nelle sottopagine.
 - Gestire il logout globale dell'area admin.
 - **Ottimizzazione Mobile**: Aggiunto padding per il notch (`safe-area-inset-top`) e trasformati i pulsanti in icone circolari per massimizzare lo spazio su schermi piccoli.
-**Comportamento**: Utilizza `usePathname` per determinare lo stato della navigazione in tempo reale.
+**Comportamento**: Utilizza `usePathname` per determinare lo stato della navigazione e fornisce un pulsante di **Refresh** che esegue `router.refresh()` (per i Server Components) ed emette un `CustomEvent` per notificare i Client Components di ricaricare i dati.
 
 ---
 
@@ -102,6 +102,26 @@ I componenti di NoZapp sono suddivisi in **UI atomici** (Shadcn), **Layout** (st
 
 ---
 
+### `Footer` — `src/components/layout/Footer.tsx`
+**Scopo**: Fornisce link di navigazione permanenti e informazioni di copyright.
+**Contenuto**: Include link rapidi alle sezioni istituzionali: Manifesto, Redazione, Archivio e Contatti.
+
+---
+
+### `BackToTop` — `src/components/layout/BackToTop.tsx`
+**Scopo**: Pulsante minimale per il ritorno a inizio pagina.
+**Caratteristiche**: Appare solo dopo uno scroll di 300px, centrato orizzontalmente con design "glassmorphism" e animazione di entrata/uscita.
+
+---
+
+### `RouteProgress` — `src/components/layout/RouteProgress.tsx`
+**Scopo**: Barra di progresso dorata superiore per feedback di caricamento tra le pagine.
+**Responsabilità**:
+- Gestisce l'animazione di caricamento durante le transizioni di rotta.
+- Effettua lo scroll automatico a inizio pagina (`window.scrollTo(0,0)`) ad ogni cambio di URL per garantire la corretta visualizzazione dei contenuti.
+
+---
+
 ### `AuthHandler` — `src/components/auth/AuthHandler.tsx`
 **Scopo**: Gestore invisibile lato client per la logica di autenticazione.
 **Responsabilità**:
@@ -122,9 +142,5 @@ Questi componenti si trovano in `src/components/ui/` e seguono le specifiche di 
 > [!NOTE]
 > Tutti i componenti utilizzano tipicamente `framer-motion` per micro-interazioni e transizioni di stato.
 
-🔄 **Aggiornato il 2026-03-28**: Ottimizzazione mobile dell'AdminHeader e evoluzione del modulo PlatformStatus in "System Vitals". Estensione del ProfileModal con i nuovi campi demografici.
-File modificati: `src/components/admin/AdminHeader.tsx`, `src/components/admin/PlatformStatus.tsx`, `src/components/profile/ProfileModal.tsx`
-
----
-🔄 **Aggiornato il 2026-03-27**: Decomposizione dei componenti della Sfera (`MovieDetailPanel`, `SphereUIOverlays`) e integrazione utility globali nell'Header.
-File modificati: `src/components/sphere/MovieDetailPanel.tsx`, `src/components/sphere/SphereUIOverlays.tsx`, `src/components/layout/Header.tsx`, `src/components/admin/AdminHeader.tsx`
+🔄 **Aggiornato il 2026-03-28**: Introdotti i componenti `BackToTop` e `RouteProgress`. Centralizzata la logica di refresh globale nell'`AdminHeader` (Client/Server syncing). Aggiornata la visibilità dell'Header globale per le nuove rotte editoriali.
+File modificati: `src/components/layout/BackToTop.tsx`, `src/components/layout/RouteProgress.tsx`, `src/components/admin/AdminHeader.tsx`, `src/components/layout/Header.tsx`, `src/components/layout/Footer.tsx`
