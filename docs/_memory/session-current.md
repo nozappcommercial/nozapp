@@ -85,4 +85,15 @@ status: active
 **Soluzione applicata**: Trasformata la selezione del sostituto in un componente Bottom Sheet con overlay oscurante e blur; aggiunto padding dinamico `env(safe-area-inset-top)` alla testata della galleria.
 **Side effects**: UX più fluida e professionale su mobile.
 
+
+## 17:40 [tipo: feature | refactor | UI/UX]
+
+**File toccati**:
+
+- `src/components/onboarding/OnboardingFlow.tsx` — Riscrittura totale (da zero) del componente. Implementato nuovo sistema di rating, piramide 2x3 mobile e logica di swap click-based.
+
+**Problema di partenza**: L'interfaccia dell'onboarding era diventata eccessivamente complessa e presentava bug strutturali di layout e interazione (overlap, notch, swap non intuitivi).
+**Soluzione applicata**: Reset completo del codice. Nuova architettura semplificata: fase di valutazione lineare, fase di conferma con piramide interattiva e gallery "overflow" sempre accessibile. Logica di scambio "clicca e clicca" uniforme al profilo utente. Gestione Safe Area nativa nel CSS.
+**Side effects**: UX drasticamente più solida e performance migliorate grazie alla rimozione di logiche e CSS obsoleti.
+
 ---
