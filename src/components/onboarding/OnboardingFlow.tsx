@@ -399,33 +399,44 @@ export default function OnboardingFlow({ films }: OnboardingFlowProps) {
 
                 {/* reaction buttons */}
                 {!stepDone && currentFilm && (
-                  <div className="ob-rxn-row" key={currentFilm.id}>
-                    <button className="ob-rxn-btn loved" onClick={() => handleReaction("loved")}>
-                      <span className="ob-rxn-icon" style={{ color: "var(--ob-gold)" }}>♥</span>
-                      <span className="ob-rxn-lbl">L&apos;ho<br />amato</span>
-                    </button>
-                    <button className="ob-rxn-btn disliked" onClick={() => handleReaction("disliked")}>
-                      <span className="ob-rxn-icon" style={{ color: "var(--ob-ink-light)" }}>
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                          <line x1="18" y1="6" x2="6" y2="18"></line>
-                          <line x1="6" y1="6" x2="18" y2="18"></line>
-                        </svg>
-                      </span>
-                      <span className="ob-rxn-lbl">Non fa<br />per me</span>
-                    </button>
+                  <>
+                    <div className="ob-rxn-row" key={currentFilm.id}>
+                      <button 
+                        className={`ob-rxn-btn loved ${reactions[currentFilm.id] === 'loved' ? 'active' : ''}`} 
+                        onClick={() => handleReaction("loved")}
+                      >
+                        <span className="ob-rxn-icon" style={{ color: "var(--ob-gold)" }}>♥</span>
+                        <span className="ob-rxn-lbl">L&apos;ho<br />amato</span>
+                      </button>
+                      <button 
+                        className={`ob-rxn-btn disliked ${reactions[currentFilm.id] === 'disliked' ? 'active' : ''}`} 
+                        onClick={() => handleReaction("disliked")}
+                      >
+                        <span className="ob-rxn-icon" style={{ color: "var(--ob-ink-light)" }}>
+                          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                            <line x1="18" y1="6" x2="6" y2="18"></line>
+                            <line x1="6" y1="6" x2="18" y2="18"></line>
+                          </svg>
+                        </span>
+                        <span className="ob-rxn-lbl">Non fa<br />per me</span>
+                      </button>
 
-                    <div className="ob-rxn-split">
-                      <div className="ob-rxn-split-bg seen-bg" />
-                      <div className="ob-rxn-split-bg unseen-bg" />
-                      <div className="ob-rxn-split-line" />
+                      <div className={`ob-rxn-split ${reactions[currentFilm.id] === 'seen' ? 'active-seen' : reactions[currentFilm.id] === 'unseen' ? 'active-unseen' : ''}`}>
+                        <div className="ob-rxn-split-bg seen-bg" />
+                        <div className="ob-rxn-split-bg unseen-bg" />
+                        <div className="ob-rxn-split-line" />
 
-                      <span className="ob-rxn-split-lbl seen-lbl">Visto</span>
-                      <span className="ob-rxn-split-lbl unseen-lbl">Non visto</span>
+                        <span className="ob-rxn-split-lbl seen-lbl">Visto</span>
+                        <span className="ob-rxn-split-lbl unseen-lbl">Non visto</span>
 
-                      <button className="ob-rxn-split-hit seen-hit" onClick={() => handleReaction("seen")} />
-                      <button className="ob-rxn-split-hit unseen-hit" onClick={() => handleReaction("unseen")} />
+                        <button className="ob-rxn-split-hit seen-hit" onClick={() => handleReaction("seen")} />
+                        <button className="ob-rxn-split-hit unseen-hit" onClick={() => handleReaction("unseen")} />
+                      </div>
                     </div>
-                  </div>
+                    {!allReacted && (
+                      <div className="ob-nudge stage-nudge">valuta tutti i film per continuare</div>
+                    )}
+                  </>
                 )}
               </div>
             </div>
@@ -440,9 +451,6 @@ export default function OnboardingFlow({ films }: OnboardingFlowProps) {
                 </div>
               </div>
               <div className="ob-botright">
-                {!stepDone && !allReacted && (
-                  <div className="ob-nudge">valuta tutti i film per continuare</div>
-                )}
                 <button
                   className={`ob-btn-cont ${allReacted || stepDone ? "on" : "off"}`}
                   disabled={!allReacted && !stepDone}
@@ -1065,6 +1073,10 @@ input[type="date"]::-webkit-calendar-picker-indicator { flex-shrink: 0; }
   font-size: 9px; letter-spacing: 0.18em;
   text-transform: uppercase; color: var(--ob-ink-faint);
 }
+.ob-nudge.stage-nudge {
+  margin-top: 2px;
+  animation: ob-au 0.4s ease both;
+}
 
 /* ── REACTION BUTTONS ── */
 .ob-rxn-row {
@@ -1098,6 +1110,13 @@ input[type="date"]::-webkit-calendar-picker-indicator { flex-shrink: 0; }
 .ob-rxn-btn.disliked:hover .ob-rxn-lbl, .ob-rxn-btn.disliked:hover .ob-rxn-icon { color: #fff !important; }
 .ob-rxn-btn.unseen:hover  { background: var(--ob-cream-dark); }
 .ob-rxn-btn:active { transform: scale(0.95); }
+
+.ob-rxn-btn.loved.active { background: var(--ob-gold); border-color: var(--ob-gold); }
+.ob-rxn-btn.loved.active .ob-rxn-icon { color: var(--ob-cream) !important; transform: scale(1.1); }
+.ob-rxn-btn.loved.active .ob-rxn-lbl  { color: rgba(255,255,255,0.85); }
+
+.ob-rxn-btn.disliked.active { background: var(--ob-ink); border-color: var(--ob-ink); }
+.ob-rxn-btn.disliked.active .ob-rxn-icon, .ob-rxn-btn.disliked.active .ob-rxn-lbl { color: #fff !important; }
 
 /* SPLIT BUTTON seen/unseen (Fixed & Polished) */
 .ob-rxn-split {
@@ -1201,6 +1220,19 @@ input[type="date"]::-webkit-calendar-picker-indicator { flex-shrink: 0; }
 .ob-rxn-split:has(.unseen-hit:hover) .seen-lbl {
   opacity: 0; transform: translate(-20px, -20px);
 }
+
+/* Active States (Selected) */
+.ob-rxn-split.active-seen { border-color: var(--ob-ink); }
+.ob-rxn-split.active-seen .seen-bg { clip-path: polygon(0 0, 200% 0, 0 200%); background: var(--ob-ink); }
+.ob-rxn-split.active-seen .ob-rxn-split-line { transform: translateX(100%); opacity: 0; }
+.ob-rxn-split.active-seen .seen-lbl { top: 50%; left: 50%; transform: translate(-50%, -50%); color: #fff; }
+.ob-rxn-split.active-seen .unseen-lbl { opacity: 0; }
+
+.ob-rxn-split.active-unseen { border-color: var(--ob-cream-dark); }
+.ob-rxn-split.active-unseen .unseen-bg { clip-path: polygon(100% -100%, 100% 100%, -100% 100%); background: var(--ob-cream-dark); }
+.ob-rxn-split.active-unseen .ob-rxn-split-line { transform: translateX(-100%); opacity: 0; }
+.ob-rxn-split.active-unseen .unseen-lbl { bottom: 50%; right: 50%; transform: translate(50%, 50%); color: var(--ob-ink); }
+.ob-rxn-split.active-unseen .seen-lbl { opacity: 0; }
 
 /* Duplicate removed */
 .ob-loved-row { display: flex; align-items: center; gap: 10px; }

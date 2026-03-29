@@ -48,4 +48,15 @@ status: active
 **Soluzione applicata**: Gestione granulare della Safe Area per componente e uso di `100dvh` per compatibilità con le barre dinamiche dei browser.
 **Side effects**: Risolto definitivamente il problema di visibilità del footer su mobile.
 
+
+## 17:00 [tipo: UI/UX | bug-fix]
+
+**File toccati**:
+
+- `src/components/onboarding/OnboardingFlow.tsx` — Spostato il nudge "valuta tutti" sotto i bottoni, pulito il footer ed eliminato l'overflow orizzontale; implementati gli stati `active` per le reazioni.
+
+**Problema di partenza**: Footer troppo affollato e con overflow a destra; messaggio di avviso troppo distante dai pulsanti; pulsante "visto/non visto" che manteneva lo stato visivo precedente al cambio film.
+**Soluzione applicata**: Riposizionato il nudge nell'area centrale, semplificato il footer e aggiunta logica React per evidenziare/resettare la reazione selezionata ad ogni cambio film.
+**Side effects**: UX più pulita e feedback visivi coerenti con lo stato dei dati.
+
 ---
