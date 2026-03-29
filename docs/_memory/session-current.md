@@ -108,3 +108,16 @@ status: active
 **Side effects**: Nessuno previsto, la logica di onboarding è rimasta invariata.
 
 ---
+
+## 20:49 bug-fix
+
+**File toccati**:
+- `src/app/layout.tsx` — Passaggio dai Google Fonts (Cormorant/Fragment) ai font locali Geist (Sans e Mono).
+- `src/app/globals.css` — Rimappatura variabili globali `--font-serif` e `--font-mono` su Geist.
+- `src/components/onboarding/OnboardingFlow.tsx` — Ripristino integrale degli stili eliminati (card, bottoni, barra progresso) e switch grafico sui font Geist.
+
+**Problema di partenza**: L'UI dell'onboarding era completamente rotta (stile mancante) e la tipografia Serif non era gradita dal cliente.
+**Soluzione applicata**: Restauro completo del CSS basato su `beta1.jsx` adattato ai nuovi font Geist caricati localmente.
+**Side effects**: Tutto il sito ora utilizza Geist come font principale (serif rimappato su geist-sans).
+
+---
