@@ -59,4 +59,19 @@ status: active
 **Soluzione applicata**: Riposizionato il nudge nell'area centrale, semplificato il footer e aggiunta logica React per evidenziare/resettare la reazione selezionata ad ogni cambio film.
 **Side effects**: UX più pulita e feedback visivi coerenti con lo stato dei dati.
 
+
+## 17:10 [tipo: feature | bug-fix | refactor | UI/UX]
+
+**File toccati**:
+
+- `src/app/page.tsx` — Rilevamento parametro `code` e redirect al callback Supabase.
+- `src/app/auth/callback/route.ts` — Redirect alla nuova pagina `confirmed` per utenti con onboarding incompleto.
+- `src/app/auth/confirm/` — [RIMOZIONE] Cartella obsoleta.
+- `src/app/auth/confirmed/page.tsx` — [NUOVO] Pagina di successo email verificata con stile premium.
+- `src/components/onboarding/OnboardingFlow.tsx` — Unificazione font, Safe Area avanzata, icone SVG, footer anti-overflow e redesign piramide/sidebar (griglia mobile 2x3).
+
+**Problema di partenza**: Necessità di affinare l'esperienza di autenticazione e ottimizzare l'onboarding per ogni scenario mobile e desktop.
+**Soluzione applicata**: Implementati 6 fix specifici: flusso auth professionale, font globali, gestione notch/safe-area tramite `max(clamp, env)`, icone SVG personalizzate, footer con ellissi e redesign della piramide dei pilastri (sidebar laterale fissa e griglia responsive).
+**Side effects**: UX coerente e visualmente eccellente su ogni dispositivo.
+
 ---

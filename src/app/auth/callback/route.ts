@@ -27,7 +27,8 @@ export async function GET(request: Request) {
             const onboardingComplete = (profile as unknown as { onboarding_complete?: boolean })?.onboarding_complete ?? false;
 
             if (!onboardingComplete) {
-                return NextResponse.redirect(new URL('/onboarding', requestUrl.origin));
+                // Per i nuovi utenti (onboarding non completo), mostriamo prima il successo della conferma email
+                return NextResponse.redirect(new URL('/auth/confirmed', requestUrl.origin));
             } else {
                 return NextResponse.redirect(new URL('/sphere', requestUrl.origin));
             }

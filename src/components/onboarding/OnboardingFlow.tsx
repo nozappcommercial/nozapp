@@ -413,9 +413,8 @@ export default function OnboardingFlow({ films }: OnboardingFlowProps) {
                         onClick={() => handleReaction("disliked")}
                       >
                         <span className="ob-rxn-icon" style={{ color: "var(--ob-ink-light)" }}>
-                          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                            <line x1="18" y1="6" x2="6" y2="18"></line>
-                            <line x1="6" y1="6" x2="18" y2="18"></line>
+                          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
+                            <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
                           </svg>
                         </span>
                         <span className="ob-rxn-lbl">Non fa<br />per me</span>
@@ -477,13 +476,13 @@ export default function OnboardingFlow({ films }: OnboardingFlowProps) {
               <button
                 className={`ob-side-toggle ${isSideboardOpen ? 'open' : ''}`}
                 onClick={() => setIsSideboardOpen(!isSideboardOpen)}
-                title={isSideboardOpen ? "Chiudi galleria" : "Apri galleria film amati"}
+                title={isSideboardOpen ? "Chiudi" : "Film preferiti"}
               >
-                <div className="ob-side-toggle-arrow">
-                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-                    <polyline points="15 18 9 12 15 6"></polyline>
+                <span className="ob-side-toggle-icon">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <polyline points="15 18 9 12 15 6"/>
                   </svg>
-                </div>
+                </span>
               </button>
 
               {/* REPLACE SHEET (Bottom Sheet) */}
@@ -778,8 +777,8 @@ const ONBOARDING_CSS = `
   --ob-gold:       #B8895A;
   --ob-gold-light: #D4A870;
   --ob-gold-faint: rgba(184,137,90,0.15);
-  --ob-serif:      var(--font-cormorant);
-  --ob-mono:       var(--font-fragment);
+  --ob-serif:      var(--font-serif);
+  --ob-mono:       var(--font-mono);
   --ob-r:          3px;
 }
 
@@ -860,8 +859,9 @@ input[type="date"]::-webkit-calendar-picker-indicator { flex-shrink: 0; }
 .ob-botbar {
   display: flex; justify-content: space-between; align-items: center;
   margin-top: auto; padding: clamp(10px,1.5vh,18px) clamp(20px,5vw,56px);
-  padding-bottom: calc(clamp(10px,1.5vh,18px) + env(safe-area-inset-bottom));
+  padding-bottom: max(clamp(12px, 2vh, 20px), env(safe-area-inset-bottom, 12px));
   border-top: 1px solid rgba(0,0,0,0.06); gap: 12px;
+  flex-wrap: nowrap;
 }
 .ob-loved-row { display: flex; align-items: center; gap: 8px; font-family: var(--ob-mono); font-size: 8px; letter-spacing: 0.1em; color: var(--ob-ink-faint); text-transform: uppercase; }
 .ob-botright {
@@ -904,8 +904,10 @@ input[type="date"]::-webkit-calendar-picker-indicator { flex-shrink: 0; }
 }
 .ob-topbar {
   display: flex; justify-content: space-between; align-items: center;
-  padding: clamp(12px,2vh,24px) clamp(20px,5vw,56px);
-  padding-top: calc(clamp(12px,2vh,24px) + env(safe-area-inset-top));
+  padding-top: max(clamp(16px, 2.5vh, 28px), env(safe-area-inset-top, 0px));
+  padding-left: clamp(20px, 5vw, 56px);
+  padding-right: clamp(20px, 5vw, 56px);
+  padding-bottom: clamp(16px, 2.5vh, 28px);
   border-bottom: 1px solid var(--ob-cream-dark);
 }
 .ob-brand { font-size: clamp(13px,2vw,16px); }
@@ -1241,9 +1243,15 @@ input[type="date"]::-webkit-calendar-picker-indicator { flex-shrink: 0; }
   font-size: clamp(8px,1.1vw,10px);
   letter-spacing: 0.16em; text-transform: uppercase;
   color: var(--ob-ink-faint);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 160px;
 }
 .ob-botright { 
   display: flex; flex-direction: row; align-items: center; gap: 12px; margin-left: auto;
+  flex-shrink: 0;
+  align-items: flex-end;
 }
 .ob-nudge {
   font-family: var(--ob-mono);
@@ -1298,6 +1306,30 @@ input[type="date"]::-webkit-calendar-picker-indicator { flex-shrink: 0; }
   align-items: center;
   gap: clamp(10px,1.8vh,18px);
   flex: 1; justify-content: center;
+  max-height: calc(100vh - 280px);
+  overflow-y: auto;
+  scrollbar-width: none;
+}
+/* Mobile override per la piramide */
+@media (max-width: 640px) {
+  .ob-pyramid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    width: 100%;
+  }
+  .ob-pyr-row {
+    display: contents; /* le card si inseriscono direttamente nella griglia */
+  }
+  .ob-pyr-card {
+    width: 100% !important;
+  }
+  /* Il vertice occupa 2 colonne */
+  .ob-pyr-row.row-0 .ob-pyr-card {
+    grid-column: span 2;
+    max-width: 160px;
+    margin: 0 auto;
+  }
 }
 .ob-pyr-row {
   display: flex; gap: clamp(8px,1.5vw,14px);
@@ -1410,41 +1442,46 @@ input[type="date"]::-webkit-calendar-picker-indicator { flex-shrink: 0; }
 
 .ob-side-toggle {
   position: fixed;
-  right: 0;
+  right: 0;           /* attaccato al bordo destro */
   top: 50%;
   transform: translateY(-50%);
-  width: 32px; height: 60px;
-  border-radius: 20px 0 0 20px;
+  width: 32px;
+  height: 64px;
+  border-radius: 12px 0 0 12px;  /* arrotondato solo a sinistra */
   background: var(--ob-ink);
   color: #fff;
   border: none;
   cursor: pointer;
   z-index: 1100;
   display: flex; align-items: center; justify-content: center;
-  box-shadow: -4px 0 12px rgba(0,0,0,0.1);
-  transition: all 0.4s cubic-bezier(0.19, 1, 0.22, 1);
+  box-shadow: -4px 0 16px rgba(0,0,0,0.15);
+  transition: background 0.3s;
 }
 .ob-side-toggle.open {
-  right: 280px;
+  background: var(--ob-gold);
 }
-.ob-side-toggle.open .ob-side-toggle-arrow {
-  transform: rotate(180deg);
+.ob-side-toggle.open .ob-side-toggle-icon svg {
+  transform: rotate(180deg); /* freccia verso destra quando aperta */
 }
-.ob-side-toggle-arrow { transition: transform 0.4s ease; display: flex; align-items: center; justify-content: center; }
+.ob-side-toggle-icon svg {
+  transition: transform 0.4s cubic-bezier(0.19, 1, 0.22, 1);
+}
 
 /* ── SIDEBAR (Bottom Sheet) ── */
 .ob-pyr-sidebar {
-  position: fixed; top: 0; right: 0; bottom: 0;
-  height: 100vh; width: 280px;
-  background: rgba(242, 237, 227, 0.98);
-  backdrop-filter: blur(20px);
+  position: fixed;
+  right: 0; top: 0; bottom: 0;
+  width: 260px;
+  height: 100%;
+  background: rgba(242, 237, 227, 0.96);
+  backdrop-filter: blur(28px);
   border-left: 1px solid var(--ob-cream-dark);
-  transform: translateX(100%);
-  transition: transform 0.4s cubic-bezier(0.19, 1, 0.22, 1);
+  transform: translateX(100%);   /* nascosta a destra */
+  transition: transform 0.5s cubic-bezier(0.19, 1, 0.22, 1);
   z-index: 1050;
   display: flex; flex-direction: column;
-  box-shadow: -12px 0 40px rgba(0,0,0,0.08);
-  padding-top: env(safe-area-inset-top);
+  border-radius: 0;
+  box-shadow: -12px 0 40px rgba(0,0,0,0.1);
 }
 .ob-pyr-sidebar.active { transform: translateX(0); }
 
