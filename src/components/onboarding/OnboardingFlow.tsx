@@ -851,12 +851,12 @@ input[type="date"]::-webkit-calendar-picker-indicator { flex-shrink: 0; }
 /* ── BOTTOM BAR ── */
 .ob-botbar {
   display: flex; justify-content: space-between; align-items: center;
-  margin-top: auto; padding-top: clamp(24px,4vh,40px);
-  border-top: 1px solid rgba(0,0,0,0.06); gap: 16px;
+  margin-top: auto; padding: clamp(10px,1.5vh,18px) clamp(20px,5vw,56px);
+  border-top: 1px solid rgba(0,0,0,0.06); gap: 12px;
 }
-.ob-loved-row { display: flex; align-items: center; gap: 8px; font-family: var(--ob-mono); font-size: 9px; letter-spacing: 0.1em; color: var(--ob-ink-faint); text-transform: uppercase; }
+.ob-loved-row { display: flex; align-items: center; gap: 8px; font-family: var(--ob-mono); font-size: 8px; letter-spacing: 0.1em; color: var(--ob-ink-faint); text-transform: uppercase; }
 .ob-botright {
-  display: flex; flex-direction: row; align-items: center; justify-content: flex-end; gap: 16px; text-align: right; flex-wrap: nowrap; white-space: nowrap;
+  display: flex; flex-direction: row; align-items: center; justify-content: flex-end; gap: 12px; text-align: right; flex-wrap: nowrap; white-space: nowrap; margin-left: auto;
 }
 
 /* ── BUTTONS ── */
@@ -889,13 +889,13 @@ input[type="date"]::-webkit-calendar-picker-indicator { flex-shrink: 0; }
 /* ── STEP SHELL ── */
 .ob-step-shell {
   position: relative; z-index: 1;
-  min-height: 100vh;
+  height: 100vh;
   display: grid;
   grid-template-rows: auto 2px 1fr auto;
 }
 .ob-topbar {
   display: flex; justify-content: space-between; align-items: center;
-  padding: clamp(16px,2.5vh,28px) clamp(20px,5vw,56px);
+  padding: clamp(12px,2vh,24px) clamp(20px,5vw,56px);
   border-bottom: 1px solid var(--ob-cream-dark);
 }
 .ob-brand { font-size: clamp(13px,2vw,16px); }
@@ -923,12 +923,12 @@ input[type="date"]::-webkit-calendar-picker-indicator { flex-shrink: 0; }
 .ob-stage {
   display: flex; flex-direction: column;
   align-items: center; justify-content: center;
-  padding: clamp(10px,2vh,20px) clamp(20px,5vw,56px);
-  gap: clamp(12px,2vh,20px);
+  padding: clamp(8px,1.5vh,16px) clamp(20px,5vw,56px);
+  gap: clamp(10px,1.8vh,18px);
 }
 .ob-stage-headline { text-align: center; }
 .ob-stage-headline h2 {
-  font-size: clamp(20px,4vw,36px); font-weight: 300;
+  font-size: clamp(18px,3.8vw,34px); font-weight: 300;
   letter-spacing: -0.01em; line-height: 1.15; margin: 0 0 6px 0;
 }
 .ob-stage-headline h2 em { font-style: italic; color: var(--ob-gold); }
@@ -1001,12 +1001,12 @@ input[type="date"]::-webkit-calendar-picker-indicator { flex-shrink: 0; }
 .ob-card-wrap {
   display: flex; flex-direction: column;
   align-items: center;
-  gap: clamp(14px,2vh,22px);
+  gap: clamp(10px,1.5vh,18px);
   width: 100%;
 }
 
 .ob-film-card-sizer {
-  height: clamp(200px, 40vh, 380px);
+  height: clamp(150px, 30vh, 320px);
   aspect-ratio: 2/3;
   flex-shrink: 0;
   position: relative;
@@ -1031,18 +1031,18 @@ input[type="date"]::-webkit-calendar-picker-indicator { flex-shrink: 0; }
 }
 .ob-fc-mood {
   font-family: var(--ob-mono);
-  font-size: clamp(7px,1vw,9px);
+  font-size: clamp(6px,0.9vw,8px);
   letter-spacing: 0.15em; text-transform: uppercase;
   color: rgba(255,255,255,0.38); line-height: 1.6;
 }
 .ob-fc-title {
   font-family: var(--ob-serif);
-  font-size: clamp(18px,3.5vw,28px); font-weight: 400;
+  font-size: clamp(16px,3.2vw,26px); font-weight: 400;
   color: #fff; line-height: 1.2; margin-bottom: 4px;
 }
 .ob-fc-dir {
   font-family: var(--ob-mono);
-  font-size: clamp(7px,1vw,9px);
+  font-size: clamp(6px,0.9vw,8px);
   letter-spacing: 0.16em; text-transform: uppercase;
   color: rgba(255,255,255,0.45);
 }
@@ -1068,12 +1068,12 @@ input[type="date"]::-webkit-calendar-picker-indicator { flex-shrink: 0; }
 .ob-rxn-row {
   display: flex; flex-direction: row;
   justify-content: center; align-items: stretch;
-  gap: clamp(10px,2vw,16px);
+  gap: clamp(8px,1.5vw,14px);
   width: 100%; max-width: 480px; margin: 0 auto;
 }
 .ob-rxn-btn {
   flex: 1; min-width: 110px; max-width: 130px;
-  height: 88px;
+  height: 74px;
   background: transparent; border: 1.5px solid var(--ob-cream-dark);
   border-radius: 4px; padding: 12px 6px; cursor: pointer;
   display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px;
@@ -1100,7 +1100,7 @@ input[type="date"]::-webkit-calendar-picker-indicator { flex-shrink: 0; }
 /* SPLIT BUTTON seen/unseen (Fixed & Polished) */
 .ob-rxn-split {
   flex: 1; min-width: 110px; max-width: 130px;
-  height: 88px;
+  height: 74px;
   border-radius: 4px;
   border: 1.5px solid var(--ob-cream-dark);
   position: relative; overflow: hidden;
@@ -1141,10 +1141,10 @@ input[type="date"]::-webkit-calendar-picker-indicator { flex-shrink: 0; }
   transition: all 0.4s cubic-bezier(0.19, 1, 0.22, 1);
 }
 .seen-lbl {
-  top: 14px; left: 14px; 
+  top: 10px; left: 10px; 
 }
 .unseen-lbl {
-  bottom: 14px; right: 14px;
+  bottom: 10px; right: 10px;
 }
 
 /* Hit Areas */
@@ -1200,14 +1200,7 @@ input[type="date"]::-webkit-calendar-picker-indicator { flex-shrink: 0; }
   opacity: 0; transform: translate(-20px, -20px);
 }
 
-/* ── BOTTOM BAR ── */
-.ob-botbar {
-  border-top: 1px solid var(--ob-cream-dark);
-  padding: clamp(12px,2vh,20px) clamp(20px,5vw,56px);
-  display: flex; align-items: center;
-  justify-content: space-between; gap: 12px;
-  flex-wrap: wrap;
-}
+/* Duplicate removed */
 .ob-loved-row { display: flex; align-items: center; gap: 10px; }
 .ob-loved-txt {
   font-family: var(--ob-mono);
@@ -1216,7 +1209,7 @@ input[type="date"]::-webkit-calendar-picker-indicator { flex-shrink: 0; }
   color: var(--ob-ink-faint);
 }
 .ob-botright { 
-  display: flex; flex-direction: row; align-items: center; gap: 16px; margin-left: auto;
+  display: flex; flex-direction: row; align-items: center; gap: 12px; margin-left: auto;
 }
 .ob-nudge {
   font-family: var(--ob-mono);
@@ -1471,7 +1464,7 @@ input[type="date"]::-webkit-calendar-picker-indicator { flex-shrink: 0; }
 
 /* ── COMPLETION CARD ── */
 .ob-done-card-sizer {
-  width: clamp(200px, 60vw, 280px);
+  width: clamp(140px, 45vw, 240px);
   aspect-ratio: 2/3;
   flex-shrink: 0;
   animation: ob-au 0.4s ease both;

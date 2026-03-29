@@ -14,4 +14,27 @@ status: active
 **Soluzione applicata**: Creata una rotta di conferma esplicita, corretti i padding per la safe-area e riprogettato l'elemento piramide per adattarsi a schermi piccoli trasformando il drawer in side-panel.
 **Side effects**: Nessuno, le modifiche ai font sono variabili CSS controllate.
 
+
+## 16:40 [tipo: UI/UX]
+
+**File toccati**:
+
+- `src/components/onboarding/OnboardingFlow.tsx` — Ridotto ingombro verticale (card 30vh, bottoni 74px) e spaziature per fit ottimale su mobile.
+
+**Problema di partenza**: Gli elementi dell'onboarding riempivano eccessivamente lo schermo verticale su mobile, rendendo l'interfaccia troppo serrata e rischiando di nascondere elementi del footer.
+**Soluzione applicata**: Ottimizzati i parametri `clamp` per altezze e gap, riducendo le dimensioni di card e componenti.
+**Side effects**: Nessuno visibile su desktop grazie all'uso di clamp.
+
+---
+
+## 16:45 [tipo: bug-fix | UI/UX]
+
+**File toccati**:
+
+- `src/components/onboarding/OnboardingFlow.tsx` — Forzato layout `height: 100vh` per le sezioni, rimosse definizioni CSS duplicate e pulita la struttura del footer.
+
+**Problema di partenza**: Al termine della valutazione di un gruppo, il pulsante "Prossimo Gruppo" non era visibile o accessibile, bloccando l'avanzamento dell'utente.
+**Soluzione applicata**: Stabilizzato il layout grid a 100vh fissi per garantire che il footer rimanga sempre all'interno del viewport e ridimensionata la card di completamento.
+**Side effects**: Risolto il blocco funzionale nell'onboarding.
+
 ---
