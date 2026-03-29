@@ -5,7 +5,6 @@ import { useIsMobile } from "@/hooks/use-is-mobile";
 import type { OnboardingFilm } from "@/app/onboarding/page";
 
 /* ─── Constants ─────────────────────────────────────────────────── */
-const FONTS_URL = "https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400;1,500&family=Courier+Prime:ital,wght@0,400;0,700;1,400&display=swap";
 const MAX_PILLARS = 6;
 
 type Reaction = "loved" | "disliked" | "seen" | "unseen";
@@ -274,8 +273,6 @@ export default function OnboardingFlow({ films }: OnboardingFlowProps) {
 
   return (
     <>
-      {/* eslint-disable-next-line @next/next/no-page-custom-font */}
-      <link rel="stylesheet" href={FONTS_URL} />
       <style>{ONBOARDING_CSS}</style>
 
       <div className={`ob-root${!fadeIn ? " ob-faded" : ""}`}>
@@ -408,7 +405,12 @@ export default function OnboardingFlow({ films }: OnboardingFlowProps) {
                       <span className="ob-rxn-lbl">L&apos;ho<br />amato</span>
                     </button>
                     <button className="ob-rxn-btn disliked" onClick={() => handleReaction("disliked")}>
-                      <span className="ob-rxn-icon" style={{ color: "var(--ob-ink-light)" }}>✕</span>
+                      <span className="ob-rxn-icon" style={{ color: "var(--ob-ink-light)" }}>
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                          <line x1="18" y1="6" x2="6" y2="18"></line>
+                          <line x1="6" y1="6" x2="18" y2="18"></line>
+                        </svg>
+                      </span>
                       <span className="ob-rxn-lbl">Non fa<br />per me</span>
                     </button>
 
@@ -463,13 +465,17 @@ export default function OnboardingFlow({ films }: OnboardingFlowProps) {
 
           return (
             <div className="ob-pyramid-shell">
-              {/* Toggle Sidebar Button */}
+              {/* Toggle Sidebar Button (Minimal Arrow) */}
               <button
                 className={`ob-side-toggle ${isSideboardOpen ? 'open' : ''}`}
                 onClick={() => setIsSideboardOpen(!isSideboardOpen)}
                 title={isSideboardOpen ? "Chiudi galleria" : "Apri galleria film amati"}
               >
-                <span className="ob-side-toggle-icon">↑</span>
+                <div className="ob-side-toggle-arrow">
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                    <polyline points="15 18 9 12 15 6"></polyline>
+                  </svg>
+                </div>
               </button>
 
               {/* REPLACE SHEET (Bottom Sheet) */}
@@ -764,8 +770,8 @@ const ONBOARDING_CSS = `
   --ob-gold:       #B8895A;
   --ob-gold-light: #D4A870;
   --ob-gold-faint: rgba(184,137,90,0.15);
-  --ob-serif:      var(--font-serif);
-  --ob-mono:       var(--font-mono);
+  --ob-serif:      var(--font-cormorant);
+  --ob-mono:       var(--font-fragment);
   --ob-r:          3px;
 }
 
@@ -777,6 +783,7 @@ const ONBOARDING_CSS = `
   position: relative;
   overflow: hidden;
   transition: opacity 0.28s ease;
+  padding-top: env(safe-area-inset-top);
 }
 .ob-root.ob-faded { opacity: 0; pointer-events: none; }
 
@@ -1208,7 +1215,9 @@ input[type="date"]::-webkit-calendar-picker-indicator { flex-shrink: 0; }
   letter-spacing: 0.16em; text-transform: uppercase;
   color: var(--ob-ink-faint);
 }
-.ob-botright { display: flex; flex-direction: column; align-items: flex-end; gap: 5px; }
+.ob-botright { 
+  display: flex; flex-direction: row; align-items: center; gap: 16px; margin-left: auto;
+}
 .ob-nudge {
   font-family: var(--ob-mono);
   font-size: 8px; letter-spacing: 0.16em;
@@ -1264,8 +1273,15 @@ input[type="date"]::-webkit-calendar-picker-indicator { flex-shrink: 0; }
   flex: 1; justify-content: center;
 }
 .ob-pyr-row {
-  display: flex; gap: clamp(10px,1.8vw,18px);
+  display: flex; gap: clamp(8px,1.5vw,14px);
   justify-content: center; align-items: flex-start;
+}
+@media (max-height: 740px) {
+  .ob-pyramid { transform: scale(0.9); transform-origin: top center; gap: 8px; }
+}
+@media (max-height: 660px) {
+  .ob-pyramid { transform: scale(0.8); }
+  .ob-pyr-header { margin-bottom: -20px; }
 }
 
 .ob-pyr-card {
@@ -1353,7 +1369,7 @@ input[type="date"]::-webkit-calendar-picker-indicator { flex-shrink: 0; }
   transition: padding-right 0.4s ease;
 }
 .ob-confirm-container.side-open {
-  padding-right: 300px; /* offset when sidebar is fixed/absolute */
+  padding-right: 0; 
 }
 
 .ob-pyramid-main {
@@ -1367,40 +1383,43 @@ input[type="date"]::-webkit-calendar-picker-indicator { flex-shrink: 0; }
 
 .ob-side-toggle {
   position: fixed;
-  right: 24px;
-  bottom: 120px;
-  width: 52px; height: 52px;
-  border-radius: 50%;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 32px; height: 60px;
+  border-radius: 20px 0 0 20px;
   background: var(--ob-ink);
   color: #fff;
   border: none;
   cursor: pointer;
   z-index: 1100;
   display: flex; align-items: center; justify-content: center;
-  box-shadow: 0 8px 24px rgba(0,0,0,0.2);
-  transition: all 0.5s cubic-bezier(0.19, 1, 0.22, 1);
+  box-shadow: -4px 0 12px rgba(0,0,0,0.1);
+  transition: all 0.4s cubic-bezier(0.19, 1, 0.22, 1);
 }
 .ob-side-toggle.open {
-  transform: translateY(-50vh) rotate(180deg);
-  background: var(--ob-gold);
+  right: 280px;
 }
-.ob-side-toggle-icon { font-size: 20px; line-height: 1; }
+.ob-side-toggle.open .ob-side-toggle-arrow {
+  transform: rotate(180deg);
+}
+.ob-side-toggle-arrow { transition: transform 0.4s ease; display: flex; align-items: center; justify-content: center; }
 
 /* ── SIDEBAR (Bottom Sheet) ── */
 .ob-pyr-sidebar {
-  position: fixed; left: 0; right: 0; bottom: 0;
-  height: 60vh; width: 100%;
-  background: rgba(242, 237, 227, 0.94);
-  backdrop-filter: blur(28px);
-  border-top: 1px solid var(--ob-cream-dark);
-  transform: translateY(100%);
-  transition: transform 0.6s cubic-bezier(0.19, 1, 0.22, 1);
+  position: fixed; top: 0; right: 0; bottom: 0;
+  height: 100vh; width: 280px;
+  background: rgba(242, 237, 227, 0.98);
+  backdrop-filter: blur(20px);
+  border-left: 1px solid var(--ob-cream-dark);
+  transform: translateX(100%);
+  transition: transform 0.4s cubic-bezier(0.19, 1, 0.22, 1);
   z-index: 1050;
   display: flex; flex-direction: column;
-  border-radius: 40px 40px 0 0;
-  box-shadow: 0 -12px 40px rgba(0,0,0,0.12);
+  box-shadow: -12px 0 40px rgba(0,0,0,0.08);
+  padding-top: env(safe-area-inset-top);
 }
-.ob-pyr-sidebar.active { transform: translateY(0); }
+.ob-pyr-sidebar.active { transform: translateX(0); }
 
 .ob-side-header { padding: 32px 40px 20px; border-bottom: 1px solid var(--ob-cream-dark); }
 .ob-side-title  { font-size: 24px; font-weight: 300; margin: 0; }
@@ -1408,16 +1427,15 @@ input[type="date"]::-webkit-calendar-picker-indicator { flex-shrink: 0; }
 .ob-side-sub    { font-family: var(--ob-mono); font-size: 9px; text-transform: uppercase; letter-spacing: 0.1em; color: var(--ob-ink-faint); margin: 6px 0 0; }
 
 .ob-side-grid {
-  flex: 1; overflow-x: auto; overflow-y: hidden;
-  display: flex; flex-direction: row;
-  gap: 24px; padding: 40px;
-  align-items: flex-start;
+  flex: 1; overflow-y: auto; overflow-x: hidden;
+  display: grid; grid-template-columns: repeat(2, 1fr);
+  gap: 16px; padding: 24px;
+  align-content: flex-start;
 }
 .ob-side-card { 
-  flex-shrink: 0;
-  width: 100px;
+  width: 100%;
   cursor: grab; transition: transform 0.2s; 
-  display: flex; flex-direction: column; gap: 8px;
+  display: flex; flex-direction: column; gap: 6px;
 }
 .ob-side-card:hover { transform: translateY(-4px); }
 .ob-side-poster { 

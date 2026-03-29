@@ -37,9 +37,22 @@ export default function AuthHandler() {
                     console.log(`[AuthHandler] Detected sensitive hash (${event}), clearing address bar...`);
                     
                     // Replace the URL with a clean version (without the hash)
-                    // We use replaceState so that the back button doesn't loop through the sensitive URL
                     const cleanUrl = window.location.pathname + window.location.search;
                     window.history.replaceState(null, '', cleanUrl);
+                }
+            }
+
+            // --- CATCH CONFIRMATION CODE ---
+            // If we are on the home page and there's a code in the URL, 
+            // redirect to the specialized confirmation success page.
+            if (typeof window !== 'undefined') {
+                const url = new URL(window.location.href);
+                const code = url.searchParams.get('code');
+                const isHome = url.pathname === '/' || url.pathname === '';
+                
+                if (code && isHome) {
+                    console.log('[AuthHandler] Code detected on home page, redirecting to /auth/confirm...');
+                    window.location.href = `/auth/confirm?code=${code}`;
                 }
             }
         });
