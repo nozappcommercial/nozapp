@@ -74,4 +74,15 @@ status: active
 **Soluzione applicata**: Implementati 6 fix specifici: flusso auth professionale, font globali, gestione notch/safe-area tramite `max(clamp, env)`, icone SVG personalizzate, footer con ellissi e redesign della piramide dei pilastri (sidebar laterale fissa e griglia responsive).
 **Side effects**: UX coerente e visualmente eccellente su ogni dispositivo.
 
+
+## 17:25 [tipo: UI/UX | bug-fix]
+
+**File toccati**:
+
+- `src/components/onboarding/OnboardingFlow.tsx` — Implementato `ob-rep-sheet` come Bottom Sheet, aggiunto backdrop di sfuocatura e corretto il padding Safe Area per la testata della sidebar.
+
+**Problema di partenza**: La visualizzazione della scelta del sostituto copriva male lo schermo senza gerarchia; la sidebar dei preferiti veniva tagliata dal notch.
+**Soluzione applicata**: Trasformata la selezione del sostituto in un componente Bottom Sheet con overlay oscurante e blur; aggiunto padding dinamico `env(safe-area-inset-top)` alla testata della galleria.
+**Side effects**: UX più fluida e professionale su mobile.
+
 ---

@@ -485,6 +485,12 @@ export default function OnboardingFlow({ films }: OnboardingFlowProps) {
                 </span>
               </button>
 
+              {/* BACKDROP for Replace Sheet */}
+              <div 
+                className={`ob-rep-backdrop ${replacingPillar !== null ? 'active' : ''}`} 
+                onClick={() => setReplacingPillar(null)}
+              />
+
               {/* REPLACE SHEET (Bottom Sheet) */}
               <div className={`ob-rep-sheet ${replacingPillar !== null ? 'active' : ''}`}>
                 <div className="ob-rep-header">
@@ -1435,10 +1441,61 @@ input[type="date"]::-webkit-calendar-picker-indicator { flex-shrink: 0; }
   flex: 0 1 auto;
   display: flex;
   flex-direction: column;
-  gap: 40px;
+  gap: clamp(24px, 4vh, 48px);
   max-width: 900px;
   width: 100%;
 }
+
+/* ── REPLACE SHEET (Bottom Up) ── */
+.ob-rep-backdrop {
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,0.4);
+  backdrop-filter: blur(8px);
+  z-index: 1080;
+  opacity: 0; pointer-events: none;
+  transition: opacity 0.4s ease;
+}
+.ob-rep-backdrop.active { opacity: 1; pointer-events: auto; }
+
+.ob-rep-sheet {
+  position: fixed; bottom: 0; left: 0; right: 0;
+  height: 85vh; width: 100%;
+  background: var(--ob-cream);
+  border-radius: 28px 28px 0 0;
+  border-top: 1px solid var(--ob-cream-dark);
+  box-shadow: 0 -12px 60px rgba(0,0,0,0.15);
+  transform: translateY(100%);
+  transition: transform 0.6s cubic-bezier(0.19, 1, 0.22, 1);
+  z-index: 1090;
+  display: flex; flex-direction: column;
+  padding-bottom: env(safe-area-inset-bottom);
+}
+.ob-rep-sheet.active { transform: translateY(0); }
+
+.ob-rep-header {
+  padding: 32px 32px 20px;
+  display: flex; justify-content: space-between; align-items: flex-start;
+  border-bottom: 1px solid rgba(0,0,0,0.05);
+}
+.ob-rep-title { font-size: 24px; font-weight: 300; margin: 0; }
+.ob-rep-title em { font-style: italic; color: var(--ob-gold); }
+.ob-rep-sub { font-family: var(--ob-mono); font-size: 9px; text-transform: uppercase; color: var(--ob-ink-faint); margin-top: 5px; }
+.ob-rep-close { border: none; background: none; font-size: 20px; cursor: pointer; color: var(--ob-ink-light); }
+
+.ob-rep-grid {
+  flex: 1; overflow-y: auto; padding: 24px 32px;
+  display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px;
+  align-content: flex-start;
+}
+@media (max-width: 480px) {
+  .ob-rep-grid { grid-template-columns: repeat(2, 1fr); padding: 20px; }
+}
+
+.ob-rep-card { width: 100%; cursor: pointer; transition: transform 0.2s; }
+.ob-rep-card:active { transform: scale(0.96); }
+.ob-rep-card-poster { width: 100%; aspect-ratio: 2/3; border-radius: 4px; overflow: hidden; margin-bottom: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+.ob-rep-ct { font-size: 11px; line-height: 1.3; font-weight: 400; color: var(--ob-ink); }
+
 
 .ob-side-toggle {
   position: fixed;
@@ -1485,7 +1542,11 @@ input[type="date"]::-webkit-calendar-picker-indicator { flex-shrink: 0; }
 }
 .ob-pyr-sidebar.active { transform: translateX(0); }
 
-.ob-side-header { padding: 32px 40px 20px; border-bottom: 1px solid var(--ob-cream-dark); }
+.ob-side-header { 
+  padding: 32px 40px 20px; 
+  padding-top: calc(32px + env(safe-area-inset-top));
+  border-bottom: 1px solid var(--ob-cream-dark); 
+}
 .ob-side-title  { font-size: 24px; font-weight: 300; margin: 0; }
 .ob-side-title em { font-style: italic; color: var(--ob-gold); }
 .ob-side-sub    { font-family: var(--ob-mono); font-size: 9px; text-transform: uppercase; letter-spacing: 0.1em; color: var(--ob-ink-faint); margin: 6px 0 0; }
@@ -1516,7 +1577,7 @@ input[type="date"]::-webkit-calendar-picker-indicator { flex-shrink: 0; }
 .ob-rep-card:hover .ob-rep-card-poster { border-color:var(--ob-gold); }
 .ob-rep-ct { font-size:11px; line-height:1.3; margin-bottom:2px; }
 .ob-rep-cy { font-family:var(--ob-mono); font-size:8px; letter-spacing:0.1em; color:var(--ob-ink-faint); text-transform:uppercase; }
-.ob-rep-empty { font-family:var(--ob-mono); font-size:10px; letter-spacing:0.18em; color:var(--ob-ink-faint); text-transform:uppercase; }
+.ob-rep-empty { font-family:var(--ob-mono); font-size:10px; letter-spacing:0.18em; color:var(--ob-ink-faint); text-transform:uppercase; grid-column: 1 / -1; text-align: center; padding: 40px 0; }
 
 /* ── DONE ── */
 .ob-done {
