@@ -102,30 +102,23 @@ export default function OnboardingFlow({ films }: OnboardingFlowProps) {
 
   const handleSwap = (clickedFilm: OnboardingFilm, source: 'pillar' | 'gallery', pillarIdx?: number) => {
     if (!selectedSwap) {
-      // First selection
       setSelectedSwap({ film: clickedFilm, source, index: pillarIdx });
       return;
     }
 
     if (selectedSwap.film.id === clickedFilm.id) {
-      // Unselect
       setSelectedSwap(null);
       return;
     }
 
-    // Execute Swap
     const nextPillars = [...pillars];
-    
     if (selectedSwap.source === 'pillar' && source === 'pillar') {
-      // Swap within pillars
       const temp = nextPillars[selectedSwap.index!];
       nextPillars[selectedSwap.index!] = nextPillars[pillarIdx!];
       nextPillars[pillarIdx!] = temp;
     } else if (selectedSwap.source === 'gallery' && source === 'pillar') {
-      // Swap gallery item with pillar spot
       nextPillars[pillarIdx!] = selectedSwap.film;
     } else if (selectedSwap.source === 'pillar' && source === 'gallery') {
-      // Swap pillar spot with gallery item
       nextPillars[selectedSwap.index!] = clickedFilm;
     }
     
@@ -133,7 +126,6 @@ export default function OnboardingFlow({ films }: OnboardingFlowProps) {
     setSelectedSwap(null);
   };
 
-  // --- Final Save ---
   const handleFinalSave = async () => {
     setFadeIn(false);
     try {
@@ -162,12 +154,15 @@ export default function OnboardingFlow({ films }: OnboardingFlowProps) {
     }
   };
 
-  // --- Visual Helpers ---
   const filmCardStyle = useCallback((film: OnboardingFilm) => {
     if (film.poster_url) {
-      return { backgroundImage: `linear-gradient(to bottom, rgba(0,0,0,0) 0%, rgba(0,0,0,0.6) 100%), url(${film.poster_url})`, backgroundSize: "cover", backgroundPosition: "center" };
+      return { 
+        backgroundImage: `linear-gradient(to bottom, rgba(0,0,0,0) 0%, rgba(0,0,0,0.7) 100%), url(${film.poster_url})`, 
+        backgroundSize: "cover", 
+        backgroundPosition: "center" 
+      };
     }
-    return { background: `linear-gradient(135deg, ${film.color_primary} 0%, ${film.color_accent} 100%)` };
+    return { background: `linear-gradient(135deg, ${film.color_primary || '#222'} 0%, ${film.color_accent || '#444'} 100%)` };
   }, []);
 
   if (!mounted) return <div className="ob-root" />;
@@ -182,10 +177,11 @@ export default function OnboardingFlow({ films }: OnboardingFlowProps) {
           <div className="ob-view ob-welcome">
             <div className="ob-notch-buffer" />
             <div className="ob-welcome-content">
-              <span className="ob-eyebrow">Onboarding · NoZapp</span>
-              <h1 className="ob-title">I pilastri del tuo <em>gusto</em></h1>
-              <p className="ob-desc">Seleziona i film che hanno definito chi sei oggi. Andremo a costruire la tua piramide semantica.</p>
-              <button className="ob-btn-gold" onClick={() => pageTransition(() => setPhase("evaluation"))}>Inizia →</button>
+              <span className="ob-eyebrow au0">Onboarding · NoZapp</span>
+              <h1 className="ob-title au1">I tuoi <em>pilastri</em> del gusto</h1>
+              <div className="ob-divider au1" />
+              <p className="ob-desc au2">Seleziona i film che hanno definito chi sei oggi.<br/>Andremo a costruire la tua piramide semantica.</p>
+              <button className="ob-btn-gold au3" onClick={() => pageTransition(() => setPhase("evaluation"))}>Inizia lo switch →</button>
             </div>
           </div>
         )}
@@ -195,29 +191,39 @@ export default function OnboardingFlow({ films }: OnboardingFlowProps) {
           <div className="ob-view ob-eval">
             <div className="ob-notch-buffer" />
             <div className="ob-top-nav">
-              <span className="ob-mono-lbl">Film {filmIndex + 1} di {films.length}</span>
-              <div className="ob-p-track"><div className="ob-p-fill" style={{ width: `${(filmIndex/films.length)*100}%` }} /></div>
+              <div className="ob-top-row">
+                <span className="ob-brand">La <em>Sfera</em> Semantica</span>
+                <span className="ob-mono-lbl">Film {filmIndex + 1} di {films.length}</span>
+              </div>
+              <div className="ob-p-track"><div className="ob-p-fill" style={{ width: `${((filmIndex + 1)/films.length)*100}%` }} /></div>
             </div>
 
-            <div className={`ob-card-stage ${cardAnim}`}>
-              <div className="ob-film-card" style={filmCardStyle(currentFilm)}>
-                <div className="ob-fc-meta">
-                  <span className="ob-fc-dir">{currentFilm.director}</span>
-                  <h2 className="ob-fc-title">{currentFilm.title}</h2>
-                  <span className="ob-fc-year">{currentFilm.year}</span>
+            <div className="ob-eval-stage">
+              <div className="ob-headline au0">
+                <h2>Questo film <em>ti appartiene?</em></h2>
+                <p>Scegli la tua reazione per continuare</p>
+              </div>
+
+              <div className={`ob-card-stage ${cardAnim}`}>
+                <div className="ob-film-card" style={filmCardStyle(currentFilm)}>
+                  <div className="ob-fc-meta">
+                    <span className="ob-fc-dir">{currentFilm.director}</span>
+                    <h2 className="ob-fc-title">{currentFilm.title}</h2>
+                    <span className="ob-fc-year">{currentFilm.year}</span>
+                  </div>
                 </div>
               </div>
-            </div>
 
-            <div className="ob-eval-actions">
-              <button className={`ob-act-btn loved ${reactions[currentFilm.id] === 'loved' ? 'active' : ''}`} onClick={() => handleReaction("loved")}>
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
-                <span>Lo amo</span>
-              </button>
-              <div className="ob-eval-row-2">
-                <button className={`ob-act-btn seen ${reactions[currentFilm.id] === 'seen' ? 'active' : ''}`} onClick={() => handleReaction("seen")}>Visto</button>
-                <button className={`ob-act-btn unseen ${reactions[currentFilm.id] === 'unseen' ? 'active' : ''}`} onClick={() => handleReaction("unseen")}>Non visto</button>
-                <button className={`ob-act-btn disliked ${reactions[currentFilm.id] === 'disliked' ? 'active' : ''}`} onClick={() => handleReaction("disliked")}>No</button>
+              <div className="ob-eval-actions au2">
+                <button className={`ob-act-btn loved ${reactions[currentFilm.id] === 'loved' ? 'active' : ''}`} onClick={() => handleReaction("loved")}>
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
+                  <span>Lo amo</span>
+                </button>
+                <div className="ob-eval-row-2">
+                  <button className={`ob-act-btn seen ${reactions[currentFilm.id] === 'seen' ? 'active' : ''}`} onClick={() => handleReaction("seen")}>Visto</button>
+                  <button className={`ob-act-btn unseen ${reactions[currentFilm.id] === 'unseen' ? 'active' : ''}`} onClick={() => handleReaction("unseen")}>Non visto</button>
+                  <button className={`ob-act-btn disliked ${reactions[currentFilm.id] === 'disliked' ? 'active' : ''}`} onClick={() => handleReaction("disliked")}>No</button>
+                </div>
               </div>
             </div>
           </div>
@@ -227,30 +233,34 @@ export default function OnboardingFlow({ films }: OnboardingFlowProps) {
         {phase === "confirm" && (
           <div className="ob-view ob-confirm">
             <div className="ob-notch-buffer" />
-            <div className="ob-confirm-header">
+            <div className="ob-confirm-header au0">
               <h2 className="ob-title-sm">La tua <em>Piramide</em></h2>
-              <p className="ob-p-sub">Seleziona due film per scambiarli di posto.</p>
+              <p className="ob-p-sub">SELEZIONA DUE FILM PER SCAMBIARLI DI POSTO.</p>
             </div>
 
-            <div className="ob-confirm-split">
-              <div className="ob-pyramid-grid">
+            <div className="ob-confirm-content">
+              <div className="ob-pyramid-grid au1">
                 {pillars.map((p, i) => (
                   <div 
                     key={i} 
                     className={`ob-p-slot spot-${i} ${selectedSwap?.index === i ? 'selected' : ''}`}
                     onClick={() => p ? handleSwap(p, 'pillar', i) : null}
                   >
-                    <div className="ob-p-rank">N° {i + 1}</div>
                     <div className="ob-p-poster" style={p ? filmCardStyle(p) : {}}>
                       {!p && <span className="ob-empty-txt">Scegli</span>}
-                      {p && <span className="ob-p-title-ov">{p.title}</span>}
+                      {p && (
+                        <div className="ob-p-overlay">
+                          <span className="ob-p-title-ov">{p.title}</span>
+                        </div>
+                      )}
                     </div>
+                    <div className="ob-p-rank">N° {i + 1}</div>
                   </div>
                 ))}
               </div>
 
               {galleryFilms.length > 0 && (
-                <div className="ob-gallery">
+                <div className="ob-gallery au2">
                   <h3 className="ob-side-title">Altri amati</h3>
                   <div className="ob-gallery-grid">
                     {galleryFilms.map(f => (
@@ -268,7 +278,7 @@ export default function OnboardingFlow({ films }: OnboardingFlowProps) {
               )}
             </div>
 
-            <div className="ob-bot-action">
+            <div className="ob-bot-action au2">
               <button className="ob-btn-ink" onClick={() => pageTransition(() => setPhase("streaming"))}>Conferma Ordine →</button>
             </div>
           </div>
@@ -278,9 +288,11 @@ export default function OnboardingFlow({ films }: OnboardingFlowProps) {
         {phase === "streaming" && (
           <div className="ob-view ob-form">
             <div className="ob-notch-buffer" />
-            <h2 className="ob-title-sm">Dove <em>vedi?</em></h2>
-            <p className="ob-p-sub">Useremo questo per mostrarti dove vedere i film suggeriti.</p>
-            <div className="ob-form-grid">
+            <div className="ob-form-header au0">
+              <h2 className="ob-title-sm">Dove <em>vedi?</em></h2>
+              <p className="ob-p-sub">Useremo questo per mostrarti dove vedere i film suggeriti.</p>
+            </div>
+            <div className="ob-form-grid au1">
               {STREAMING_PLATFORMS.map(p => (
                 <button 
                   key={p.id} 
@@ -291,8 +303,8 @@ export default function OnboardingFlow({ films }: OnboardingFlowProps) {
                 </button>
               ))}
             </div>
-            <div className="ob-bot-action">
-              <button className="ob-btn-ink" onClick={() => pageTransition(() => setPhase("demographics"))}>Prossimo →</button>
+            <div className="ob-bot-action au2">
+              <button className="ob-btn-gold" onClick={() => pageTransition(() => setPhase("demographics"))}>Prossimo →</button>
             </div>
           </div>
         )}
@@ -301,8 +313,11 @@ export default function OnboardingFlow({ films }: OnboardingFlowProps) {
         {phase === "demographics" && (
           <div className="ob-view ob-form">
             <div className="ob-notch-buffer" />
-            <h2 className="ob-title-sm">Un ultimo <em>tocco</em></h2>
-            <div className="ob-input-stack">
+            <div className="ob-form-header au0">
+              <h2 className="ob-title-sm">Un ultimo <em>tocco</em></h2>
+              <p className="ob-p-sub">Conoscerti meglio ci aiuta a calibrare la Sfera.</p>
+            </div>
+            <div className="ob-input-stack au1">
               <div className="ob-field">
                 <label>Data di nascita</label>
                 <input type="date" value={birthDate} onChange={e => setBirthDate(e.target.value)} />
@@ -317,7 +332,7 @@ export default function OnboardingFlow({ films }: OnboardingFlowProps) {
                 </select>
               </div>
             </div>
-            <div className="ob-bot-action">
+            <div className="ob-bot-action au2">
               <button className="ob-btn-gold" onClick={handleFinalSave}>Completa registrazione →</button>
             </div>
           </div>
@@ -328,9 +343,10 @@ export default function OnboardingFlow({ films }: OnboardingFlowProps) {
           <div className="ob-view ob-welcome">
             <div className="ob-notch-buffer" />
             <div className="ob-welcome-content">
-              <h1 className="ob-title">Sei <em>dentro</em></h1>
-              <p className="ob-desc">La tua Sfera personale sta nascendo ora. Pronto a immergerti nel Cinema Semantico?</p>
-              <a href="/sphere" className="ob-btn-gold">Entra nella Sfera →</a>
+              <h1 className="ob-title au0">Sei <em>dentro</em></h1>
+              <div className="ob-divider au0" />
+              <p className="ob-desc au1">La tua Sfera personale sta nascendo ora.<br/>Pronto a immergerti nel Cinema Semantico?</p>
+              <a href="/sphere" className="ob-btn-gold au2">Entra nella Sfera →</a>
             </div>
           </div>
         )}
@@ -344,8 +360,10 @@ const ONBOARDING_CSS = `
   .ob-root {
     --ob-gold: #B8895A;
     --ob-ink: #1A1614;
+    --ob-ink-light: #4A4440;
+    --ob-ink-faint: #9A9490;
     --ob-cream: #F2EDE3;
-    --ob-cream-dark: #E6DFD1;
+    --ob-cream-dark: #E4DBCC;
     --ob-serif: var(--font-serif);
     --ob-mono: var(--font-mono);
     
@@ -357,6 +375,14 @@ const ONBOARDING_CSS = `
     transition: opacity 0.3s ease;
     z-index: 1000;
   }
+  
+  .ob-root::after {
+    content: ''; position: fixed; inset: 0;
+    pointer-events: none; z-index: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+    opacity: 0.6;
+  }
+
   .ob-root.faded { opacity: 0; }
   
   .ob-view {
@@ -364,6 +390,7 @@ const ONBOARDING_CSS = `
     display: flex; flex-direction: column;
     width: 100%; height: 100dvh;
     padding: 0 clamp(20px, 5vw, 60px);
+    z-index: 1;
   }
   
   .ob-notch-buffer { 
@@ -372,93 +399,122 @@ const ONBOARDING_CSS = `
   }
   
   .ob-welcome { justify-content: center; align-items: center; text-align: center; }
-  .ob-welcome-content { max-width: 460px; animation: ob-pop 0.6s ease both; }
+  .ob-welcome-content { max-width: 520px; }
   
-  .ob-eyebrow { font-family: var(--ob-mono); font-size: 10px; text-transform: uppercase; letter-spacing: 0.2em; opacity: 0.6; }
-  .ob-title { font-size: clamp(38px, 8vw, 72px); font-weight: 300; line-height: 1.1; margin: 16px 0; }
-  .ob-title-sm { font-size: clamp(28px, 5vw, 42px); font-weight: 300; line-height: 1.2; margin: 12px 0 4px; }
-  .ob-title em { font-style: italic; color: var(--ob-gold); }
-  .ob-desc { font-size: clamp(16px, 2vw, 20px); opacity: 0.8; line-height: 1.6; margin-bottom: 40px; }
-  .ob-p-sub { font-family: var(--ob-mono); font-size: 10px; text-transform: uppercase; letter-spacing: 0.1em; opacity: 0.5; margin-bottom: 24px; }
+  .ob-eyebrow { 
+    display: block; font-family: var(--ob-mono); font-size: 10px; 
+    text-transform: uppercase; letter-spacing: 0.25em; color: var(--ob-gold);
+    margin-bottom: 24px;
+  }
+  .ob-title { font-size: clamp(42px, 9vw, 84px); font-weight: 300; line-height: 1.05; margin: 16px 0; }
+  .ob-title-sm { font-size: clamp(32px, 6vw, 48px); font-weight: 300; line-height: 1.1; margin: 12px 0 8px; }
+  .ob-title-sm em, .ob-title em { font-style: italic; color: var(--ob-gold); }
+  
+  .ob-divider { width: 32px; height: 1px; background: var(--ob-gold); margin: 32px auto; }
+  
+  .ob-desc { font-size: clamp(16px, 2.2vw, 20px); font-weight: 300; color: var(--ob-ink-light); line-height: 1.65; margin-bottom: 48px; }
+  .ob-p-sub { font-family: var(--ob-mono); font-size: clamp(8px, 1.2vw, 10px); text-transform: uppercase; letter-spacing: 0.2em; opacity: 0.5; margin-bottom: 24px; }
   
   .ob-btn-gold { 
-    background: var(--ob-gold); color: #fff; border: none; padding: 16px 48px; border-radius: 4px;
-    font-family: var(--ob-mono); text-transform: uppercase; letter-spacing: 0.1em; font-size: 12px; cursor: pointer;
-    transition: transform 0.2s, background 0.2s;
+    background: var(--ob-ink); color: var(--ob-cream); border: none; padding: 18px 48px; border-radius: 4px;
+    font-family: var(--ob-mono); text-transform: uppercase; letter-spacing: 0.15em; font-size: 11px; cursor: pointer;
+    transition: all 0.22s;
   }
-  .ob-btn-gold:hover { background: var(--ob-ink); transform: translateY(-2px); }
+  .ob-btn-gold:hover { background: var(--ob-gold); transform: translateY(-2px); }
   .ob-btn-ink { 
-    background: var(--ob-ink); color: #fff; border: none; padding: 16px 40px; border-radius: 4px;
-    font-family: var(--ob-mono); text-transform: uppercase; letter-spacing: 0.1em; font-size: 11px; cursor: pointer;
+    background: var(--ob-ink); color: var(--ob-cream); border: none; padding: 16px 40px; border-radius: 4px;
+    font-family: var(--ob-mono); text-transform: uppercase; letter-spacing: 0.15em; font-size: 11px; cursor: pointer;
+    transition: all 0.2s;
   }
+  .ob-btn-ink:hover { background: var(--ob-gold); }
 
-  /* Evaluation */
-  .ob-eval { padding-top: 20px; }
-  .ob-top-nav { display: flex; flex-direction: column; gap: 8px; margin-bottom: 20px; }
-  .ob-mono-lbl { font-family: var(--ob-mono); font-size: 10px; text-transform: uppercase; opacity: 0.4; }
+  /* Top Bar */
+  .ob-top-nav { padding: 20px 0; position: relative; z-index: 10; }
+  .ob-top-row { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 12px; }
+  .ob-brand { font-size: 16px; font-weight: 300; }
+  .ob-brand em { font-style: italic; color: var(--ob-gold); }
+  .ob-mono-lbl { font-family: var(--ob-mono); font-size: 9px; text-transform: uppercase; letter-spacing: 0.1em; opacity: 0.4; }
   .ob-p-track { height: 2px; width: 100%; background: var(--ob-cream-dark); }
   .ob-p-fill { height: 100%; background: var(--ob-gold); transition: width 0.4s ease; }
+
+  /* Evaluation */
+  .ob-eval-stage { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; padding-bottom: 40px; }
+  .ob-headline { text-align: center; margin-bottom: clamp(20px, 4vh, 40px); }
+  .ob-headline h2 { font-size: clamp(22px, 4vw, 36px); font-weight: 300; margin-bottom: 8px; }
+  .ob-headline h2 em { font-style: italic; color: var(--ob-gold); }
+  .ob-headline p { font-family: var(--ob-mono); font-size: 9px; text-transform: uppercase; letter-spacing: 0.15em; color: var(--ob-ink-faint); }
   
   .ob-card-stage { 
-    flex: 1; display: flex; align-items: center; justify-content: center; 
+    width: 100%; display: flex; justify-content: center; 
     transition: transform 0.3s ease, opacity 0.3s ease;
   }
   .ob-film-card {
-    width: clamp(260px, 70vw, 360px); aspect-ratio: 2/3;
-    border-radius: 12px; overflow: hidden; position: relative;
-    box-shadow: 0 20px 50px rgba(0,0,0,0.15);
-    display: flex; align-items: flex-end; padding: 32px;
+    width: clamp(240px, 45vh, 340px); aspect-ratio: 2/3;
+    border-radius: 4px; overflow: hidden; position: relative;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.2), 0 5px 15px rgba(0,0,0,0.1);
+    display: flex; align-items: flex-end; padding: 24px;
+    background-color: var(--ob-ink);
   }
-  .ob-fc-meta { color: #fff; }
-  .ob-fc-dir { font-family: var(--ob-mono); font-size: 10px; text-transform: uppercase; opacity: 0.7; }
-  .ob-fc-title { font-size: 28px; line-height: 1.1; margin: 4px 0 8px; font-weight: 300; }
-  .ob-fc-year { opacity: 0.4; font-size: 13px; }
+  .ob-fc-meta { color: #fff; position: relative; z-index: 2; width: 100%; }
+  .ob-fc-dir { font-family: var(--ob-mono); font-size: 9px; text-transform: uppercase; opacity: 0.6; letter-spacing: 0.1em; }
+  .ob-fc-title { font-size: clamp(20px, 3.5vh, 28px); line-height: 1.15; margin: 4px 0 6px; font-weight: 400; }
+  .ob-fc-year { opacity: 0.4; font-family: var(--ob-mono); font-size: 11px; }
 
-  .ob-eval-actions { padding: 32px 0; display: flex; flex-direction: column; gap: 12px; align-items: center; }
-  .ob-eval-row-2 { display: flex; gap: 8px; width: 100%; max-width: 360px; }
+  .ob-eval-actions { padding-top: 32px; display: flex; flex-direction: column; gap: 10px; align-items: center; width: 100%; max-width: 360px; }
+  .ob-eval-row-2 { display: flex; gap: 8px; width: 100%; }
   .ob-act-btn { 
-    flex: 1; background: transparent; border: 1px solid var(--ob-cream-dark); padding: 14px; border-radius: 6px;
-    font-family: var(--ob-mono); font-size: 10px; text-transform: uppercase; cursor: pointer;
-    transition: all 0.2s; color: var(--ob-ink);
+    flex: 1; background: transparent; border: 1.5px solid var(--ob-cream-dark); padding: 14px; border-radius: 4px;
+    font-family: var(--ob-mono); font-size: clamp(8px, 1.2vw, 10px); text-transform: uppercase; letter-spacing: 0.1em; cursor: pointer;
+    transition: all 0.18s; color: var(--ob-ink-light);
     display: flex; align-items: center; justify-content: center; gap: 8px;
   }
   .ob-act-btn.loved { 
-    width: 100%; max-width: 360px; background: rgba(184,137,90,0.08); border-color: var(--ob-gold); 
-    color: var(--ob-gold); font-size: 12px; padding: 18px;
+    width: 100%; background: var(--ob-gold); border-color: var(--ob-gold); 
+    color: #fff; font-size: 12px; padding: 18px; margin-bottom: 4px;
   }
+  .ob-act-btn:hover { border-color: var(--ob-gold); color: var(--ob-gold); }
+  .ob-act-btn.loved:hover { background: var(--ob-ink); border-color: var(--ob-ink); color: #fff; }
   .ob-act-btn.active { background: var(--ob-ink); color: #fff; border-color: var(--ob-ink); }
-  .ob-act-btn.loved.active { background: var(--ob-gold); color: #fff; border-color: var(--ob-gold); }
+  .ob-act-btn.loved.active { background: var(--ob-ink); color: #fff; border-color: var(--ob-ink); }
 
   /* Confirm / Pyramid */
-  .ob-confirm { padding-top: 20px; }
-  .ob-confirm-split { display: flex; gap: 40px; flex: 1; overflow: hidden; padding-bottom: 100px; }
+  .ob-confirm-header { padding: 32px 0 20px; text-align: center; }
+  .ob-confirm-content { display: flex; gap: 40px; flex: 1; overflow: hidden; padding-bottom: 100px; }
   
   .ob-pyramid-grid {
-    flex: 1; display: grid; grid-template-columns: repeat(6, 1fr); grid-template-rows: repeat(2, auto);
-    gap: 12px; align-content: center;
+    flex: 1; display: grid; grid-template-columns: repeat(6, 1fr); 
+    gap: 16px 12px; align-content: flex-start;
   }
   .ob-p-slot { 
-    position: relative; cursor: pointer; transition: transform 0.2s;
+    position: relative; cursor: pointer; transition: transform 0.22s ease;
+    display: flex; flex-direction: column; gap: 8px;
   }
-  .ob-p-slot.selected { outline: 2px solid var(--ob-gold); outline-offset: 4px; transform: scale(1.05); }
-  .ob-p-rank { position: absolute; top: -14px; left: 0; font-family: var(--ob-mono); font-size: 8px; color: var(--ob-gold); text-transform: uppercase; }
+  .ob-p-slot.selected { transform: scale(1.05); }
+  .ob-p-slot.selected .ob-p-poster { border: 2.5px solid var(--ob-gold); box-shadow: 0 0 20px rgba(184,137,90,0.3); }
+  
+  .ob-p-rank { font-family: var(--ob-mono); font-size: clamp(7px, 1vw, 9px); color: var(--ob-gold); text-transform: uppercase; letter-spacing: 0.1em; display: flex; align-items: center; gap: 6px; }
+  .ob-p-rank::after { content: ''; flex: 1; height: 1px; background: var(--ob-gold); opacity: 0.2; }
+  
   .ob-p-poster { 
-    width: 100%; aspect-ratio: 2/3; border-radius: 6px; background: var(--ob-cream-dark);
+    width: 100%; aspect-ratio: 2/3; border-radius: 3px; background: var(--ob-cream-dark);
     display: flex; align-items: center; justify-content: center; overflow: hidden;
+    position: relative; box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    transition: all 0.22s; border: 1.5px solid transparent;
   }
-  .ob-p-title-ov { position: absolute; bottom: 8px; left: 8px; right: 8px; color: #fff; font-size: 9px; line-height:1.2; font-weight: 300; }
+  .ob-p-overlay { position: absolute; inset: 0; background: linear-gradient(to top, rgba(0,0,0,0.8) 0%, transparent 60%); display: flex; align-items: flex-end; padding: 10px; }
+  .ob-p-title-ov { color: #fff; font-size: clamp(8px, 1.2vw, 11px); line-height: 1.3; font-weight: 300; }
   .ob-empty-txt { font-family: var(--ob-mono); font-size: 9px; text-transform: uppercase; opacity: 0.3; }
 
-  /* Mobile Pyramid (2x3 Grid) */
+  /* Mobile Pyramid (2x3 Grid style) */
   .spot-0 { grid-column: span 3; }
   .spot-1 { grid-column: span 3; }
   .spot-2 { grid-column: span 2; }
   .spot-3 { grid-column: span 2; }
   .spot-4 { grid-column: span 2; }
-  .spot-5 { grid-column: span 3; } /* Adjusted for mobile grid look */
+  .spot-5 { grid-column: span 3; }
 
   @media (min-width: 640px) {
-    .ob-pyramid-grid { grid-template-columns: repeat(3, 1fr); }
+    .ob-pyramid-grid { grid-template-columns: repeat(3, 1fr); padding-bottom: 20px; }
     .spot-0 { grid-column: 2 / 3; }
     .spot-1 { grid-column: 1 / 2; }
     .spot-2 { grid-column: 2 / 3; }
@@ -467,44 +523,59 @@ const ONBOARDING_CSS = `
     .spot-5 { grid-column: 3 / 4; }
   }
 
-  .ob-gallery { width: 200px; border-left: 1px solid var(--ob-cream-dark); padding-left: 24px; display: flex; flex-direction: column; }
+  .ob-gallery { width: clamp(160px, 20vw, 220px); border-left: 1px solid var(--ob-cream-dark); padding-left: 24px; display: flex; flex-direction: column; }
   .ob-side-title { font-family: var(--ob-mono); font-size: 9px; text-transform: uppercase; letter-spacing: 0.15em; margin-bottom: 16px; opacity: 0.5; }
-  .ob-gallery-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; overflow-y: auto; flex: 1; padding-bottom: 24px; }
+  .ob-gallery-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; overflow-y: auto; flex: 1; padding-bottom: 120px; }
   .ob-gal-card { cursor: pointer; transition: transform 0.2s; }
-  .ob-gal-card.selected { outline: 2px solid var(--ob-gold); outline-offset: 1px; }
-  .ob-gal-poster { aspect-ratio: 2/3; border-radius: 4px; background: var(--ob-cream-dark); }
-  .ob-gal-name { font-size: 9px; display: block; margin-top: 4px; height: 24px; overflow: hidden; opacity: 0.7; }
+  .ob-gal-card.selected .ob-gal-poster { border: 2px solid var(--ob-gold); }
+  .ob-gal-poster { aspect-ratio: 2/3; border-radius: 2px; background: var(--ob-cream-dark); border: 1.5px solid transparent; transition: all 0.2s; }
+  .ob-gal-name { font-size: 9px; display: block; margin-top: 4px; height: 24px; overflow: hidden; opacity: 0.7; font-family: var(--ob-mono); text-transform: uppercase; }
 
-  .ob-bot-action { position: fixed; bottom: 0; left: 0; right: 0; background: var(--ob-cream); padding: 20px 60px 40px; border-top: 1px solid var(--ob-cream-dark); text-align: right; }
+  .ob-bot-action { 
+    position: fixed; bottom: 0; left: 0; right: 0; 
+    background: linear-gradient(to top, var(--ob-cream) 80%, transparent); 
+    padding: 30px clamp(20px, 5vw, 60px) clamp(30px, 6vh, 40px); 
+    display: flex; justify-content: flex-end; align-items: center; gap: 20px;
+    z-index: 50;
+  }
 
   /* Forms */
-  .ob-form-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 10px; margin-top: 24px; }
+  .ob-form-header { padding: 40px 0 20px; text-align: center; }
+  .ob-form-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 12px; padding-bottom: 120px; }
   .ob-chip { 
-    background: transparent; border: 1px solid var(--ob-cream-dark); padding: 12px; border-radius: 4px;
-    font-family: var(--ob-mono); font-size: 10px; cursor: pointer; text-align: center;
+    background: transparent; border: 1.5px solid var(--ob-cream-dark); padding: 14px; border-radius: 4px;
+    font-family: var(--ob-mono); font-size: 10px; cursor: pointer; text-align: center; color: var(--ob-ink-light);
+    transition: all 0.2s;
   }
+  .ob-chip:hover { border-color: var(--ob-gold); color: var(--ob-gold); }
   .ob-chip.active { background: var(--ob-ink); color: #fff; border-color: var(--ob-ink); }
 
-  .ob-input-stack { margin-top: 32px; display: flex; flex-direction: column; gap: 20px; max-width: 400px; }
-  .ob-field label { display: block; font-family: var(--ob-mono); font-size: 10px; text-transform: uppercase; margin-bottom: 8px; opacity: 0.6; }
+  .ob-input-stack { margin: 32px auto; display: flex; flex-direction: column; gap: 24px; width: 100%; max-width: 440px; }
+  .ob-field label { display: block; font-family: var(--ob-mono); font-size: 10px; text-transform: uppercase; letter-spacing: 0.15em; margin-bottom: 10px; opacity: 0.6; }
   .ob-field input, .ob-field select { 
-    width: 100%; padding: 14px; border: 1px solid var(--ob-cream-dark); border-radius: 4px; background: transparent;
-    font-family: var(--ob-serif); font-size: 16px;
+    width: 100%; padding: 16px; border: 1.5px solid var(--ob-cream-dark); border-radius: 4px; background: transparent;
+    font-family: var(--ob-serif); font-size: 18px; color: var(--ob-ink); transition: border-color 0.2s;
   }
+  .ob-field input:focus, .ob-field select:focus { border-color: var(--ob-gold); outline: none; }
 
   /* Animations */
-  @keyframes ob-pop { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: none; } }
+  @keyframes au { from { opacity: 0; transform: translateY(18px); } to { opacity: 1; transform: none; } }
+  .au0 { animation: au 0.6s 0.1s ease both; }
+  .au1 { animation: au 0.6s 0.2s ease both; }
+  .au2 { animation: au 0.6s 0.3s ease both; }
+  .au3 { animation: au 0.6s 0.4s ease both; }
   
-  .exit-loved { transform: translateX(100px) rotate(10deg); opacity: 0; }
-  .exit-disliked { transform: translateX(-100px) rotate(-10deg); opacity: 0; }
+  .exit-loved { transform: translateX(100px) rotate(8deg); opacity: 0; }
+  .exit-disliked { transform: translateX(-100px) rotate(-8deg); opacity: 0; }
   .exit-seen { transform: translateY(-40px); opacity: 0; }
   .exit-unseen { transform: translateY(40px); opacity: 0; }
-  .enter { transform: translateY(20px); opacity: 0; transition: none; }
+  .enter { transform: translateY(12px); opacity: 0; transition: none; }
 
   @media (max-width: 640px) {
-    .ob-confirm-split { flex-direction: column; overflow-y: auto; }
+    .ob-confirm-content { flex-direction: column; overflow-y: auto; padding-bottom: 140px; }
     .ob-gallery { width: 100%; border-left: none; border-top: 1px solid var(--ob-cream-dark); padding: 24px 0; }
-    .ob-gallery-grid { grid-template-columns: repeat(4, 1fr); min-height: 200px; }
-    .ob-bot-action { padding: 20px 24px 34px; }
+    .ob-gallery-grid { grid-template-columns: repeat(4, 1fr); min-height: 200px; padding-bottom: 20px; }
+    .ob-bot-action { padding: 20px 20px clamp(30px, 5vh, 40px); background: var(--ob-cream); }
+    .ob-form-grid { grid-template-columns: repeat(2, 1fr); }
   }
 `;
