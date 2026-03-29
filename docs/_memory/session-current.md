@@ -97,3 +97,14 @@ status: active
 **Side effects**: UX drasticamente più solida e performance migliorate grazie alla rimozione di logiche e CSS obsoleti.
 
 ---
+
+## 18:51 bug-fix
+
+**File toccati**:
+- `src/components/onboarding/OnboardingFlow.tsx` — Ripristinata estetica premium, corretto layout piramidale (1-2-3 centrato) e tipografia (Serif/Mono).
+
+**Problema di partenza**: L'interfaccia aveva perso i font corretti, il layout della piramide era disordinato (random grid) e c'erano spazi vuoti eccessivi.
+**Soluzione applicata**: Aggiornato `ONBOARDING_CSS` con variabili di design system, implementato Flexbox per la piramide e ridotto il padding superiore.
+**Side effects**: Nessuno previsto, la logica di onboarding è rimasta invariata.
+
+---
