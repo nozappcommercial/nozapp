@@ -37,4 +37,15 @@ status: active
 **Soluzione applicata**: Stabilizzato il layout grid a 100vh fissi per garantire che il footer rimanga sempre all'interno del viewport e ridimensionata la card di completamento.
 **Side effects**: Risolto il blocco funzionale nell'onboarding.
 
+
+## 16:55 [tipo: bug-fix | UI/UX]
+
+**File toccati**:
+
+- `src/components/onboarding/OnboardingFlow.tsx` — Adottato `100dvh`, rimosso padding globale da `.ob-root` e inseriti padding Safe Area mirati.
+
+**Problema di partenza**: Il footer risultava tagliato su mobile. La causa era il padding globale in `ob-root` che sommato ai 100vh spingeva i componenti fuori dall'overflow.
+**Soluzione applicata**: Gestione granulare della Safe Area per componente e uso di `100dvh` per compatibilità con le barre dinamiche dei browser.
+**Side effects**: Risolto definitivamente il problema di visibilità del footer su mobile.
+
 ---

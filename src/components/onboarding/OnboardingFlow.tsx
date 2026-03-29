@@ -776,14 +776,13 @@ const ONBOARDING_CSS = `
 }
 
 .ob-root {
-  height: 100vh;
+  height: 100dvh;
   background: var(--ob-cream);
   font-family: var(--ob-serif);
   color: var(--ob-ink);
   position: relative;
   overflow: hidden;
   transition: opacity 0.28s ease;
-  padding-top: env(safe-area-inset-top);
 }
 .ob-root.ob-faded { opacity: 0; pointer-events: none; }
 
@@ -810,6 +809,7 @@ input[type="date"]::-webkit-calendar-picker-indicator { flex-shrink: 0; }
   display: flex; flex-direction: column;
   align-items: center; justify-content: center;
   padding: clamp(40px,10vw,88px) clamp(24px,6vw,64px);
+  padding-top: calc(clamp(40px,10vw,88px) + env(safe-area-inset-top));
   text-align: center;
 }
 .ob-eyebrow {
@@ -852,6 +852,7 @@ input[type="date"]::-webkit-calendar-picker-indicator { flex-shrink: 0; }
 .ob-botbar {
   display: flex; justify-content: space-between; align-items: center;
   margin-top: auto; padding: clamp(10px,1.5vh,18px) clamp(20px,5vw,56px);
+  padding-bottom: calc(clamp(10px,1.5vh,18px) + env(safe-area-inset-bottom));
   border-top: 1px solid rgba(0,0,0,0.06); gap: 12px;
 }
 .ob-loved-row { display: flex; align-items: center; gap: 8px; font-family: var(--ob-mono); font-size: 8px; letter-spacing: 0.1em; color: var(--ob-ink-faint); text-transform: uppercase; }
@@ -889,13 +890,14 @@ input[type="date"]::-webkit-calendar-picker-indicator { flex-shrink: 0; }
 /* ── STEP SHELL ── */
 .ob-step-shell {
   position: relative; z-index: 1;
-  height: 100vh;
+  height: 100%;
   display: grid;
   grid-template-rows: auto 2px 1fr auto;
 }
 .ob-topbar {
   display: flex; justify-content: space-between; align-items: center;
   padding: clamp(12px,2vh,24px) clamp(20px,5vw,56px);
+  padding-top: calc(clamp(12px,2vh,24px) + env(safe-area-inset-top));
   border-bottom: 1px solid var(--ob-cream-dark);
 }
 .ob-brand { font-size: clamp(13px,2vw,16px); }

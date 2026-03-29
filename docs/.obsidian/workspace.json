@@ -13,12 +13,12 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "pages-and-routing.md",
+                "file": "project-structure.md",
                 "mode": "source",
                 "source": false
               },
               "icon": "lucide-file",
-              "title": "pages-and-routing"
+              "title": "project-structure"
             }
           }
         ]
@@ -156,13 +156,13 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "pages-and-routing.md",
+                "file": "project-structure.md",
                 "followCursor": false,
                 "showSearch": false,
                 "searchQuery": ""
               },
               "icon": "lucide-list",
-              "title": "Struttura di pages-and-routing"
+              "title": "Struttura di project-structure"
             }
           }
         ],
@@ -185,11 +185,12 @@
   },
   "active": "210fda53ff551c12",
   "lastOpenFiles": [
+    "progetto.md",
+    "pages-and-routing.md",
     "dataset.md",
     "dependencies.md",
     "editorial-system.md",
     "_memory/session-2026-03-28.md",
-    "progetto.md",
     "security.md",
     "components.md",
     "architecture.md",
@@ -198,7 +199,6 @@
     "data-flow.md",
     "todo.md",
     "Senza nome.canvas",
-    "pages-and-routing.md",
     "types.md",
     "project-structure.md",
     "_memory/session-2026-03-27.md",
