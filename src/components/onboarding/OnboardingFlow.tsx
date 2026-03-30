@@ -4,6 +4,23 @@ import { useState, useEffect, useRef, useCallback } from "react";
 import { useIsMobile } from "@/hooks/use-is-mobile";
 import type { OnboardingFilm } from "@/app/onboarding/page";
 
+/* ─── IntersectionObserver hook for scroll reveal ─────────────── */
+function useScrollReveal(threshold = 0.18) {
+  const ref = useRef<HTMLDivElement>(null);
+  const [visible, setVisible] = useState(false);
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const obs = new IntersectionObserver(
+      ([entry]) => { if (entry.isIntersecting) { setVisible(true); obs.disconnect(); } },
+      { threshold }
+    );
+    obs.observe(el);
+    return () => obs.disconnect();
+  }, [threshold]);
+  return { ref, visible };
+}
+
 /* ─── Constants ─────────────────────────────────────────────────── */
 const MAX_PILLARS = 6;
 
@@ -56,7 +73,7 @@ export default function OnboardingFlow({ films }: OnboardingFlowProps) {
   const [dragItem, setDragItem] = useState<number | null>(null);
   const [dragOver, setDragOver] = useState<number | null>(null);
   const [saving, setSaving] = useState(false);
-  const [isSideboardOpen, setIsSideboardOpen] = useState(false);
+  const [swapSource, setSwapSource] = useState<OnboardingFilm | null>(null);
   const touchStartX = useRef<number | null>(null);
 
   const lovedFilms = films.filter(f => reactions[f.id] === "loved");
@@ -397,7 +414,7 @@ export default function OnboardingFlow({ films }: OnboardingFlowProps) {
                   >→</button>
                 </div>
 
-                {/* reaction buttons */}
+                {/* reaction buttons — 3 bottoni uniformi */}
                 {!stepDone && currentFilm && (
                   <>
                     <div className="ob-rxn-row" key={currentFilm.id}>
@@ -420,17 +437,22 @@ export default function OnboardingFlow({ films }: OnboardingFlowProps) {
                         <span className="ob-rxn-lbl">Non fa<br />per me</span>
                       </button>
 
-                      <div className={`ob-rxn-split ${reactions[currentFilm.id] === 'seen' ? 'active-seen' : reactions[currentFilm.id] === 'unseen' ? 'active-unseen' : ''}`}>
-                        <div className="ob-rxn-split-bg seen-bg" />
-                        <div className="ob-rxn-split-bg unseen-bg" />
-                        <div className="ob-rxn-split-line" />
-
-                        <span className="ob-rxn-split-lbl seen-lbl">Visto</span>
-                        <span className="ob-rxn-split-lbl unseen-lbl">Non visto</span>
-
-                        <button className="ob-rxn-split-hit seen-hit" onClick={() => handleReaction("seen")} />
-                        <button className="ob-rxn-split-hit unseen-hit" onClick={() => handleReaction("unseen")} />
-                      </div>
+                      <button
+                        className={`ob-rxn-btn unseen-split ${reactions[currentFilm.id] === 'seen' ? 'active-s' : reactions[currentFilm.id] === 'unseen' ? 'active-u' : ''}`}
+                        onClick={() => handleReaction(
+                          reactions[currentFilm.id] === 'unseen' ? 'seen' : 'unseen'
+                        )}
+                      >
+                        <span className="ob-rxn-icon">
+                          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                            <circle cx="12" cy="12" r="10"/>
+                            <line x1="4" y1="4" x2="20" y2="20"/>
+                          </svg>
+                        </span>
+                        <span className="ob-rxn-lbl">
+                          {reactions[currentFilm.id] === 'seen' ? <>Visto</> : <>Non l&apos;ho<br/>visto</>}
+                        </span>
+                      </button>
                     </div>
                     {!allReacted && (
                       <div className="ob-nudge stage-nudge">valuta tutti i film per continuare</div>
@@ -462,162 +484,27 @@ export default function OnboardingFlow({ films }: OnboardingFlowProps) {
           </div>
         )}
 
-        {/* ═══ CONFIRM — PYRAMID ═══ */}
-        {phase === "confirm" && (() => {
-          const rows = [
-            pillars.slice(0, 1),
-            pillars.slice(1, 3),
-            pillars.slice(3, 6),
-          ].filter(r => r.length > 0);
-
-          return (
-            <div className="ob-pyramid-shell">
-              {/* Toggle Sidebar Button (Minimal Arrow) */}
-              <button
-                className={`ob-side-toggle ${isSideboardOpen ? 'open' : ''}`}
-                onClick={() => setIsSideboardOpen(!isSideboardOpen)}
-                title={isSideboardOpen ? "Chiudi" : "Film preferiti"}
-              >
-                <span className="ob-side-toggle-icon">
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <polyline points="15 18 9 12 15 6"/>
-                  </svg>
-                </span>
-              </button>
-
-              {/* BACKDROP for Replace Sheet */}
-              <div 
-                className={`ob-rep-backdrop ${replacingPillar !== null ? 'active' : ''}`} 
-                onClick={() => setReplacingPillar(null)}
-              />
-
-              {/* REPLACE SHEET (Bottom Sheet) */}
-              <div className={`ob-rep-sheet ${replacingPillar !== null ? 'active' : ''}`}>
-                <div className="ob-rep-header">
-                  <h3 className="ob-rep-title">Scegli il <em>sostituto</em></h3>
-                  <div className="ob-rep-sub">Film amati · non nei pilastri</div>
-                  <button className="ob-rep-close" onClick={() => setReplacingPillar(null)}>✕</button>
-                </div>
-                <div className="ob-rep-grid">
-                  {replacementCandidates.length === 0
-                    ? <p className="ob-rep-empty">Nessun candidato disponibile</p>
-                    : replacementCandidates.map(film => (
-                      <div key={film.id} className="ob-rep-card" onClick={() => handleReplace(replacingPillar!, film)}>
-                        <div className="ob-rep-card-poster">
-                          <div style={{ ...filmGradient(film), width: "100%", height: "100%", display: "flex", alignItems: "flex-end", padding: "10px 8px" }}>
-                            <span style={{ fontFamily: "var(--ob-serif)", fontSize: "11px", color: "#fff", lineHeight: 1.2 }}>{film.title}</span>
-                          </div>
-                        </div>
-                        <div className="ob-rep-ct">{film.title}</div>
-                      </div>
-                    ))
-                  }
-                </div>
-              </div>
-
-              <div className={`ob-confirm-container ${isSideboardOpen ? 'side-open' : ''}`}>
-                <div className="ob-pyramid-main">
-                  <div className="ob-pyr-header">
-                    <div>
-                      <h2 className="ob-pyr-title">Il tuo<br /><em>profilo</em></h2>
-                      <div className="ob-pyr-sub">Trascina per riordinare · hover per sostituire</div>
-                    </div>
-                    <div className="ob-pyr-hint">
-                      Il vertice è<br />il tuo centro.<br />L&apos;ordine conta.
-                    </div>
-                  </div>
-
-                  {pillars.length === 0 ? (
-                    <div className="ob-pyr-empty">
-                      <div className="ob-pyr-empty-title">Nessun film <em>amato</em></div>
-                      <div className="ob-pyr-empty-sub">
-                        Torna indietro e seleziona<br />almeno un film che ti ha colpito.
-                      </div>
-                    </div>
-                  ) : (
-                    <div className="ob-pyramid">
-                      {rows.map((row, rowIdx) => (
-                        <div key={rowIdx} className={`ob-pyr-row row-${rowIdx}`}>
-                          {row.map((film) => {
-                            const globalIdx = pillars.indexOf(film);
-                            return (
-                              <div
-                                key={film.id}
-                                className={`ob-pyr-card ${dragItem === globalIdx ? "drag-src" : ""} ${dragOver === globalIdx ? "drag-tgt" : ""}`}
-                                data-rank={globalIdx}
-                                draggable
-                                onDragStart={() => onDragStart(globalIdx)}
-                                onDragEnter={() => onDragEnter(globalIdx)}
-                                onDragEnd={onDragEnd}
-                                onDragOver={e => e.preventDefault()}
-                                onDrop={() => onDrop(globalIdx)}
-                              >
-                                <div className="ob-pyr-rank-lbl">
-                                  {globalIdx === 0 ? "▲ vertice" : `n° ${globalIdx + 1}`}
-                                </div>
-                                <div className="ob-pyr-poster">
-                                  <div className="ob-pyr-poster-inner" style={filmGradient(film)}>
-                                    <span className="ob-pyr-poster-title">{film.title}</span>
-                                  </div>
-                                  <button className="ob-pyr-rep" onClick={() => setReplacingPillar(globalIdx)}>↔ Sostituisci</button>
-                                </div>
-                                <div className="ob-pyr-name">{film.title}</div>
-                                <div className="ob-pyr-meta">{film.director} · {film.year}</div>
-                              </div>
-                            );
-                          })}
-                        </div>
-                      ))}
-                    </div>
-                  )}
-
-                  <div className="ob-pyr-foot">
-                    <div className="ob-pyr-count">
-                      {pillars.length} {pillars.length === 1 ? "pilastro" : "pilastri"} selezionati
-                    </div>
-                    <button className="ob-btn-p" onClick={() => pageTransition(() => setPhase("streaming"))}>
-                      Prosegui →
-                    </button>
-                  </div>
-                </div>
-
-                {/* Sidebar per altri film amati (Bottom Sheet) */}
-                <div className={`ob-pyr-sidebar ${isSideboardOpen ? 'active' : ''}`}>
-                  <div className="ob-side-header">
-                    <h3 className="ob-side-title">Altri <em>preferiti</em></h3>
-                    <p className="ob-side-sub">Film che hai amato</p>
-                  </div>
-                  <div className="ob-side-grid">
-                    {replacementCandidates.length === 0 ? (
-                      <p className="ob-side-empty">Nessun altro film amato</p>
-                    ) : (
-                      replacementCandidates.map(film => (
-                        <div
-                          key={film.id}
-                          className="ob-side-card"
-                          draggable
-                          onDragStart={() => {
-                            setDragItem(-1);
-                            (window as any)._draggedSidebarFilm = film;
-                          }}
-                          onClick={() => setReplacingPillar(pillars.length - 1)}
-                        >
-                          <div className="ob-side-poster" style={filmGradient(film)}>
-                            <span className="ob-side-poster-title">{film.title}</span>
-                          </div>
-                          <div className="ob-side-meta">
-                            <div className="ob-side-name">{film.title}</div>
-                            <div className="ob-side-year">{film.year}</div>
-                          </div>
-                        </div>
-                      ))
-                    )}
-                  </div>
-                </div>
-              </div>
-            </div>
-          );
-        })()}
+        {/* ═══ CONFIRM — SCROLLABLE PAGE ═══ */}
+        {phase === "confirm" && <ConfirmPhase
+          pillars={pillars}
+          setPillars={setPillars}
+          lovedFilms={lovedFilms}
+          replacementCandidates={replacementCandidates}
+          replacingPillar={replacingPillar}
+          setReplacingPillar={setReplacingPillar}
+          handleReplace={handleReplace}
+          swapSource={swapSource}
+          setSwapSource={setSwapSource}
+          dragItem={dragItem}
+          dragOver={dragOver}
+          onDragStart={onDragStart}
+          onDragEnter={onDragEnter}
+          onDragEnd={onDragEnd}
+          onDrop={onDrop}
+          filmGradient={filmGradient}
+          pageTransition={pageTransition}
+          setPhase={setPhase}
+        />}
 
         {/* ═══ STREAMING SUBSCRIPTIONS ═══ */}
         {phase === "streaming" && (
@@ -768,6 +655,219 @@ export default function OnboardingFlow({ films }: OnboardingFlowProps) {
   );
 }
 
+/* ─── ConfirmPhase (scrollable page) ─────────────────────────────── */
+interface ConfirmPhaseProps {
+  pillars: OnboardingFilm[];
+  setPillars: (p: OnboardingFilm[]) => void;
+  lovedFilms: OnboardingFilm[];
+  replacementCandidates: OnboardingFilm[];
+  replacingPillar: number | null;
+  setReplacingPillar: (n: number | null) => void;
+  handleReplace: (idx: number, film: OnboardingFilm) => void;
+  swapSource: OnboardingFilm | null;
+  setSwapSource: (f: OnboardingFilm | null) => void;
+  dragItem: number | null;
+  dragOver: number | null;
+  onDragStart: (idx: number) => void;
+  onDragEnter: (idx: number) => void;
+  onDragEnd: () => void;
+  onDrop: (idx: number) => void;
+  filmGradient: (film: OnboardingFilm) => React.CSSProperties;
+  pageTransition: (fn: () => void) => void;
+  setPhase: (p: Phase) => void;
+}
+
+function ConfirmPhase({
+  pillars, setPillars, lovedFilms, replacementCandidates,
+  replacingPillar, setReplacingPillar, handleReplace,
+  swapSource, setSwapSource,
+  dragItem, dragOver, onDragStart, onDragEnter, onDragEnd, onDrop,
+  filmGradient, pageTransition, setPhase,
+}: ConfirmPhaseProps) {
+  const pyramidReveal = useScrollReveal(0.15);
+  const extraReveal = useScrollReveal(0.15);
+
+  const rows = [
+    pillars.slice(0, 1),
+    pillars.slice(1, 3),
+    pillars.slice(3, 6),
+  ].filter(r => r.length > 0);
+
+  /* Click-click swap logic: click extra card → click pillar card */
+  function handleExtraClick(film: OnboardingFilm) {
+    if (swapSource?.id === film.id) {
+      setSwapSource(null); // deselect
+    } else {
+      setSwapSource(film);
+    }
+  }
+  function handlePillarClick(idx: number) {
+    if (swapSource) {
+      handleReplace(idx, swapSource);
+      setSwapSource(null);
+    } else {
+      setReplacingPillar(idx);
+    }
+  }
+
+  return (
+    <div className="ob-confirm-scroll">
+      {/* ─── Sezione A — Hero ─── */}
+      <div className="ob-conf-hero">
+        <h1 className="ob-conf-hero-title">
+          Il tuo<br /><em>profilo</em>
+        </h1>
+        <div className="ob-conf-hero-sub">
+          scorri per scoprire i tuoi pilastri
+        </div>
+        <div className="ob-conf-scroll-arrow">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <polyline points="6 9 12 15 18 9"/>
+          </svg>
+        </div>
+      </div>
+
+      {/* ─── Sezione B — Piramide ─── */}
+      <div
+        ref={pyramidReveal.ref}
+        className={`ob-conf-section ${pyramidReveal.visible ? 'visible' : ''}`}
+      >
+        <div className="ob-pyr-header">
+          <div>
+            <h2 className="ob-pyr-title">I tuoi<br /><em>pilastri</em></h2>
+            <div className="ob-pyr-sub">Trascina per riordinare · click per sostituire</div>
+          </div>
+          <div className="ob-pyr-hint">
+            Il vertice è<br />il tuo centro.<br />L&apos;ordine conta.
+          </div>
+        </div>
+
+        {pillars.length === 0 ? (
+          <div className="ob-pyr-empty" style={{ textAlign: 'center', padding: '60px 20px' }}>
+            <div className="ob-pyr-empty-title" style={{ fontFamily: 'var(--ob-serif)', fontSize: 'clamp(24px,5vw,40px)', fontWeight: 700, marginBottom: 12 }}>
+              Nessun film <em style={{ fontStyle: 'italic', color: 'var(--ob-gold)', fontWeight: 300 }}>amato</em>
+            </div>
+            <div style={{ fontFamily: 'var(--ob-mono)', fontSize: '10px', letterSpacing: '0.15em', textTransform: 'uppercase' as const, color: 'var(--ob-ink-faint)' }}>
+              Torna indietro e seleziona<br />almeno un film che ti ha colpito.
+            </div>
+          </div>
+        ) : (
+          <div className="ob-pyramid">
+            {rows.map((row, rowIdx) => (
+              <div key={rowIdx} className={`ob-pyr-row row-${rowIdx}`}>
+                {row.map((film) => {
+                  const globalIdx = pillars.indexOf(film);
+                  return (
+                    <div
+                      key={film.id}
+                      className={`ob-pyr-card ${dragItem === globalIdx ? "drag-src" : ""} ${dragOver === globalIdx ? "drag-tgt" : ""} ${swapSource ? "swap-ready" : ""}`}
+                      data-rank={globalIdx}
+                      draggable
+                      onDragStart={() => onDragStart(globalIdx)}
+                      onDragEnter={() => onDragEnter(globalIdx)}
+                      onDragEnd={onDragEnd}
+                      onDragOver={e => e.preventDefault()}
+                      onDrop={() => onDrop(globalIdx)}
+                      onClick={() => handlePillarClick(globalIdx)}
+                    >
+                      <div className="ob-pyr-rank-lbl">
+                        {globalIdx === 0 ? "▲ vertice" : `n° ${globalIdx + 1}`}
+                      </div>
+                      <div className="ob-pyr-poster">
+                        <div className="ob-pyr-poster-inner" style={filmGradient(film)}>
+                          <span className="ob-pyr-poster-title">{film.title}</span>
+                        </div>
+                        {swapSource && (
+                          <div style={{
+                            position: 'absolute', inset: 0,
+                            background: 'rgba(184,137,90,0.25)',
+                            display: 'flex', alignItems: 'center', justifyContent: 'center',
+                            fontFamily: 'var(--ob-mono)', fontSize: '8px',
+                            letterSpacing: '0.1em', textTransform: 'uppercase' as const,
+                            color: '#fff',
+                          }}>
+                            ↔ Scambia
+                          </div>
+                        )}
+                      </div>
+                      <div className="ob-pyr-name">{film.title}</div>
+                      <div className="ob-pyr-meta">{film.director} · {film.year}</div>
+                    </div>
+                  );
+                })}
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+
+      {/* ─── Replace Modal (overlay) ─── */}
+      {replacingPillar !== null && (
+        <div className="ob-rep-overlay" onClick={() => setReplacingPillar(null)}>
+          <div className="ob-rep-modal" onClick={e => e.stopPropagation()}>
+            <div className="ob-rep-modal-header">
+              <div className="ob-rep-modal-title">Scegli il <em>sostituto</em></div>
+              <button className="ob-rep-modal-close" onClick={() => setReplacingPillar(null)}>✕</button>
+            </div>
+            <div className="ob-rep-modal-grid">
+              {replacementCandidates.length === 0
+                ? <p style={{ fontFamily: 'var(--ob-mono)', fontSize: '10px', color: 'var(--ob-ink-faint)', letterSpacing: '0.15em', textTransform: 'uppercase' }}>Nessun candidato disponibile</p>
+                : replacementCandidates.map(film => (
+                  <div key={film.id} className="ob-rep-modal-card" onClick={() => handleReplace(replacingPillar, film)}>
+                    <div className="ob-rep-modal-poster" style={filmGradient(film)}>
+                      <span>{film.title}</span>
+                    </div>
+                  </div>
+                ))
+              }
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ─── Sezione C — Film extra (solo se più di 6 film amati) ─── */}
+      {lovedFilms.length > 6 && (
+        <div
+          ref={extraReveal.ref}
+          className={`ob-conf-section ${extraReveal.visible ? 'visible' : ''}`}
+        >
+          <h3 className="ob-extra-title">
+            Altri film <em>amati</em>
+          </h3>
+          <div className="ob-extra-sub">
+            Click su una card · poi click su un pilastro per scambiare
+          </div>
+          <div className="ob-extra-grid">
+            {replacementCandidates.map(film => (
+              <div
+                key={film.id}
+                className={`ob-extra-card ${swapSource?.id === film.id ? 'selected' : ''}`}
+                onClick={() => handleExtraClick(film)}
+              >
+                <div className="ob-extra-poster" style={filmGradient(film)}>
+                  <span>{film.title}</span>
+                </div>
+                <div className="ob-extra-name">{film.title}</div>
+                <div className="ob-extra-meta">{film.director} · {film.year}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* ─── Footer ─── */}
+      <div className="ob-pyr-foot">
+        <div className="ob-pyr-count">
+          {pillars.length} {pillars.length === 1 ? "pilastro" : "pilastri"} selezionati
+        </div>
+        <button className="ob-btn-p" onClick={() => pageTransition(() => setPhase("streaming"))}>
+          Prosegui →
+        </button>
+      </div>
+    </div>
+  );
+}
+
 /* ═══════════════════════════════════════════════════════════════════
    CSS — prefixed with 'ob-' to avoid class collisions with the rest
    of the app. Ported from beta1.jsx with minimal changes.
@@ -783,18 +883,17 @@ const ONBOARDING_CSS = `
   --ob-gold:       #B8895A;
   --ob-gold-light: #D4A870;
   --ob-gold-faint: rgba(184,137,90,0.15);
-  --ob-serif:      var(--font-geist-sans), sans-serif;
-  --ob-mono:       var(--font-geist-mono), monospace;
+  --ob-serif:      'Cormorant Garamond', Georgia, serif;
+  --ob-mono:       'Fragment Mono', monospace;
   --ob-r:          3px;
 }
 
 .ob-root {
-  height: 100dvh;
+  min-height: 100dvh;
   background: var(--ob-cream);
   font-family: var(--ob-serif);
   color: var(--ob-ink);
   position: relative;
-  overflow: hidden;
   transition: opacity 0.28s ease;
 }
 .ob-root.ob-faded { opacity: 0; pointer-events: none; }
@@ -1027,35 +1126,25 @@ const ONBOARDING_CSS = `
 
 .ob-rxn-btn:active { transform: scale(0.95); }
 
-/* split btn */
-.ob-rxn-split {
-  flex: 1.5; min-width: 140px; max-width: 200px;
-  position: relative; height: clamp(48px, 7vh, 64px);
-  border-radius: var(--ob-r); border: 1.5px solid var(--ob-cream-dark);
-  overflow: hidden; display: flex;
+/* unseen-split btn (terzo bottone) */
+.ob-rxn-btn.unseen-split { position: relative; overflow: hidden; }
+.ob-rxn-btn.unseen-split .ob-rxn-icon { color: var(--ob-ink-faint); transition: color 0.18s; }
+.ob-rxn-btn.unseen-split.active-u { background: var(--ob-cream-dark); border-color: var(--ob-ink-faint); }
+.ob-rxn-btn.unseen-split.active-u .ob-rxn-icon { color: var(--ob-ink); }
+.ob-rxn-btn.unseen-split.active-u .ob-rxn-lbl { color: var(--ob-ink); }
+.ob-rxn-btn.unseen-split.active-s { background: var(--ob-ink-light); border-color: var(--ob-ink-light); }
+.ob-rxn-btn.unseen-split.active-s .ob-rxn-icon { color: #fff; }
+.ob-rxn-btn.unseen-split.active-s .ob-rxn-lbl { color: rgba(255,255,255,0.75); }
+/* diagonal slash inside the button */
+.ob-rxn-btn.unseen-split::after {
+  content: ''; position: absolute;
+  top: 4px; right: 4px; bottom: 4px; left: 4px;
+  border-right: 1px solid var(--ob-cream-dark);
+  transform: rotate(-35deg); pointer-events: none;
+  opacity: 0.5;
 }
-.ob-rxn-split-bg { position: absolute; inset: 0; pointer-events: none; transition: background 0.2s; }
-.ob-rxn-split-line { position: absolute; left: 50%; top: 15%; bottom: 15%; width: 1px; background: var(--ob-cream-dark); z-index: 2; transition: opacity 0.2s; }
-
-.ob-rxn-split-lbl {
-  position: absolute; z-index: 3;
-  font-family: var(--ob-mono); font-size: 7px;
-  letter-spacing: 0.12em; text-transform: uppercase;
-  color: var(--ob-ink-faint); pointer-events: none;
-  width: 50%; text-align: center; top: 50%; transform: translateY(-50%);
-  transition: color 0.15s;
-}
-.ob-rxn-split-lbl.seen-lbl { left: 0; }
-.ob-rxn-split-lbl.unseen-lbl { right: 0; }
-
-.ob-rxn-split-hit { flex: 1; border: none; background: transparent; cursor: pointer; position: relative; z-index: 4; }
-.ob-rxn-split-hit:hover + .ob-rxn-split-bg, .ob-rxn-split-hit:hover + * + .ob-rxn-split-bg { background: rgba(0,0,0,0.03); }
-
-.ob-rxn-split.active-seen .seen-bg { background: var(--ob-ink-light); }
-.ob-rxn-split.active-seen .seen-lbl { color: #fff; }
-.ob-rxn-split.active-unseen .unseen-bg { background: var(--ob-cream-dark); }
-.ob-rxn-split.active-unseen .unseen-lbl { color: var(--ob-ink); }
-.ob-rxn-split.active-seen .ob-rxn-split-line, .ob-rxn-split.active-unseen .ob-rxn-split-line { opacity: 0; }
+.ob-rxn-btn.unseen-split.active-u::after,
+.ob-rxn-btn.unseen-split.active-s::after { opacity: 0; }
 
 /* ── BOTTOM BAR ── */
 .ob-botbar {
@@ -1081,9 +1170,9 @@ const ONBOARDING_CSS = `
 }
 .ob-btn-cont {
   font-family: var(--ob-mono);
-  font-size: clamp(9px,1.3vw,11px);
+  font-size: clamp(8px,1.1vw,10px);
   letter-spacing: 0.2em; text-transform: uppercase;
-  padding: clamp(11px,1.7vh,15px) clamp(22px,3vw,36px);
+  padding: clamp(9px,1.4vh,12px) clamp(18px,2.5vw,28px);
   border: none; cursor: pointer; border-radius: var(--ob-r);
   transition: background 0.2s, transform 0.12s;
 }
@@ -1091,20 +1180,59 @@ const ONBOARDING_CSS = `
 .ob-btn-cont.on:hover  { background: var(--ob-gold); }
 .ob-btn-cont.off { background: var(--ob-cream-dark); color: var(--ob-ink-faint); cursor: not-allowed; }
 
-/* ── PYRAMID SHELL ── */
-.ob-pyramid-shell {
+/* ── CONFIRM SCROLL PAGE ── */
+.ob-confirm-scroll {
   position: relative; z-index: 1;
   min-height: 100vh;
+}
+
+/* Section A — Hero */
+.ob-conf-hero {
+  min-height: 100vh;
   display: flex; flex-direction: column;
-  padding: clamp(32px, 6vh, 60px) clamp(20px,4vw,48px) clamp(28px,5vw,56px);
-  padding-top: calc(clamp(32px, 6vh, 60px) + env(safe-area-inset-top));
-  gap: clamp(24px,4vh,40px);
+  align-items: center; justify-content: center;
+  text-align: center;
+  padding: clamp(60px, 12vh, 100px) clamp(24px,6vw,64px);
+  position: relative;
+}
+.ob-conf-hero-title {
+  font-family: var(--ob-serif);
+  font-size: clamp(48px,10vw,96px); font-weight: 700;
+  letter-spacing: -0.025em; line-height: 1.02; margin: 0;
+}
+.ob-conf-hero-title em { font-style: italic; color: var(--ob-gold); font-weight: 300; }
+.ob-conf-hero-sub {
+  font-family: var(--ob-mono);
+  font-size: clamp(9px,1.2vw,11px);
+  letter-spacing: 0.22em; text-transform: uppercase;
+  color: var(--ob-ink-faint); margin-top: 20px;
+}
+.ob-conf-scroll-arrow {
+  position: absolute; bottom: clamp(32px, 6vh, 60px);
+  left: 50%; transform: translateX(-50%);
+  animation: ob-bounce 2s ease-in-out infinite;
+  color: var(--ob-gold); opacity: 0.6;
+}
+@keyframes ob-bounce {
+  0%,100% { transform: translateX(-50%) translateY(0); }
+  50%     { transform: translateX(-50%) translateY(12px); }
+}
+
+/* Section B — Pyramid */
+.ob-conf-section {
+  padding: clamp(40px, 8vh, 80px) clamp(20px,4vw,48px);
+  opacity: 0; transform: translateY(40px);
+  transition: opacity 0.7s ease, transform 0.7s ease;
+}
+.ob-conf-section.visible {
+  opacity: 1; transform: none;
 }
 
 .ob-pyr-header {
   display: flex; justify-content: space-between;
   align-items: flex-start; flex-wrap: wrap; gap: 16px;
-  margin-bottom: clamp(12px, 2vh, 24px);
+  margin-bottom: clamp(20px, 3vh, 36px);
+  max-width: 900px; margin-left: auto; margin-right: auto;
 }
 .ob-pyr-title {
   font-family: var(--ob-serif);
@@ -1130,8 +1258,8 @@ const ONBOARDING_CSS = `
   display: flex; flex-direction: column;
   align-items: center;
   gap: clamp(16px,3vh,32px);
-  flex: 1; justify-content: center;
-  width: 100%;
+  width: 100%; max-width: 900px;
+  margin: 0 auto;
 }
 
 .ob-pyr-row {
@@ -1143,7 +1271,7 @@ const ONBOARDING_CSS = `
 .ob-pyr-card {
   cursor: grab; transition: transform 0.2s, opacity 0.2s;
   position: relative; flex-shrink: 0;
-  width: clamp(110px, 14vw, 160px); 
+  width: clamp(110px, 14vw, 160px);
   display: flex; flex-direction: column;
 }
 
@@ -1192,41 +1320,104 @@ const ONBOARDING_CSS = `
 .ob-pyr-name { font-family: var(--ob-serif); font-size: clamp(11px,1.4vw,14px); font-weight:700; line-height:1.3; margin-bottom:2px; }
 .ob-pyr-meta { font-family:var(--ob-mono); font-size:clamp(7px,0.9vw,9px); letter-spacing:0.1em; color:var(--ob-ink-faint); text-transform:uppercase; }
 
-/* ── SIDEBAR & SHEETS ── */
-.ob-side-toggle {
-  position: fixed; right: 0; top: 50%; transform: translateY(-50%);
-  width: 32px; height: 64px; border-radius: 12px 0 0 12px;
-  background: var(--ob-ink); color: #fff; border: none; cursor: pointer;
-  z-index: 1100; display: flex; align-items: center; justify-content: center;
-  box-shadow: -4px 0 16px rgba(0,0,0,0.15);
+/* ── REPLACE MODAL (overlay) ── */
+.ob-rep-overlay {
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,0.55);
+  z-index: 1080; display: flex;
+  align-items: center; justify-content: center;
+  animation: ob-fadeIn 0.3s ease both;
 }
-.ob-pyr-sidebar {
-  position: fixed; right: 0; top: 0; bottom: 0; width: 280px;
-  background: rgba(242, 237, 227, 0.98); backdrop-filter: blur(20px);
-  border-left: 1px solid var(--ob-cream-dark);
-  transform: translateX(100%); transition: transform 0.5s cubic-bezier(0.19, 1, 0.22, 1);
-  z-index: 1050; box-shadow: -15px 0 45px rgba(0,0,0,0.1);
-  display: flex; flex-direction: column;
+@keyframes ob-fadeIn { from { opacity: 0; } to { opacity: 1; } }
+.ob-rep-modal {
+  background: var(--ob-cream);
+  border-radius: 16px; padding: clamp(24px,4vw,40px);
+  max-width: 560px; width: 90vw;
+  max-height: 80vh; overflow-y: auto;
+  box-shadow: 0 24px 80px rgba(0,0,0,0.25);
+  animation: ob-modalIn 0.4s cubic-bezier(0.19,1,0.22,1) both;
 }
-.ob-pyr-sidebar.active { transform: translateX(0); }
-.ob-side-header { padding: 40px 30px 20px; border-bottom: 1px solid var(--ob-cream-dark); }
-.ob-side-title { font-family: var(--ob-serif); font-size: 24px; font-weight: 700; }
-.ob-side-title em { font-style: italic; color: var(--ob-gold); font-weight: 300; }
+@keyframes ob-modalIn { from { opacity:0; transform: translateY(24px) scale(0.97); } to { opacity:1; transform: none; } }
+.ob-rep-modal-header {
+  display: flex; justify-content: space-between; align-items: center;
+  margin-bottom: 20px;
+}
+.ob-rep-modal-title { font-family: var(--ob-serif); font-size: clamp(20px,4vw,28px); font-weight: 700; }
+.ob-rep-modal-title em { font-style: italic; color: var(--ob-gold); font-weight: 300; }
+.ob-rep-modal-close {
+  width: 36px; height: 36px; border-radius: 50%;
+  border: 1px solid var(--ob-cream-dark); background: transparent;
+  cursor: pointer; display: flex; align-items: center; justify-content: center;
+  font-size: 16px; color: var(--ob-ink-light);
+  transition: background 0.18s;
+}
+.ob-rep-modal-close:hover { background: var(--ob-cream-dark); }
+.ob-rep-modal-grid {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+  gap: 12px;
+}
+.ob-rep-modal-card {
+  cursor: pointer; border-radius: 4px; overflow: hidden;
+  transition: transform 0.18s, box-shadow 0.18s;
+}
+.ob-rep-modal-card:hover { transform: translateY(-3px); box-shadow: 0 8px 24px rgba(0,0,0,0.15); }
+.ob-rep-modal-poster {
+  width: 100%; aspect-ratio: 2/3;
+  display: flex; align-items: flex-end; padding: 8px;
+}
+.ob-rep-modal-poster span {
+  font-family: var(--ob-serif); font-size: 11px; color: #fff; line-height: 1.2;
+}
 
-.ob-rep-backdrop {
-  position: fixed; inset: 0; background: rgba(0,0,0,0.4);
-  backdrop-filter: blur(8px); z-index: 1080; opacity: 0; pointer-events: none;
-  transition: opacity 0.4s ease;
+/* ── Sezione C — Film extra ── */
+.ob-extra-title {
+  font-family: var(--ob-serif);
+  font-size: clamp(24px,5vw,40px); font-weight: 700;
+  letter-spacing: -0.01em; margin: 0 0 8px 0;
+  max-width: 900px; margin-left: auto; margin-right: auto;
 }
-.ob-rep-backdrop.active { opacity: 1; pointer-events: auto; }
-.ob-rep-sheet {
-  position: fixed; bottom: 0; left: 0; right: 0; height: 85vh;
-  background: var(--ob-cream); border-radius: 28px 28px 0 0;
-  box-shadow: 0 -12px 60px rgba(0,0,0,0.15);
-  transform: translateY(100%); transition: transform 0.6s cubic-bezier(0.19, 1, 0.22, 1);
-  z-index: 1090; display: flex; flex-direction: column;
+.ob-extra-title em { font-style: italic; color: var(--ob-gold); font-weight: 300; }
+.ob-extra-sub {
+  font-family: var(--ob-mono);
+  font-size: clamp(8px,1vw,10px);
+  letter-spacing: 0.18em; text-transform: uppercase;
+  color: var(--ob-ink-faint); margin-bottom: 24px;
+  max-width: 900px; margin-left: auto; margin-right: auto;
 }
-.ob-rep-sheet.active { transform: translateY(0); }
+.ob-extra-grid {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+  gap: 16px; max-width: 900px; margin: 0 auto;
+}
+.ob-extra-card {
+  cursor: pointer; border-radius: 4px; overflow: hidden;
+  transition: transform 0.18s, box-shadow 0.18s;
+  border: 2px solid transparent;
+}
+.ob-extra-card:hover { transform: translateY(-3px); box-shadow: 0 8px 24px rgba(0,0,0,0.12); }
+.ob-extra-card.selected { border-color: var(--ob-gold); }
+.ob-extra-poster {
+  width: 100%; aspect-ratio: 2/3;
+  display: flex; align-items: flex-end; padding: 8px;
+}
+.ob-extra-poster span {
+  font-family: var(--ob-serif); font-size: 11px; color: #fff; line-height: 1.2;
+}
+.ob-extra-name { font-family: var(--ob-serif); font-size: 12px; font-weight: 700; padding: 6px 4px 2px; }
+.ob-extra-meta { font-family: var(--ob-mono); font-size: 8px; color: var(--ob-ink-faint); letter-spacing: 0.1em; text-transform: uppercase; padding: 0 4px 8px; }
+
+/* ── CONFIRM FOOTER ── */
+.ob-pyr-foot {
+  display: flex; flex-direction: column;
+  align-items: center; gap: 16px;
+  padding: clamp(40px, 6vh, 60px) 20px;
+  max-width: 900px; margin: 0 auto;
+}
+.ob-pyr-count {
+  font-family: var(--ob-mono);
+  font-size: clamp(8px,1vw,10px);
+  letter-spacing: 0.2em; text-transform: uppercase;
+  color: var(--ob-ink-faint);
+}
 
 /* Animations */
 @keyframes ob-au { from { opacity:0; transform:translateY(15px); } to { opacity:1; transform:none; } }

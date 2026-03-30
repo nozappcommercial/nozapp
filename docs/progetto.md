@@ -47,6 +47,11 @@ agent: scrittore
 - [[known-issues]] — Bug noti, TODO e limitazioni tecniche.
 - [[onboarding-guide]] — Guida rapida per nuovi sviluppatori.
 
+## Memoria Sessioni
+- [[session-current]] — Diario di lavoro della sessione attiva.
+- [[chat-history/2026-03-30/1509-onboarding-ui]] — Backup sessione Antigravity (Onboarding UI).
+- [[chat-history/2026-03-30/1816-missing-history]] — Backup sessione Antigravity (Recupero History).
+
 ## Quick Start (Sviluppo Locale)
 
 1. **Prerequisiti**: Node.js 18+, Python 3.10+ (opzionale per pipeline dati).
