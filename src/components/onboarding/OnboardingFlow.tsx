@@ -362,6 +362,13 @@ export default function OnboardingFlow({ films }: OnboardingFlowProps) {
                         tutti i film<br />valutati
                       </div>
                     </div>
+                    <div className="ob-done-card-summary">
+                      {stepFilms.filter(f => reactions[f.id] === 'loved').length} amati
+                      &nbsp;·&nbsp;
+                      {stepFilms.filter(f => reactions[f.id] === 'disliked').length} scartati
+                      &nbsp;·&nbsp;
+                      {stepFilms.filter(f => reactions[f.id] === 'unseen' || reactions[f.id] === 'seen').length} altri
+                    </div>
                   </div>
                 ) : currentFilm ? (
                   <>
@@ -737,9 +744,6 @@ function ConfirmPhase({
             <h2 className="ob-pyr-title">I tuoi<br /><em>pilastri</em></h2>
             <div className="ob-pyr-sub">Trascina per riordinare · click per sostituire</div>
           </div>
-          <div className="ob-pyr-hint">
-            Il vertice è<br />il tuo centro.<br />L&apos;ordine conta.
-          </div>
         </div>
 
         {pillars.length === 0 ? (
@@ -968,7 +972,7 @@ const ONBOARDING_CSS = `
 /* ── STEP SHELL ── */
 .ob-step-shell {
   position: relative; z-index: 1;
-  height: 100%;
+  min-height: 100dvh;
   display: grid;
   grid-template-rows: auto 2px 1fr auto;
 }
@@ -1184,16 +1188,20 @@ const ONBOARDING_CSS = `
 .ob-confirm-scroll {
   position: relative; z-index: 1;
   min-height: 100vh;
+  scroll-snap-type: y mandatory;
+  overflow-y: auto;
+  height: 100dvh;
 }
 
 /* Section A — Hero */
 .ob-conf-hero {
-  min-height: 100vh;
+  min-height: 100dvh;
   display: flex; flex-direction: column;
   align-items: center; justify-content: center;
   text-align: center;
   padding: clamp(60px, 12vh, 100px) clamp(24px,6vw,64px);
   position: relative;
+  scroll-snap-align: start;
 }
 .ob-conf-hero-title {
   font-family: var(--ob-serif);
@@ -1220,9 +1228,13 @@ const ONBOARDING_CSS = `
 
 /* Section B — Pyramid */
 .ob-conf-section {
-  padding: clamp(40px, 8vh, 80px) clamp(20px,4vw,48px);
+  min-height: 100dvh;
+  padding: clamp(24px, 4vh, 48px) clamp(16px,3vw,32px);
   opacity: 0; transform: translateY(40px);
   transition: opacity 0.7s ease, transform 0.7s ease;
+  scroll-snap-align: start;
+  display: flex; flex-direction: column;
+  justify-content: center;
 }
 .ob-conf-section.visible {
   opacity: 1; transform: none;
@@ -1230,40 +1242,33 @@ const ONBOARDING_CSS = `
 
 .ob-pyr-header {
   display: flex; justify-content: space-between;
-  align-items: flex-start; flex-wrap: wrap; gap: 16px;
-  margin-bottom: clamp(20px, 3vh, 36px);
+  align-items: flex-start; flex-wrap: wrap; gap: 12px;
+  margin-bottom: clamp(12px, 2vh, 20px);
   max-width: 900px; margin-left: auto; margin-right: auto;
 }
 .ob-pyr-title {
   font-family: var(--ob-serif);
-  font-size: clamp(32px,6vw,54px); font-weight: 700;
+  font-size: clamp(24px,5vw,42px); font-weight: 700;
   letter-spacing: -0.01em; line-height: 1.05; margin: 0;
 }
 .ob-pyr-title em { font-style: italic; color: var(--ob-gold); font-weight: 300; }
 .ob-pyr-sub {
   font-family: var(--ob-mono);
-  font-size: clamp(8px,1.1vw,10px);
+  font-size: clamp(7px,1vw,9px);
   letter-spacing: 0.18em; text-transform: uppercase;
-  color: var(--ob-ink-faint); margin-top: 10px;
-}
-.ob-pyr-hint {
-  font-family: var(--ob-mono);
-  font-size: 9px;
-  letter-spacing: 0.13em; text-transform: uppercase;
-  color: var(--ob-ink-faint); line-height: 1.85;
-  text-align: right; margin-top: 6px;
+  color: var(--ob-ink-faint); margin-top: 6px;
 }
 
 .ob-pyramid {
   display: flex; flex-direction: column;
   align-items: center;
-  gap: clamp(16px,3vh,32px);
+  gap: clamp(10px,1.8vh,20px);
   width: 100%; max-width: 900px;
   margin: 0 auto;
 }
 
 .ob-pyr-row {
-  display: flex; gap: clamp(12px,2vw,24px);
+  display: flex; gap: clamp(8px,1.5vw,18px);
   justify-content: center; align-items: flex-start;
   width: 100%;
 }
@@ -1271,15 +1276,19 @@ const ONBOARDING_CSS = `
 .ob-pyr-card {
   cursor: grab; transition: transform 0.2s, opacity 0.2s;
   position: relative; flex-shrink: 0;
-  width: clamp(110px, 14vw, 160px);
+  width: clamp(100px, 13vw, 150px);
   display: flex; flex-direction: column;
 }
 
 @media (max-width: 640px) {
-  .ob-pyramid { gap: 16px; }
-  .ob-pyr-row { gap: 12px; }
-  .ob-pyr-card { width: clamp(85px, 26vw, 120px); }
-  .row-0 .ob-pyr-card { width: clamp(120px, 35vw, 160px); }
+  .ob-pyramid { gap: 10px; }
+  .ob-pyr-row { gap: 8px; }
+  .ob-pyr-card { width: clamp(80px, 25vw, 105px); }
+  .row-0 .ob-pyr-card { width: clamp(100px, 30vw, 130px); }
+  .ob-pyr-rank-lbl { font-size: 6px; margin-bottom: 3px; }
+  .ob-pyr-poster { margin-bottom: 4px; }
+  .ob-pyr-name { font-size: 10px; }
+  .ob-pyr-meta { font-size: 7px; }
 }
 
 .ob-pyr-rank-lbl {
@@ -1440,31 +1449,38 @@ const ONBOARDING_CSS = `
 
 /* ── COMPLETION CARD ── */
 .ob-done-card-sizer {
-  padding: 20px;
-  width: clamp(140px, 45vw, 240px);
-  aspect-ratio: 2/3;
+  display: flex; flex-direction: column;
+  align-items: center; gap: 16px;
+  padding: 12px;
   flex-shrink: 0;
   animation: ob-au 0.4s ease both;
 }
 .ob-done-card {
-  width: 100%; height: 100%;
+  width: clamp(100px, 28vw, 160px);
+  aspect-ratio: 2/3;
   display: flex; flex-direction: column;
   align-items: center; justify-content: center;
-  gap: 16px; border-radius: 4px; border: 1.5px solid var(--ob-cream-dark);
+  gap: 12px; border-radius: 4px; border: 1.5px solid var(--ob-cream-dark);
   background: rgba(242,237,227,0.4);
 }
 .ob-done-card-check {
-  font-size: clamp(32px,5vw,48px);
+  font-size: clamp(28px, 4vw, 40px);
   color: var(--ob-gold);
   line-height: 1;
   animation: ob-checkPop 0.4s 0.1s cubic-bezier(0.34,1.56,0.64,1) both;
 }
 .ob-done-card-label {
   font-family: var(--ob-mono);
-  font-size: clamp(8px,1.1vw,10px);
-  letter-spacing: 0.22em; text-transform: uppercase;
+  font-size: clamp(7px,1vw,9px);
+  letter-spacing: 0.2em; text-transform: uppercase;
   color: var(--ob-ink-faint); text-align: center;
-  line-height: 1.8;
+  line-height: 1.7;
+}
+.ob-done-card-summary {
+  font-family: var(--ob-mono);
+  font-size: clamp(8px, 1.1vw, 10px);
+  letter-spacing: 0.15em; text-transform: uppercase;
+  color: var(--ob-ink-faint); text-align: center;
 }
 
 /* ── NAV ARROWS ── */
@@ -1503,4 +1519,63 @@ const ONBOARDING_CSS = `
   to   { opacity:1; transform:none; }
 }
 .ob-au0 { animation: ob-au 0.5s ease both; }
+
+/* ── STREAMING GRID ── */
+.ob-streaming-shell {
+  position: relative; z-index: 1;
+}
+.ob-streaming-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: clamp(8px, 1.5vw, 12px);
+  width: 100%; max-width: 420px;
+  margin: clamp(24px, 4vh, 40px) auto 0;
+}
+@media (max-width: 400px) {
+  .ob-streaming-grid { grid-template-columns: repeat(2, 1fr); }
+}
+.ob-streaming-btn {
+  display: flex; align-items: center; gap: 8px;
+  padding: clamp(10px, 1.8vh, 14px) clamp(10px, 2vw, 16px);
+  border-radius: var(--ob-r);
+  border: 1.5px solid var(--ob-cream-dark);
+  background: transparent; cursor: pointer;
+  font-family: var(--ob-mono);
+  font-size: clamp(8px, 1.2vw, 10px);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ob-ink-light);
+  transition: background 0.18s, border-color 0.18s, color 0.18s, transform 0.12s;
+  white-space: nowrap;
+  text-align: left;
+}
+.ob-streaming-btn:hover {
+  border-color: var(--ob-gold-faint);
+  background: var(--ob-gold-faint);
+}
+.ob-streaming-btn.active {
+  background: var(--ob-ink);
+  border-color: var(--ob-ink);
+  color: var(--ob-cream);
+}
+.ob-streaming-btn:active { transform: scale(0.96); }
+.ob-streaming-check {
+  width: 18px; height: 18px;
+  border-radius: 50%;
+  border: 1.5px solid var(--ob-cream-dark);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 11px; line-height: 1;
+  flex-shrink: 0;
+  transition: background 0.18s, border-color 0.18s;
+}
+.ob-streaming-btn.active .ob-streaming-check {
+  background: var(--ob-gold);
+  border-color: var(--ob-gold);
+  color: #fff;
+}
+
+/* ── CONFIRM FOOTER SNAP ── */
+.ob-pyr-foot {
+  scroll-snap-align: start;
+}
 `;

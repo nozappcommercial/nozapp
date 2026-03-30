@@ -32,3 +32,19 @@ status: active
 
 **Side effects**: Nessuno. Il componente è autocontenuto, il CSS è prefissato `ob-`.
 
+---
+
+## 19:08 [tipo: bug-fix | refactor]
+
+**File toccati**:
+
+- `src/components/onboarding/OnboardingFlow.tsx` — Fix 3 problemi visivi su mobile
+
+**Problema di partenza**: (1) Completion card troppo grande con spazio vuoto sotto, (2) pagina piramide non entra in uno schermo + manca snap scroll, (3) bottoni streaming senza stile (testo collassato).
+
+**Soluzione applicata**:
+1. **Completion card**: ridotta da `45vw` a `28vw`, aggiunto summary "X amati · Y scartati · Z altri".
+2. **Snap scroll + piramide compatta**: scroll-snap-type su `.ob-confirm-scroll`, snap-align sulle sezioni. Card piramide ridotte (~25vw mobile). Rimossa la scritta "Il vertice è il tuo centro". `.ob-step-shell` ora usa `min-height: 100dvh`.
+3. **Streaming grid**: aggiunto CSS completo per `.ob-streaming-grid` (griglia 3 colonne), `.ob-streaming-btn` (pillole con check cerchio) e `.ob-streaming-check` con stato attivo scuro.
+
+**Side effects**: Nessuno.
