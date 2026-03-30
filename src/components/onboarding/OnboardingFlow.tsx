@@ -1456,11 +1456,11 @@ const ONBOARDING_CSS = `
   animation: ob-au 0.4s ease both;
 }
 .ob-done-card {
-  width: clamp(100px, 28vw, 160px);
+  width: clamp(120px, 38vw, 200px);
   aspect-ratio: 2/3;
   display: flex; flex-direction: column;
   align-items: center; justify-content: center;
-  gap: 12px; border-radius: 4px; border: 1.5px solid var(--ob-cream-dark);
+  gap: 14px; border-radius: 4px; border: 1.5px solid var(--ob-cream-dark);
   background: rgba(242,237,227,0.4);
 }
 .ob-done-card-check {

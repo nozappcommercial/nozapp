@@ -48,3 +48,15 @@ status: active
 3. **Streaming grid**: aggiunto CSS completo per `.ob-streaming-grid` (griglia 3 colonne), `.ob-streaming-btn` (pillole con check cerchio) e `.ob-streaming-check` con stato attivo scuro.
 
 **Side effects**: Nessuno.
+
+---
+
+## 19:19 [tipo: bug-fix]
+
+**File toccati**:
+
+- `src/components/onboarding/OnboardingFlow.tsx` — Ingrandita completion card
+
+**Problema di partenza**: La card "tutti i film valutati" era troppo piccola su mobile.
+**Soluzione applicata**: Width da `clamp(100px, 28vw, 160px)` → `clamp(120px, 38vw, 200px)`. Frecce e pallini restano invariati.
+**Side effects**: Nessuno.
