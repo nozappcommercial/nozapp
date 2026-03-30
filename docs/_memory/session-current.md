@@ -60,3 +60,15 @@ status: active
 **Problema di partenza**: La card "tutti i film valutati" era troppo piccola su mobile.
 **Soluzione applicata**: Width da `clamp(100px, 28vw, 160px)` → `clamp(120px, 38vw, 200px)`. Frecce e pallini restano invariati.
 **Side effects**: Nessuno.
+
+---
+
+## 19:30 [tipo: bug-fix]
+
+**File toccati**:
+
+- `src/components/onboarding/OnboardingFlow.tsx` — Fix bottom bar + titolo piramide
+
+**Problema di partenza**: (1) La bottom bar con "nessun film amato" e il bottone saliva invece di restare ancorata in fondo. (2) Il titolo "I tuoi pilastri" era spezzato su due righe.
+**Soluzione applicata**: (1) `.ob-step-shell` torna a `height: 100dvh` (non `min-height`) perché la griglia CSS necessita di un'altezza fissa per ancorare l'ultima riga in fondo. (2) Rimosso `<br />` dal titolo → "I tuoi *pilastri*" su una riga.
+**Side effects**: Nessuno.

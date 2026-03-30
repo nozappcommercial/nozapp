@@ -741,7 +741,7 @@ function ConfirmPhase({
       >
         <div className="ob-pyr-header">
           <div>
-            <h2 className="ob-pyr-title">I tuoi<br /><em>pilastri</em></h2>
+            <h2 className="ob-pyr-title">I tuoi <em>pilastri</em></h2>
             <div className="ob-pyr-sub">Trascina per riordinare · click per sostituire</div>
           </div>
         </div>
@@ -972,7 +972,7 @@ const ONBOARDING_CSS = `
 /* ── STEP SHELL ── */
 .ob-step-shell {
   position: relative; z-index: 1;
-  min-height: 100dvh;
+  height: 100dvh;
   display: grid;
   grid-template-rows: auto 2px 1fr auto;
 }
