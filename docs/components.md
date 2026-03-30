@@ -122,11 +122,22 @@ I componenti di NoZapp sono suddivisi in **UI atomici** (Shadcn), **Layout** (st
 
 ---
 
+### `OnboardingFlow` — `src/components/onboarding/OnboardingFlow.tsx`
+**Scopo**: Gestione del percorso di configurazione iniziale del gusto utente.
+**Caratteristiche**:
+- **Design Editoriale**: Estetica "slow-web" con tipografia Geist e layout arioso.
+- **Rating Dinamico**: Valutazione dei film per identificare i "pilastri" del gusto.
+- **Piramide 1-2-3**: Layout piramidale centrato su desktop, trasformato in **griglia 2x3** su mobile per usabilità.
+- **Bottom Sheet Selection**: Mobile UX per la sostituzione dei pilastri tramite foglio a scomparsa (`ob-rep-sheet`) con backdrop blur.
+- **Safe Area Native**: Gestione via CSS (`100dvh`, `env(safe-area-inset-bottom)`) per evitare sovrapposizioni con notch e barre di sistema.
+
+---
+
 ### `AuthHandler` — `src/components/auth/AuthHandler.tsx`
 **Scopo**: Gestore invisibile lato client per la logica di autenticazione.
 **Responsabilità**:
-- Intercettare i parametri URL di Supabase (es. `#access_token`).
-- Gestire i redirect post-login.
+- Intercettare i parametri URL di Supabase (es. `#access_token` o `code`).
+- Gestire i redirect post-login o post-verfica email.
 - Pulire l'URL dai token dopo l'accettazione.
 
 ---
@@ -142,5 +153,5 @@ Questi componenti si trovano in `src/components/ui/` e seguono le specifiche di 
 > [!NOTE]
 > Tutti i componenti utilizzano tipicamente `framer-motion` per micro-interazioni e transizioni di stato.
 
-🔄 **Aggiornato il 2026-03-28**: Introdotti i componenti `BackToTop` e `RouteProgress`. Centralizzata la logica di refresh globale nell'`AdminHeader` (Client/Server syncing). Aggiornata la visibilità dell'Header globale per le nuove rotte editoriali.
-File modificati: `src/components/layout/BackToTop.tsx`, `src/components/layout/RouteProgress.tsx`, `src/components/admin/AdminHeader.tsx`, `src/components/layout/Header.tsx`, `src/components/layout/Footer.tsx`
+🔄 **Aggiornato il 2026-03-30**: Riprogettazione totale di `OnboardingFlow` per massimizzare la robustezza su mobile e l'estetica premium. Implementazione Bottom Sheet e griglia 2x3.
+File modificati: `src/components/onboarding/OnboardingFlow.tsx`

@@ -13,7 +13,8 @@ NoZapp utilizza l'**App Router** di Next.js 14 per gestire la navigazione. La ma
 | :--- | :--- | :--- | :--- | :--- |
 | `/` | `app/page.tsx` | SSR | Root | Landing page o redirect automatico alla sfera. |
 | `/login` | `app/(auth)/login/page.tsx` | CSR | Root | Autenticazione utente (Email/Password + Magic Link). |
-| `/onboarding`| `app/onboarding/page.tsx` | Dynamic | Root | Wizard iniziale di selezione dei pilastri del gusto. |
+| `/auth/confirmed` | `app/auth/confirmed/page.tsx` | SSR | Root | Pagina di successo dopo la conferma dell'email. |
+| `/onboarding`| `app/onboarding/page.tsx` | Dynamic | Root | Wizard iniziale di selezione dei pilastri del gusto (3D/2D Hybrid). |
 | `/redazione` | `app/redazione/page.tsx` | Dynamic | Root | Informazioni redazionali e visione del progetto. |
 | `/redazione/[slug]` | `app/redazione/[slug]/page.tsx` | Dynamic | Root | Visualizzazione articolo singolo (Hero Title-first + Design Immersivo). |
 | `/archivio` | `app/archivio/page.tsx` | Dynamic | Root | Biblioteca digitale completa degli articoli pubblicati. |
@@ -37,7 +38,7 @@ Le pagine `/` e `/sphere` agiscono come Server Components per:
 ### Client Components
 I componenti critici per l'interazione sono isolati come Client Components:
 - **Auth Forms**: Validazione input e chiamate `supabase.auth`.
-- **OnboardingFlow**: Gestione del wizard a step e Drag & Drop.
+- **OnboardingFlow**: Wizard a step con logica di rating cinematografico, piramide 2x3 mobile e gestione Bottom Sheet.
 - **SemanticSphere**: Rendering WebGL e loop Three.js.
 
 ## Flusso di Navigazione
@@ -73,5 +74,5 @@ graph TD
 > [!TIP]
 > Il middleware in `src/lib/supabase/middleware.ts` è il centro di controllo del routing basato sullo stato di onboarding dell'utente e sui permessi amministrativi (MFA).
 
-🔄 **Aggiornato il 2026-03-28**: Consolidate le rotte editoriali ed introdotte le sezioni istituzionali (`/manifesto`, `/archivio`, `/contatti`). Implementato `RouteProgress` nel layout globale per feedback di navigazione e reset dello scroll.
-File modificati: `src/app/layout.tsx`, `src/app/redazione/page.tsx`, `src/app/manifesto/page.tsx`, `src/app/archivio/page.tsx`, `src/app/contatti/page.tsx`, `src/components/layout/RouteProgress.tsx`
+🔄 **Aggiornato il 2026-03-30**: Introdotta la rotta `/auth/confirmed` per il successo della verifica email. Ottimizzato il middleware per gestire il redirect automatico post-conferma.
+File modificati: `src/app/auth/confirmed/page.tsx`, `src/app/auth/callback/route.ts`, `src/app/page.tsx`

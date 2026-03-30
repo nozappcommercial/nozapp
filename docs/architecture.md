@@ -80,4 +80,5 @@ NoZapp adotta un approccio a più livelli per proteggere i dati e le funzionalit
 > [!TIP]
 > Il progetto utilizza un approccio "Defense-in-Depth" per la sicurezza, coordinando RLS su Supabase, MFA nel middleware e validazione Zod nelle API.
 
-🔄 **Aggiornato il 2026-03-26**: Inserito il layer di sicurezza MFA per l'area amministrativa.
+🔄 **Aggiornato il 2026-03-30**: Passaggio dai Google Fonts ai font locali **Geist Sans** e **Geist Mono** per garantire privacy, performance e un'estetica editoriale coerente. Tutte le variabili CSS tipo `--font-serif` sono state mappate su Geist.
+File modificati: `src/app/layout.tsx`, `src/app/globals.css`

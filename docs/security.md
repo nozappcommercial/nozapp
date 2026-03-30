@@ -58,4 +58,6 @@ await logSecurityEvent('auth_success', {
 
 ---
 🔄 **Aggiornato il 2026-03-28**: Implementato bypass RLS sicuro tramite Service Role per il calcolo delle statistiche aggregate nella Dashboard Admin.
-File modificati: `src/app/actions/admin_analytics.ts`
+
+🔄 **Aggiornato il 2026-03-30**: Rafforzato il flusso di conferma email con una pagina di successo dedicata (`/auth/confirmed`) che previene leak di token nell'URL e fornisce feedback immediato all'utente.
+File modificati: `src/app/auth/confirmed/page.tsx`, `src/components/auth/AuthHandler.tsx`

@@ -23,7 +23,7 @@ Definisce gli alias di percorso (Path Aliases):
 
 ### `tailwind.config.ts`
 Estende il tema di base con:
-- Font custom (`cormorant`, `fragment`).
+- Font custom (**Geist Sans**, **Geist Mono**).
 - Colori HSL mappati alle variabili di `globals.css`.
 - Animazioni personalizzate (es. pulse e accordion).
 
@@ -51,5 +51,5 @@ Per avviare il progetto da zero:
 ---
 🔄 **Aggiornato il 2026-03-28**: Aumentato il limite di memoria heap di Node a 8GB per ottimizzare le performance di build in locale. Pulizia delle chiavi sperimentali deprecate in `next.config.mjs`.
 
----
-🔄 **Aggiornato il 2026-03-27**: L'infrastruttura MFA ora utilizza il servizio Email nativo di Supabase. Non è più richiesto il setup di provider SMS esterni per l'area Admin.
+🔄 **Aggiornato il 2026-03-30**: Importati localmente i font Geist Sans e Mono in `src/app/layout.tsx`. Rimosse le dipendenze esterne da Google Fonts per migliorare le performance e la privacy (GDPR compliance).
+File modificati: `src/app/layout.tsx`, `src/app/globals.css`
