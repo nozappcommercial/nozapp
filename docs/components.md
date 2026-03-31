@@ -1,4 +1,4 @@
-updated: 2026-03-28
+updated: 2026-03-31
 agent: aggiornatore
 ---
 
@@ -123,13 +123,23 @@ I componenti di NoZapp sono suddivisi in **UI atomici** (Shadcn), **Layout** (st
 ---
 
 ### `OnboardingFlow` — `src/components/onboarding/OnboardingFlow.tsx`
-**Scopo**: Gestione del percorso di configurazione iniziale del gusto utente.
+**Scopo**: Gestore principale del wizard di configurazione iniziale.
 **Caratteristiche**:
+- **Architettura Modulare**: Decomposta in sotto-componenti (`ConfirmPhase`, `types`, `css`) per manutenibilità.
 - **Design Editoriale**: Estetica "slow-web" con tipografia Geist e layout arioso.
-- **Rating Dinamico**: Valutazione dei film per identificare i "pilastri" del gusto.
-- **Piramide 1-2-3**: Layout piramidale centrato su desktop, trasformato in **griglia 2x3** su mobile per usabilità.
-- **Bottom Sheet Selection**: Mobile UX per la sostituzione dei pilastri tramite foglio a scomparsa (`ob-rep-sheet`) con backdrop blur.
-- **Safe Area Native**: Gestione via CSS (`100dvh`, `env(safe-area-inset-bottom)`) per evitare sovrapposizioni con notch e barre di sistema.
+- **Rating Dinamico**: Valutazione dei film per identificare i "pilastri" del gusto tramite swipe o bottoni.
+- **Streaming Selection**: Griglia di piattaforme con loghi ufficiali e selezione persistente.
+- **Safe Area Native**: Gestione via CSS (`100dvh`, `env(safe-area-inset-bottom)`) via Flexbox per stabilità su iOS.
+
+---
+
+### `ConfirmPhase` — `src/components/onboarding/ConfirmPhase.tsx`
+**Scopo**: Visualizzazione finale dei film scelti e ordinamento gerarchico.
+**Caratteristiche**:
+- **Piramide 1-2-3**: Layout piramidale dei pilastri con supporto Drag & Drop per il riordino.
+- **Replacement Modal**: Interfaccia di sostituzione rapida dei pilastri tramite modale centrato.
+- **Centered Footer**: Sezione finale "Prosegui" a tutta altezza (`100dvh`) per un focus totale sulla call to action.
+- **Scroll Reveal**: Utilizza l'hook `useScrollReveal` per animare l'entrata degli elementi durante lo scroll verticale.
 
 ---
 
@@ -153,5 +163,5 @@ Questi componenti si trovano in `src/components/ui/` e seguono le specifiche di 
 > [!NOTE]
 > Tutti i componenti utilizzano tipicamente `framer-motion` per micro-interazioni e transizioni di stato.
 
-🔄 **Aggiornato il 2026-03-30**: Riprogettazione totale di `OnboardingFlow` per massimizzare la robustezza su mobile e l'estetica premium. Implementazione Bottom Sheet e griglia 2x3.
-File modificati: `src/components/onboarding/OnboardingFlow.tsx`
+🔄 **Aggiornato il 2026-03-31**: Refactoring modulare del flusso di onboarding. Il file monolitico è stato diviso in `OnboardingFlow` (core), `ConfirmPhase` (UI piramide), `types`, `onboarding.css.ts` e `useScrollReveal`.
+File modificati: `src/components/onboarding/OnboardingFlow.tsx`, `src/components/onboarding/ConfirmPhase.tsx`

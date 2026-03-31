@@ -15,6 +15,10 @@ NoZapp utilizza pochi ma critici hook personalizzati per gestire lo stato della 
 **Scopo**: Hook centralizzato che rileva se l'utente sta navigando da un dispositivo mobile basandosi sulla larghezza della finestra (`< 768px`).
 **Ritorna**: `boolean`. Utilizza un `ResizeObserver` per una reattività ottimale.
 
+### `useScrollReveal` — `src/components/onboarding/useScrollReveal.ts`
+**Scopo**: Gestisce le animazioni di entrata degli elementi UI durante lo scroll, basandosi sull'API `IntersectionObserver`.
+**Funzionamento**: Aggiunge la classe `visible` agli elementi quando entrano nel viewport.
+
 ### `useLayoutEffect` (Scroll Spy) — `src/components/layout/Header.tsx`
 Utilizzato all'interno del componente Header per sincronizzare la posizione della "Bubble Nav" con il ridimensionamento della finestra e lo scroll della pagina.
 
@@ -57,8 +61,8 @@ Utility per la protezione delle rotte lato server:
 **Scopo**: Unisce classi Tailwind in modo intelligente, risolvendo i conflitti (wrapper su `clsx` e `tailwind-merge`).
 
 ---
-🔄 **Aggiornato il 2026-03-27**: Centralizzazione di `useIsMobile`, introduzione di `auth-client` e `scroll-utils` per migliorare la modularità.
-File modificati: `src/hooks/use-is-mobile.ts`, `src/lib/supabase/auth-client.ts`, `src/lib/scroll-utils.ts`
+🔄 **Aggiornato il 2026-03-31**: Aggiunto hook `useScrollReveal` specifico per il flusso di onboarding per gestire le animazioni di comparsa al viewport.
+File modificati: `src/components/onboarding/useScrollReveal.ts`
 
 ## Logica del Grafo
 ### `traversal.ts` — `src/lib/graph/traversal.ts`

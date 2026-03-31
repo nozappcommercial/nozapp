@@ -1,4 +1,4 @@
-updated: 2026-03-26
+updated: 2026-03-31
 agent: aggiornatore
 ---
 
@@ -32,16 +32,21 @@ Utilizzati dallo Sphere Engine per il rendering e la navigazione.
   - `shell`: 0 | 1 | 2
   - `geometry`: { x, y, z }
 - **`FilmEdge`**: Rappresenta una relazione tra due film.
-  - `source`: number (ID film)
-  - `target`: number (ID film)
-  - `type`: 'affinity' | 'pillar' | 'contrast'
 - **`NavContext`**: Lo stato della navigazione corrente.
   - `current`: ID film selezionato.
   - `parent`: ID film genitore nel percorso di navigazione.
   - `visible`: Set di ID film da renderizzare.
 
-## Tipi Onboarding (`app/onboarding/page.tsx`)
+## Tipi Onboarding (`src/components/onboarding/types.ts`)
 - **`OnboardingFilm`**: Estensione di `Film` con l'aggiunta di `onboarding_group` e campi colore personalizzati (`color_primary`, `color_accent`).
+- **`ReactionType`**: `'loved' | 'disliked' | 'unseen' | 'seen' | null`.
+- **`StreamingPlatform`**:
+  - `id`: string
+  - `name`: string
+  - `logo?`: string (percorso all'asset SVG in `/public/logos`).
+
+### Costanti
+- **`STREAMING_PLATFORMS`**: Array tipizzato contenente l'elenco delle piattaforme supportate (Netflix, Prime Video, Disney+, ecc.) con i relativi loghi ufficiali.
 
 ---
 
@@ -77,3 +82,4 @@ L'utilizzo del tipo `any` è scoraggiato e limitato esclusivamente a:
 > Quando modifichi lo schema del database su Supabase, ricordati di rigenerare i tipi tramite `npx supabase gen types typescript --project-id ... > src/types/supabase.ts`.
 
 🔄 **Aggiornato il 2026-03-27**: Ripristinata la tabella `security_logs` nel database e nei tipi TypeScript.
+🔄 **Aggiornato il 2026-03-31**: Spostamento dei tipi di onboarding in un file dedicato (`src/components/onboarding/types.ts`) e introduzione del tipo `StreamingPlatform` per la gestione dei loghi SVG.

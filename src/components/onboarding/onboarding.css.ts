@@ -285,11 +285,11 @@ export const ONBOARDING_CSS = `
 .ob-botbar {
   flex: 0 0 auto;
   border-top: 1px solid var(--ob-cream-dark);
-  padding: 16px clamp(20px,5vw,56px);
+  padding: 8px clamp(20px,5vw,56px);
   display: flex; align-items: center;
   justify-content: space-between; gap: 12px;
   background: var(--ob-cream);
-  padding-bottom: calc(16px + env(safe-area-inset-bottom, 0px));
+  padding-bottom: calc(8px + env(safe-area-inset-bottom, 0px));
 }
 .ob-loved-row { display: flex; align-items: center; gap: 10px; }
 .ob-loved-txt {

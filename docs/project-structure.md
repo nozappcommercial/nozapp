@@ -1,6 +1,6 @@
 ---
 tags: [#structure, #status/complete]
-updated: 2026-03-26
+updated: 2026-03-31
 agent: aggiornatore
 ---
 
@@ -31,7 +31,7 @@ nozapp/
 │   ├── components/       # Componenti React
 │   │   ├── auth/         # Gestione UI autenticazione
 │   │   ├── layout/       # Header, Footer, Navigazione
-│   │   ├── onboarding/   # Wizard di onboarding
+│   │   ├── onboarding/   # Wizard di onboarding (OnboardingFlow.tsx, ConfirmPhase.tsx, onboarding.css.ts, types.ts, useScrollReveal.ts)
 │   │   ├── sphere/       # ShellNavigator e componenti sfera
 │   │   └── ui/           # Shadcn (pulsanti, input, ecc.)
 │   ├── lib/              # Logica di business e utility
