@@ -700,21 +700,8 @@ function ConfirmPhase({
     pillars.slice(3, 6),
   ].filter(r => r.length > 0);
 
-  /* Click-click swap logic: click extra card → click pillar card */
-  function handleExtraClick(film: OnboardingFilm) {
-    if (swapSource?.id === film.id) {
-      setSwapSource(null); // deselect
-    } else {
-      setSwapSource(film);
-    }
-  }
   function handlePillarClick(idx: number) {
-    if (swapSource) {
-      handleReplace(idx, swapSource);
-      setSwapSource(null);
-    } else {
-      setReplacingPillar(idx);
-    }
+    setReplacingPillar(idx);
   }
 
   return (
@@ -803,6 +790,13 @@ function ConfirmPhase({
             ))}
           </div>
         )}
+
+        {/* Hint per sostituire */}
+        {replacementCandidates.length > 0 && (
+          <div className="ob-pyr-hint">
+            Tocca un film per sostituirlo con uno degli altri {replacementCandidates.length} amati
+          </div>
+        )}
       </div>
 
       {/* ─── Replace Modal (overlay) ─── */}
@@ -829,48 +823,8 @@ function ConfirmPhase({
         </div>
       )}
 
-      {/* ─── Sezione C — Film extra (solo se più di 6 film amati) ─── */}
-      {lovedFilms.length > 6 && (
-        <div
-          ref={extraReveal.ref}
-          className={`ob-conf-section ob-conf-section-last ${extraReveal.visible ? 'visible' : ''}`}
-        >
-          <h3 className="ob-extra-title">
-            Altri film <em>amati</em>
-          </h3>
-          <div className="ob-extra-sub">
-            Click su una card · poi click su un pilastro per scambiare
-          </div>
-          <div className="ob-extra-grid">
-            {replacementCandidates.map(film => (
-              <div
-                key={film.id}
-                className={`ob-extra-card ${swapSource?.id === film.id ? 'selected' : ''}`}
-                onClick={() => handleExtraClick(film)}
-              >
-                <div className="ob-extra-poster" style={filmGradient(film)}>
-                  <span>{film.title}</span>
-                </div>
-                <div className="ob-extra-name">{film.title}</div>
-                <div className="ob-extra-meta">{film.director} · {film.year}</div>
-              </div>
-            ))}
-          </div>
-
-          {/* Footer integrato nella sezione extra */}
-          <div className="ob-pyr-foot">
-            <div className="ob-pyr-count">
-              {pillars.length} {pillars.length === 1 ? "pilastro" : "pilastri"} selezionati
-            </div>
-            <button className="ob-btn-p" onClick={() => pageTransition(() => setPhase("streaming"))}>
-              Prosegui →
-            </button>
-          </div>
-        </div>
-      )}
-
-      {/* Footer standalone solo se NON ci sono film extra */}
-      {lovedFilms.length <= 6 && (
+      {/* ─── Footer — Prosegui centrato ─── */}
+      <div className="ob-conf-footer-section">
         <div className="ob-pyr-foot">
           <div className="ob-pyr-count">
             {pillars.length} {pillars.length === 1 ? "pilastro" : "pilastri"} selezionati
@@ -879,7 +833,7 @@ function ConfirmPhase({
             Prosegui →
           </button>
         </div>
-      )}
+      </div>
     </div>
   );
 }
