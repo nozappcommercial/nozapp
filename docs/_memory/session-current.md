@@ -150,3 +150,22 @@ status: active
 Scomposto in 5 file coesivi. Build TypeScript pulita (0 errori). Nessuna modifica funzionale.
 
 **Side effects**: Nessuno. L'import tree è corretto, il comportamento runtime è identico.
+
+---
+
+## 11:40 [tipo: bug-fix | feature]
+
+**File toccati**:
+
+- `src/components/onboarding/onboarding.css.ts` — `ob-conf-footer-section` a 100dvh + stili loghi streaming
+- `src/components/onboarding/types.ts` — Aggiunti path dei loghi a `STREAMING_PLATFORMS`
+- `src/components/onboarding/OnboardingFlow.tsx` — Rendering loghi (img) al posto del testo se disponibili
+
+**Problema di partenza**: (1) Il tasto "Prosegui" nella fase confirm era troppo vicino alla piramide (immagine 1). (2) La selezione piattaforme streaming mostrava solo testo invece dei loghi (immagine 2).
+
+**Soluzione applicata**:
+1. **Footer full-screen**: `ob-conf-footer-section` ora ha `min-height: 100dvh`, garantendo che il tasto "Prosegui" sia al centro di una schermata pulita senza altri elementi.
+2. **Loghi Streaming**: mappati i file SVG in `/public/logos` nell'array `STREAMING_PLATFORMS`.
+3. **Layout loghi**: aggiornati i bottoni streaming per contenere immagini `object-fit: contain` con checkmark posizionato in alto a sinistra.
+
+**Side effects**: Nessuno. Fallback sul nome testuale se il logo non è presente.

@@ -500,7 +500,11 @@ export default function OnboardingFlow({ films }: OnboardingFlowProps) {
                       }}
                     >
                       <div className="ob-streaming-check">{isSelected ? "✓" : "+"}</div>
-                      {platform.name}
+                      {'logo' in platform && platform.logo ? (
+                        <img src={platform.logo} alt={platform.name} className="ob-streaming-logo" />
+                      ) : (
+                        <span className="ob-streaming-name">{platform.name}</span>
+                      )}
                     </button>
                   );
                 })}

@@ -533,13 +533,13 @@ export const ONBOARDING_CSS = `
 
 /* ── CONFIRM FOOTER SECTION ── */
 .ob-conf-footer-section {
-  min-height: 60dvh;
+  min-height: 100dvh;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   scroll-snap-align: start;
-  padding-bottom: env(safe-area-inset-bottom, 20px);
+  padding-bottom: env(safe-area-inset-top, 20px);
 }
 
 /* ── CONFIRM FOOTER ── */
@@ -663,38 +663,47 @@ export const ONBOARDING_CSS = `
   .ob-streaming-grid { grid-template-columns: repeat(2, 1fr); }
 }
 .ob-streaming-btn {
-  display: flex; align-items: center; gap: 8px;
-  padding: clamp(10px, 1.8vh, 14px) clamp(10px, 2vw, 16px);
+  display: flex; align-items: center; justify-content: center; position: relative;
+  height: clamp(54px, 7vh, 80px);
+  padding: 12px;
   border-radius: var(--ob-r);
-  border: 1.5px solid var(--ob-cream-dark);
+  border: 1px solid var(--ob-cream-dark);
   background: transparent; cursor: pointer;
+  transition: all 0.2s ease;
+}
+.ob-streaming-logo {
+  height: 100%; width: auto; max-width: 100%;
+  object-fit: contain;
+  opacity: 0.85;
+}
+.ob-streaming-btn.active .ob-streaming-logo {
+  opacity: 1; filter: drop-shadow(0 0 2px rgba(255,255,255,0.4));
+}
+.ob-streaming-name {
   font-family: var(--ob-mono);
   font-size: clamp(8px, 1.2vw, 10px);
   letter-spacing: 0.08em;
   text-transform: uppercase;
   color: var(--ob-ink-light);
-  transition: background 0.18s, border-color 0.18s, color 0.18s, transform 0.12s;
-  white-space: nowrap;
-  text-align: left;
 }
 .ob-streaming-btn:hover {
   border-color: var(--ob-gold-faint);
   background: var(--ob-gold-faint);
 }
 .ob-streaming-btn.active {
-  background: var(--ob-ink);
+  background: var(--ob-ink-light);
   border-color: var(--ob-ink);
   color: var(--ob-cream);
 }
 .ob-streaming-btn:active { transform: scale(0.96); }
 .ob-streaming-check {
-  width: 18px; height: 18px;
+  position: absolute; top: 8px; left: 8px;
+  width: 16px; height: 16px;
   border-radius: 50%;
-  border: 1.5px solid var(--ob-cream-dark);
+  border: 1px solid var(--ob-cream-dark);
   display: flex; align-items: center; justify-content: center;
-  font-size: 11px; line-height: 1;
-  flex-shrink: 0;
-  transition: background 0.18s, border-color 0.18s;
+  font-size: 10px; line-height: 1;
+  background: white;
 }
 .ob-streaming-btn.active .ob-streaming-check {
   background: var(--ob-gold);
