@@ -166,6 +166,6 @@ Scomposto in 5 file coesivi. Build TypeScript pulita (0 errori). Nessuna modific
 **Soluzione applicata**:
 1. **Footer full-screen**: `ob-conf-footer-section` ora ha `min-height: 100dvh`, garantendo che il tasto "Prosegui" sia al centro di una schermata pulita senza altri elementi.
 2. **Loghi Streaming**: mappati i file SVG in `/public/logos` nell'array `STREAMING_PLATFORMS`.
-3. **Layout loghi**: aggiornati i bottoni streaming per contenere immagini `object-fit: contain` con checkmark posizionato in alto a sinistra.
+3. **Layout loghi**: aggiornati i bottoni streaming per contenere immagini `object-fit: contain`. Rimosso il cerchietto con il "+" (selection indicator) per una UI più pulita come richiesto.
 
 **Side effects**: Nessuno. Fallback sul nome testuale se il logo non è presente.

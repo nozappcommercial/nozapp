@@ -282,11 +282,11 @@ export const ONBOARDING_CSS = `
 /* ── BOTTOM BAR ── */
 .ob-botbar {
   border-top: 1px solid var(--ob-cream-dark);
-  padding: clamp(12px,2vh,20px) clamp(20px,5vw,56px);
+  padding: clamp(8px,1.5vh,16px) clamp(20px,5vw,56px);
   display: flex; align-items: center;
   justify-content: space-between; gap: 12px;
   background: var(--ob-cream);
-  padding-bottom: calc(clamp(12px,2vh,20px) + env(safe-area-inset-bottom));
+  padding-bottom: calc(clamp(8px,1.5vh,16px) + env(safe-area-inset-bottom, 0px));
 }
 .ob-loved-row { display: flex; align-items: center; gap: 10px; }
 .ob-loved-txt {
@@ -539,7 +539,7 @@ export const ONBOARDING_CSS = `
   align-items: center;
   justify-content: center;
   scroll-snap-align: start;
-  padding-bottom: env(safe-area-inset-top, 20px);
+  padding-bottom: env(safe-area-inset-bottom, 20px);
 }
 
 /* ── CONFIRM FOOTER ── */
