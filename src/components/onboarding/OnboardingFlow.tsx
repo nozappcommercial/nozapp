@@ -899,6 +899,9 @@ const ONBOARDING_CSS = `
   color: var(--ob-ink);
   position: relative;
   transition: opacity 0.28s ease;
+  overflow-x: hidden;
+  width: 100%;
+  max-width: 100vw;
 }
 .ob-root.ob-faded { opacity: 0; pointer-events: none; }
 
@@ -1190,7 +1193,9 @@ const ONBOARDING_CSS = `
   min-height: 100vh;
   scroll-snap-type: y mandatory;
   overflow-y: auto;
+  overflow-x: hidden;
   height: 100dvh;
+  width: 100%;
 }
 
 /* Section A — Hero */
@@ -1235,6 +1240,9 @@ const ONBOARDING_CSS = `
   scroll-snap-align: start;
   display: flex; flex-direction: column;
   justify-content: center;
+  overflow-x: hidden;
+  width: 100%;
+  box-sizing: border-box;
 }
 .ob-conf-section.visible {
   opacity: 1; transform: none;
@@ -1271,12 +1279,15 @@ const ONBOARDING_CSS = `
   display: flex; gap: clamp(8px,1.5vw,18px);
   justify-content: center; align-items: flex-start;
   width: 100%;
+  overflow: hidden;
+  flex-wrap: wrap;
 }
 
 .ob-pyr-card {
   cursor: grab; transition: transform 0.2s, opacity 0.2s;
-  position: relative; flex-shrink: 0;
+  position: relative;
   width: clamp(100px, 13vw, 150px);
+  min-width: 0;
   display: flex; flex-direction: column;
 }
 
@@ -1384,6 +1395,9 @@ const ONBOARDING_CSS = `
   font-size: clamp(24px,5vw,40px); font-weight: 700;
   letter-spacing: -0.01em; margin: 0 0 8px 0;
   max-width: 900px; margin-left: auto; margin-right: auto;
+  padding: 0 clamp(12px, 3vw, 24px);
+  text-align: center;
+  width: 100%; box-sizing: border-box;
 }
 .ob-extra-title em { font-style: italic; color: var(--ob-gold); font-weight: 300; }
 .ob-extra-sub {
@@ -1392,10 +1406,19 @@ const ONBOARDING_CSS = `
   letter-spacing: 0.18em; text-transform: uppercase;
   color: var(--ob-ink-faint); margin-bottom: 24px;
   max-width: 900px; margin-left: auto; margin-right: auto;
+  padding: 0 clamp(12px, 3vw, 24px);
+  text-align: center;
+  width: 100%; box-sizing: border-box;
 }
 .ob-extra-grid {
-  display: grid; grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
-  gap: 16px; max-width: 900px; margin: 0 auto;
+  display: grid; grid-template-columns: repeat(3, 1fr);
+  gap: clamp(8px, 2vw, 16px); max-width: 900px; margin: 0 auto;
+  padding: 0 clamp(12px, 3vw, 24px);
+  width: 100%;
+  box-sizing: border-box;
+}
+@media (max-width: 360px) {
+  .ob-extra-grid { grid-template-columns: repeat(2, 1fr); }
 }
 .ob-extra-card {
   cursor: pointer; border-radius: 4px; overflow: hidden;

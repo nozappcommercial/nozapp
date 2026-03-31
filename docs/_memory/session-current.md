@@ -72,3 +72,24 @@ status: active
 **Problema di partenza**: (1) La bottom bar con "nessun film amato" e il bottone saliva invece di restare ancorata in fondo. (2) Il titolo "I tuoi pilastri" era spezzato su due righe.
 **Soluzione applicata**: (1) `.ob-step-shell` torna a `height: 100dvh` (non `min-height`) perché la griglia CSS necessita di un'altezza fissa per ancorare l'ultima riga in fondo. (2) Rimosso `<br />` dal titolo → "I tuoi *pilastri*" su una riga.
 **Side effects**: Nessuno.
+
+---
+
+## 09:35 [tipo: bug-fix]
+
+**File toccati**:
+
+- `src/components/onboarding/OnboardingFlow.tsx` — Fix overflow orizzontale su tutta la pagina onboarding (confirm + extra films)
+
+**Problema di partenza**: La pagina onboarding (fase confirm) permetteva di scrollare orizzontalmente, mostrando spazio vuoto a destra. Visibile sia nella sezione piramide che in "Altri film amati".
+
+**Soluzione applicata**:
+1. **`.ob-root`**: aggiunto `overflow-x: hidden`, `width: 100%`, `max-width: 100vw` per bloccare qualsiasi overflow orizzontale a livello radice.
+2. **`.ob-confirm-scroll`**: aggiunto `overflow-x: hidden` e `width: 100%`.
+3. **`.ob-conf-section`**: aggiunto `overflow-x: hidden`, `width: 100%`, `box-sizing: border-box`.
+4. **`.ob-pyr-row`**: aggiunto `overflow: hidden` e `flex-wrap: wrap` per evitare che le card escano dal contenitore.
+5. **`.ob-pyr-card`**: rimosso `flex-shrink: 0` (che forzava dimensioni fisse), aggiunto `min-width: 0`.
+6. **`.ob-extra-grid`**: cambiato da `repeat(auto-fill, minmax(110px, 1fr))` a `repeat(3, 1fr)` con padding laterale e `box-sizing: border-box`. Griglia fissa a 3 colonne (2 sotto 360px).
+7. **`.ob-extra-title` / `.ob-extra-sub`**: aggiunto padding laterale, `text-align: center`, `width: 100%`, `box-sizing: border-box`.
+
+**Side effects**: Nessuno. Tutte le classi sono prefissate `ob-`.
