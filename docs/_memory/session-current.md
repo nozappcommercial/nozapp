@@ -111,3 +111,42 @@ status: active
 4. **Rimosso** `scroll-snap-align: start` dal footer (non serve più come snap point separato).
 
 **Side effects**: Nessuno. Classi prefissate `ob-`.
+
+---
+
+## 10:30 [tipo: refactor]
+
+**File toccati**:
+
+- `src/components/onboarding/OnboardingFlow.tsx` — Rimossa sezione "Altri film amati", semplificata fase confirm
+
+**Problema di partenza**: La sezione "Altri film amati" era ridondante: il modale di sostituzione (click su card piramide) già permette di scambiare i film. L'utente doveva scrollare troppo (piramide → extra films → footer).
+
+**Soluzione applicata**:
+1. **Eliminata completamente** la sezione C "Altri film amati" (JSX + tutto il CSS `.ob-extra-*`).
+2. **Aggiunto hint** sotto la piramide: "Tocca un film per sostituirlo con uno degli altri N amati" (classe `.ob-pyr-hint`, visibile solo se ci sono candidati).
+3. **Footer semplificato**: unico `<div className="ob-conf-footer-section">` con snap, centrato verticalmente (60dvh), contiene contatore pilastri + bottone "Prosegui →".
+4. **Rimosso** tutto il codice `swapSource`/`setSwapSource` (state, props, interface, overlay "↔ Scambia" sulla piramide, funzione `handleExtraClick`).
+5. **Rimosso** hook `extraReveal` (non più necessario).
+6. **`handlePillarClick`** ora apre direttamente il modale di sostituzione senza passare per swap.
+
+**Side effects**: Nessuno. Classi prefissate `ob-`.
+
+---
+
+## 11:22 [tipo: refactor]
+
+**File toccati**:
+
+- `src/components/onboarding/OnboardingFlow.tsx` — Riscritto: ora 626 righe (prima 1528)
+- `src/components/onboarding/ConfirmPhase.tsx` — [NEW] Componente piramide + modale + footer (158 righe)
+- `src/components/onboarding/onboarding.css.ts` — [NEW] Tutto il CSS (704 righe)
+- `src/components/onboarding/types.ts` — [NEW] Tipi, costanti, interfacce (27 righe)
+- `src/components/onboarding/useScrollReveal.ts` — [NEW] Hook IntersectionObserver (23 righe)
+
+**Problema di partenza**: File monolitico di 1528 righe, difficile da navigare e mantenere.
+
+**Soluzione applicata**:
+Scomposto in 5 file coesivi. Build TypeScript pulita (0 errori). Nessuna modifica funzionale.
+
+**Side effects**: Nessuno. L'import tree è corretto, il comportamento runtime è identico.
