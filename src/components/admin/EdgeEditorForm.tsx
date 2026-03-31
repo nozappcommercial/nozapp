@@ -4,6 +4,74 @@ import React, { useState, useEffect } from 'react';
 import { searchFilms, addEditorialEdge, getEdgesForFilm, deleteEditorialEdge } from '@/app/actions/editorial_edges';
 import { Search, Plus, Trash2, ArrowRightLeft, Loader2, AlertCircle, Link } from 'lucide-react';
 
+const FilmSearchBox = ({ 
+    title, placeholder, query, setQuery, results, film, setFilm 
+}: {
+    title: string; placeholder: string; query: string; setQuery: (q: string) => void;
+    results: any[]; film: any; setFilm: (f: any) => void;
+}) => (
+    <div className="space-y-3 relative">
+        <h3 className="text-sm font-medium uppercase tracking-widest text-black/50 font-['Fragment_Mono']">
+            {title}
+        </h3>
+        
+        {film ? (
+            <div className="p-4 rounded-xl border border-[var(--gold)]/30 bg-[var(--gold)]/5 flex justify-between items-center group">
+                <div>
+                    <p className="font-medium text-lg">{film.title}</p>
+                    <p className="text-sm opacity-60">{film.director} • {film.year}</p>
+                </div>
+                <button 
+                    onClick={() => { setFilm(null); setQuery(''); }}
+                    className="p-2 rounded-full hover:bg-black/5 opacity-0 group-hover:opacity-100 transition-opacity"
+                    title="Rimuovi"
+                >
+                    <Trash2 size={16} />
+                </button>
+            </div>
+        ) : (
+            <div className="relative">
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <Search size={16} className="text-black/30" />
+                </div>
+                <input
+                    type="text"
+                    value={query}
+                    onChange={(e) => setQuery(e.target.value)}
+                    placeholder={placeholder}
+                    className="w-full pl-10 px-4 py-3 rounded-xl border-none ring-1 ring-black/10 bg-white/50 focus:ring-[var(--gold)] focus:outline-none transition-shadow"
+                />
+                
+                {results.length > 0 && (
+                    <div className="absolute top-14 left-0 w-full bg-white rounded-xl shadow-xl ring-1 ring-black/5 overflow-hidden z-10 max-h-60 overflow-y-auto">
+                        {results.map((r, i) => (
+                            <button
+                                key={i}
+                                className="w-full text-left p-3 hover:bg-black/5 transition-colors border-b border-black/5 last:border-0 flex items-center gap-3"
+                                onClick={() => {
+                                    setFilm(r);
+                                    setQuery('');
+                                }}
+                            >
+                                {r.poster_url && (
+                                    <div className="w-8 h-12 bg-black/10 rounded flex-shrink-0 overflow-hidden relative">
+                                        {/* We ignore actual Images here for simplicity, just a placeholder styling */}
+                                        <div className="absolute inset-0 bg-cover bg-center" style={{backgroundImage: `url(${r.poster_url})`}} />
+                                    </div>
+                                )}
+                                <div>
+                                    <p className="font-medium truncate">{r.title}</p>
+                                    <p className="text-xs opacity-50">{r.director} • {r.year}</p>
+                                </div>
+                            </button>
+                        ))}
+                    </div>
+                )}
+            </div>
+        )}
+    </div>
+);
+
 export default function EdgeEditorForm() {
     const [sourceQuery, setSourceQuery] = useState('');
     const [targetQuery, setTargetQuery] = useState('');
@@ -104,74 +172,6 @@ export default function EdgeEditorForm() {
             setError(res.error || 'Errore durante l\'eliminazione');
         }
     };
-
-    const FilmSearchBox = ({ 
-        title, placeholder, query, setQuery, results, film, setFilm 
-    }: {
-        title: string; placeholder: string; query: string; setQuery: (q: string) => void;
-        results: any[]; film: any; setFilm: (f: any) => void;
-    }) => (
-        <div className="space-y-3 relative">
-            <h3 className="text-sm font-medium uppercase tracking-widest text-black/50 font-['Fragment_Mono']">
-                {title}
-            </h3>
-            
-            {film ? (
-                <div className="p-4 rounded-xl border border-[var(--gold)]/30 bg-[var(--gold)]/5 flex justify-between items-center group">
-                    <div>
-                        <p className="font-medium text-lg">{film.title}</p>
-                        <p className="text-sm opacity-60">{film.director} • {film.year}</p>
-                    </div>
-                    <button 
-                        onClick={() => { setFilm(null); setQuery(''); }}
-                        className="p-2 rounded-full hover:bg-black/5 opacity-0 group-hover:opacity-100 transition-opacity"
-                        title="Rimuovi"
-                    >
-                        <Trash2 size={16} />
-                    </button>
-                </div>
-            ) : (
-                <div className="relative">
-                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                        <Search size={16} className="text-black/30" />
-                    </div>
-                    <input
-                        type="text"
-                        value={query}
-                        onChange={(e) => setQuery(e.target.value)}
-                        placeholder={placeholder}
-                        className="w-full pl-10 px-4 py-3 rounded-xl border-none ring-1 ring-black/10 bg-white/50 focus:ring-[var(--gold)] focus:outline-none transition-shadow"
-                    />
-                    
-                    {results.length > 0 && (
-                        <div className="absolute top-14 left-0 w-full bg-white rounded-xl shadow-xl ring-1 ring-black/5 overflow-hidden z-10 max-h-60 overflow-y-auto">
-                            {results.map((r, i) => (
-                                <button
-                                    key={i}
-                                    className="w-full text-left p-3 hover:bg-black/5 transition-colors border-b border-black/5 last:border-0 flex items-center gap-3"
-                                    onClick={() => {
-                                        setFilm(r);
-                                        setQuery('');
-                                    }}
-                                >
-                                    {r.poster_url && (
-                                        <div className="w-8 h-12 bg-black/10 rounded flex-shrink-0 overflow-hidden relative">
-                                            {/* We ignore actual Images here for simplicity, just a placeholder styling */}
-                                            <div className="absolute inset-0 bg-cover bg-center" style={{backgroundImage: `url(${r.poster_url})`}} />
-                                        </div>
-                                    )}
-                                    <div>
-                                        <p className="font-medium truncate">{r.title}</p>
-                                        <p className="text-xs opacity-50">{r.director} • {r.year}</p>
-                                    </div>
-                                </button>
-                            ))}
-                        </div>
-                    )}
-                </div>
-            )}
-        </div>
-    );
 
     return (
         <div className="space-y-8">

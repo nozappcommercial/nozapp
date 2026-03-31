@@ -50,3 +50,17 @@ status: active
 **Side effects**: Aggiornamento delle regole di accessibilità globale sui file root. Serve spingere la migrazione sql su Supabase.
 
 ---
+
+## [18:15] [tipo: bug-fix]
+
+**File toccati**:
+
+- `src/app/admin/collegamenti/page.tsx` — Rimosso bottone "Torna alla dashboard", tag in alto "COLLEGAMENTI EDITORIALI", e il box delle Note Editoriali.
+- `src/components/admin/EdgeEditorForm.tsx` — Portato fuori dal flusso di Render React principale il subcomponent `FilmSearchBox` per prevenire l'unboxing prematuro causante perdita di Focus input (1 carattere alla volta).
+- `supabase/migrations/20260331000001_editorial_edges_rls.sql` — [NEW] Creata apposita Row-Level Security Policy da applicare al database tramite migration o query per bypassare il blocco INSERT/DELETE su `editorial_edges`.
+
+**Problema di partenza**: Piccole modifiche UI e bug di perdita Focus sull'input, oltre al blocco di Supabase causato dalle policy di default del database RLS stringenti per le queries.
+**Soluzione applicata**: Rimozione codice UI inutile, estrapolazione sub-component e stesura del file `.sql` integrativo bypass RLS.
+**Side effects**: Va spinta la seconda migration su Supabase per permettere l'insert senza errori RLS.
+
+---
