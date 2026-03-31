@@ -11,12 +11,12 @@ export const STREAMING_PLATFORMS = [
   { id: "Disney+", name: "Disney+", logo: "/logos/Disney+_(black)_logo.svg" },
   { id: "Apple TV", name: "Apple TV", logo: "/logos/Apple_TV_Plus_Logo.svg" },
   { id: "Now", name: "Now", logo: "/logos/Sky_Group_logo_2020.svg" },
-  { id: "Paramount+", name: "Paramount+" },
+  { id: "Paramount+", name: "Paramount+", logo: "/logos/Paramount_Plus.svg" },
   { id: "HBO Max", name: "HBO Max", logo: "/logos/HBO_Max_Logo_(October_2019_Print).svg" },
   { id: "Mubi", name: "Mubi", logo: "/logos/Mubi_logo.svg" },
-  { id: "Crunchyroll", name: "Crunchyroll" },
-  { id: "Discovery+", name: "Discovery+" },
-  { id: "Infinity", name: "Infinity" },
+  { id: "Crunchyroll", name: "Crunchyroll", logo: "/logos/Crunchyroll_2024.svg" },
+  { id: "Discovery+", name: "Discovery+", logo: "/logos/Discovery_Plus_logo.svg" },
+  { id: "Infinity", name: "Infinity", logo: "/logos/Infinity+_logo.svg" },
   { id: "RaiPlay", name: "RaiPlay", logo: "/logos/RaiPlay.svg" }
 ];
 
