@@ -119,6 +119,7 @@ export interface Database {
                     is_admin: boolean
                     admin_verified_at: string | null
                     created_at: string
+                    role: 'base' | 'redattore' | 'analista' | 'admin'
                 }
                 Insert: {
                     id: string
@@ -127,6 +128,7 @@ export interface Database {
                     is_admin?: boolean
                     admin_verified_at?: string | null
                     created_at?: string
+                    role?: 'base' | 'redattore' | 'analista' | 'admin'
                 }
                 Update: {
                     id?: string
@@ -135,6 +137,7 @@ export interface Database {
                     is_admin?: boolean
                     admin_verified_at?: string | null
                     created_at?: string
+                    role?: 'base' | 'redattore' | 'analista' | 'admin'
                 }
             }
             security_logs: {

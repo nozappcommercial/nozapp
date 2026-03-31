@@ -36,6 +36,7 @@ agent: scrittore
 - [[hooks-and-utilities]] — Custom hook e helper di sistema.
 - [[types]] — Definition Type e interfacce TypeScript.
 - [[editorial-system]] — Gestione articoli, workflow redazione e dashboard admin.
+- [[relazione-accessi-editoriali]] — Piano architetturale per i ruoli utente (RBAC) e la pagina collegamenti.
 
 ### Dati e Integrazioni
 - [[dataset]] — Pipeline CSV e arricchimento titoli (Wikidata).
