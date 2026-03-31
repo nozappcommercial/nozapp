@@ -696,18 +696,4 @@ export const ONBOARDING_CSS = `
   color: var(--ob-cream);
 }
 .ob-streaming-btn:active { transform: scale(0.96); }
-.ob-streaming-check {
-  position: absolute; top: 8px; left: 8px;
-  width: 16px; height: 16px;
-  border-radius: 50%;
-  border: 1px solid var(--ob-cream-dark);
-  display: flex; align-items: center; justify-content: center;
-  font-size: 10px; line-height: 1;
-  background: white;
-}
-.ob-streaming-btn.active .ob-streaming-check {
-  background: var(--ob-gold);
-  border-color: var(--ob-gold);
-  color: #fff;
-}
 `;
