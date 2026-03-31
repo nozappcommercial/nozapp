@@ -116,6 +116,18 @@ export function useSphereEngine({
                     const targetOp = NCFG[f.shell].glow;
                     const targetBaseOp = 1;
 
+                    let targetScale = 1;
+                    if (shell === 0) {
+                        targetScale = 1;
+                    } else if (shell === 1) {
+                        if (f.shell === 1) targetScale = 5.0; // Ingrandisci Affinità
+                        else if (f.shell === 0) targetScale = 0.3; // Rimpicciolisci Pilastri
+                    } else if (shell === 2) {
+                        if (f.shell === 2) targetScale = 10.0; // Ingrandisci Scoperta
+                        else if (f.shell === 1) targetScale = 2.0; // Affinità media
+                        else if (f.shell === 0) targetScale = 0.15; // Pilastri piccolissimi
+                    }
+
                     if (shouldShow) {
                         const baseDelay = isCurrentShell ? f.shell * 300 : 0;
                         const individualDelay = isCurrentShell ? i * 5 : 0;
@@ -126,6 +138,13 @@ export function useSphereEngine({
 
                         addTween(glowMeshes[i].material as THREE.MeshBasicMaterial, 'opacity', finalGlow, 600, delay);
                         addTween(nodeMeshes[i].material as THREE.MeshBasicMaterial, 'opacity', finalBase, 600, delay);
+                        
+                        addTween(nodeMeshes[i].scale, 'x', targetScale, 600, delay);
+                        addTween(nodeMeshes[i].scale, 'y', targetScale, 600, delay);
+                        addTween(nodeMeshes[i].scale, 'z', targetScale, 600, delay);
+                        addTween(glowMeshes[i].scale, 'x', targetScale, 600, delay);
+                        addTween(glowMeshes[i].scale, 'y', targetScale, 600, delay);
+                        addTween(glowMeshes[i].scale, 'z', targetScale, 600, delay);
                     } else {
                         addTween(glowMeshes[i].material as THREE.MeshBasicMaterial, 'opacity', 0, 400, 0);
                         addTween(nodeMeshes[i].material as THREE.MeshBasicMaterial, 'opacity', 0, 400, 0);
@@ -271,7 +290,8 @@ export function useSphereEngine({
                 el.style.left = screenX + 'px';
                 el.style.top = screenY + 'px';
 
-                const offset = NCFG[f.shell].size * 100 + 8;
+                const currentScale = nodeMeshes[index].scale.y;
+                const offset = (NCFG[f.shell].size * currentScale * 100) + 8;
                 el.style.transform = `translate(-50%,calc(-50% - ${offset}px))`;
 
                 let op = 0;

@@ -64,3 +64,15 @@ status: active
 **Side effects**: Va spinta la seconda migration su Supabase per permettere l'insert senza errori RLS.
 
 ---
+
+## [18:50] [tipo: bug-fix]
+
+**File toccati**:
+
+- `src/hooks/useSphereEngine.ts` — Aggiunta espansione logaritmica/scalare sulle dimensioni del nodo al passaggio di shell (`setShell`). I `nodeMeshes` e `glowMeshes` ora aumentano il loro volume localmente quando la vista passa dalla loro gerarchia (es. shell 1 scala a x5.0, mentre shell 0 diminuisce a x0.3). L'offset del box Title HTML è stato modificato in real time usando la `currentScale` del singolo nodo.
+
+**Problema di partenza**: Nelle viste profonde (Affinità / Scoperta) i nodi primari Pilastro sovrastavano visivamente i film di riferimento essendo staticamente codificati per restare più grandi.
+**Soluzione applicata**: Applicato "Tween" sulle direttrici (x,y,z) della Three.js Geometry ricalibrandosi in base a `activeShell`.
+**Side effects**: CSS title offset ricalcolato live durante la transizione tween.
+
+---
