@@ -102,8 +102,8 @@ export const ONBOARDING_CSS = `
 .ob-step-shell {
   position: relative; z-index: 1;
   height: 100dvh;
-  display: grid;
-  grid-template-rows: auto 2px 1fr auto;
+  display: flex;
+  flex-direction: column;
 }
 .ob-topbar {
   display: flex; justify-content: space-between; align-items: center;
@@ -136,10 +136,12 @@ export const ONBOARDING_CSS = `
 
 /* ── CARD STAGE ── */
 .ob-stage {
+  flex: 1;
   display: flex; flex-direction: column;
   align-items: center; justify-content: center;
-  padding: clamp(16px,3vw,40px) clamp(20px,5vw,56px);
-  gap: clamp(16px,2.5vh,28px);
+  padding: clamp(16px,3vw,32px) clamp(20px,5vw,56px);
+  gap: clamp(16px,2vh,24px);
+  overflow: hidden;
 }
 .ob-stage-headline { text-align: center; }
 .ob-stage-headline h2 {
@@ -281,12 +283,13 @@ export const ONBOARDING_CSS = `
 
 /* ── BOTTOM BAR ── */
 .ob-botbar {
+  flex: 0 0 auto;
   border-top: 1px solid var(--ob-cream-dark);
-  padding: clamp(8px,1.5vh,16px) clamp(20px,5vw,56px);
+  padding: 16px clamp(20px,5vw,56px);
   display: flex; align-items: center;
   justify-content: space-between; gap: 12px;
   background: var(--ob-cream);
-  padding-bottom: calc(clamp(8px,1.5vh,16px) + env(safe-area-inset-bottom, 0px));
+  padding-bottom: calc(16px + env(safe-area-inset-bottom, 0px));
 }
 .ob-loved-row { display: flex; align-items: center; gap: 10px; }
 .ob-loved-txt {
