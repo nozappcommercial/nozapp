@@ -93,3 +93,21 @@ status: active
 7. **`.ob-extra-title` / `.ob-extra-sub`**: aggiunto padding laterale, `text-align: center`, `width: 100%`, `box-sizing: border-box`.
 
 **Side effects**: Nessuno. Tutte le classi sono prefissate `ob-`.
+
+---
+
+## 10:20 [tipo: bug-fix | refactor]
+
+**File toccati**:
+
+- `src/components/onboarding/OnboardingFlow.tsx` — Footer "Prosegui" integrato nella sezione + fix padding top piramide
+
+**Problema di partenza**: (1) Il bottone "Prosegui →" e il contatore pilastri erano visibili solo con uno scroll aggiuntivo dopo la sezione "Altri film amati". (2) Scrollando alla sezione piramide, il titolo "I tuoi pilastri" era tagliato dal notch iOS (mancava safe-area-inset-top).
+
+**Soluzione applicata**:
+1. **Footer integrato**: quando ci sono film extra (>6 amati), il footer è ora DENTRO la sezione `.ob-conf-section-last`. Quando non ci sono extra, il footer resta standalone.
+2. **`.ob-conf-section-last`**: nuova classe CSS con `min-height: auto` (non forza 100dvh), `justify-content: flex-start`, e `padding-bottom: env(safe-area-inset-bottom)`.
+3. **Padding top**: aggiunto `padding-top: calc(clamp(40px, 5vh, 60px) + env(safe-area-inset-top))` a `.ob-conf-section` per evitare taglio dal notch.
+4. **Rimosso** `scroll-snap-align: start` dal footer (non serve più come snap point separato).
+
+**Side effects**: Nessuno. Classi prefissate `ob-`.

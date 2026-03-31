@@ -833,7 +833,7 @@ function ConfirmPhase({
       {lovedFilms.length > 6 && (
         <div
           ref={extraReveal.ref}
-          className={`ob-conf-section ${extraReveal.visible ? 'visible' : ''}`}
+          className={`ob-conf-section ob-conf-section-last ${extraReveal.visible ? 'visible' : ''}`}
         >
           <h3 className="ob-extra-title">
             Altri film <em>amati</em>
@@ -856,18 +856,30 @@ function ConfirmPhase({
               </div>
             ))}
           </div>
+
+          {/* Footer integrato nella sezione extra */}
+          <div className="ob-pyr-foot">
+            <div className="ob-pyr-count">
+              {pillars.length} {pillars.length === 1 ? "pilastro" : "pilastri"} selezionati
+            </div>
+            <button className="ob-btn-p" onClick={() => pageTransition(() => setPhase("streaming"))}>
+              Prosegui →
+            </button>
+          </div>
         </div>
       )}
 
-      {/* ─── Footer ─── */}
-      <div className="ob-pyr-foot">
-        <div className="ob-pyr-count">
-          {pillars.length} {pillars.length === 1 ? "pilastro" : "pilastri"} selezionati
+      {/* Footer standalone solo se NON ci sono film extra */}
+      {lovedFilms.length <= 6 && (
+        <div className="ob-pyr-foot">
+          <div className="ob-pyr-count">
+            {pillars.length} {pillars.length === 1 ? "pilastro" : "pilastri"} selezionati
+          </div>
+          <button className="ob-btn-p" onClick={() => pageTransition(() => setPhase("streaming"))}>
+            Prosegui →
+          </button>
         </div>
-        <button className="ob-btn-p" onClick={() => pageTransition(() => setPhase("streaming"))}>
-          Prosegui →
-        </button>
-      </div>
+      )}
     </div>
   );
 }
@@ -1235,6 +1247,7 @@ const ONBOARDING_CSS = `
 .ob-conf-section {
   min-height: 100dvh;
   padding: clamp(24px, 4vh, 48px) clamp(16px,3vw,32px);
+  padding-top: calc(clamp(40px, 5vh, 60px) + env(safe-area-inset-top, 0px));
   opacity: 0; transform: translateY(40px);
   transition: opacity 0.7s ease, transform 0.7s ease;
   scroll-snap-align: start;
@@ -1246,6 +1259,12 @@ const ONBOARDING_CSS = `
 }
 .ob-conf-section.visible {
   opacity: 1; transform: none;
+}
+/* Ultima sezione: non forzare altezza, allinea in alto */
+.ob-conf-section-last {
+  min-height: auto;
+  justify-content: flex-start;
+  padding-bottom: env(safe-area-inset-bottom, 20px);
 }
 
 .ob-pyr-header {
@@ -1597,8 +1616,5 @@ const ONBOARDING_CSS = `
   color: #fff;
 }
 
-/* ── CONFIRM FOOTER SNAP ── */
-.ob-pyr-foot {
-  scroll-snap-align: start;
-}
+/* ── CONFIRM FOOTER ── footer now lives inside sections, no snap needed */
 `;
