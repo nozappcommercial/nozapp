@@ -500,8 +500,6 @@ export default function OnboardingFlow({ films }: OnboardingFlowProps) {
           replacingPillar={replacingPillar}
           setReplacingPillar={setReplacingPillar}
           handleReplace={handleReplace}
-          swapSource={swapSource}
-          setSwapSource={setSwapSource}
           dragItem={dragItem}
           dragOver={dragOver}
           onDragStart={onDragStart}
@@ -687,12 +685,10 @@ interface ConfirmPhaseProps {
 function ConfirmPhase({
   pillars, setPillars, lovedFilms, replacementCandidates,
   replacingPillar, setReplacingPillar, handleReplace,
-  swapSource, setSwapSource,
   dragItem, dragOver, onDragStart, onDragEnter, onDragEnd, onDrop,
   filmGradient, pageTransition, setPhase,
 }: ConfirmPhaseProps) {
   const pyramidReveal = useScrollReveal(0.15);
-  const extraReveal = useScrollReveal(0.15);
 
   const rows = [
     pillars.slice(0, 1),
@@ -1362,53 +1358,31 @@ const ONBOARDING_CSS = `
   font-family: var(--ob-serif); font-size: 11px; color: #fff; line-height: 1.2;
 }
 
-/* ── Sezione C — Film extra ── */
-.ob-extra-title {
-  font-family: var(--ob-serif);
-  font-size: clamp(24px,5vw,40px); font-weight: 700;
-  letter-spacing: -0.01em; margin: 0 0 8px 0;
-  max-width: 900px; margin-left: auto; margin-right: auto;
-  padding: 0 clamp(12px, 3vw, 24px);
-  text-align: center;
-  width: 100%; box-sizing: border-box;
-}
-.ob-extra-title em { font-style: italic; color: var(--ob-gold); font-weight: 300; }
-.ob-extra-sub {
+/* ── PYRAMID HINT ── */
+.ob-pyr-hint {
   font-family: var(--ob-mono);
-  font-size: clamp(8px,1vw,10px);
-  letter-spacing: 0.18em; text-transform: uppercase;
-  color: var(--ob-ink-faint); margin-bottom: 24px;
-  max-width: 900px; margin-left: auto; margin-right: auto;
-  padding: 0 clamp(12px, 3vw, 24px);
+  font-size: clamp(8px, 1.1vw, 10px);
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--ob-ink-faint);
   text-align: center;
-  width: 100%; box-sizing: border-box;
+  margin-top: clamp(16px, 3vh, 28px);
+  max-width: 320px;
+  margin-left: auto;
+  margin-right: auto;
+  line-height: 1.7;
 }
-.ob-extra-grid {
-  display: grid; grid-template-columns: repeat(3, 1fr);
-  gap: clamp(8px, 2vw, 16px); max-width: 900px; margin: 0 auto;
-  padding: 0 clamp(12px, 3vw, 24px);
-  width: 100%;
-  box-sizing: border-box;
+
+/* ── CONFIRM FOOTER SECTION ── */
+.ob-conf-footer-section {
+  min-height: 60dvh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  scroll-snap-align: start;
+  padding-bottom: env(safe-area-inset-bottom, 20px);
 }
-@media (max-width: 360px) {
-  .ob-extra-grid { grid-template-columns: repeat(2, 1fr); }
-}
-.ob-extra-card {
-  cursor: pointer; border-radius: 4px; overflow: hidden;
-  transition: transform 0.18s, box-shadow 0.18s;
-  border: 2px solid transparent;
-}
-.ob-extra-card:hover { transform: translateY(-3px); box-shadow: 0 8px 24px rgba(0,0,0,0.12); }
-.ob-extra-card.selected { border-color: var(--ob-gold); }
-.ob-extra-poster {
-  width: 100%; aspect-ratio: 2/3;
-  display: flex; align-items: flex-end; padding: 8px;
-}
-.ob-extra-poster span {
-  font-family: var(--ob-serif); font-size: 11px; color: #fff; line-height: 1.2;
-}
-.ob-extra-name { font-family: var(--ob-serif); font-size: 12px; font-weight: 700; padding: 6px 4px 2px; }
-.ob-extra-meta { font-family: var(--ob-mono); font-size: 8px; color: var(--ob-ink-faint); letter-spacing: 0.1em; text-transform: uppercase; padding: 0 4px 8px; }
 
 /* ── CONFIRM FOOTER ── */
 .ob-pyr-foot {
