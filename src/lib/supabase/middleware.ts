@@ -71,7 +71,7 @@ export async function updateSession(request: NextRequest) {
     }
 
     if (user) {
-        const { data: profile, error: profileError } = await supabase
+        let { data: profile, error: profileError } = await supabase
             .from('users')
             .select('onboarding_complete, role')
             .eq('id', user.id)
@@ -79,6 +79,16 @@ export async function updateSession(request: NextRequest) {
 
         if (profileError) {
             console.error(`[Middleware] Error fetching profile for ${user.id}:`, profileError);
+            // Fallback: Se la query fallisce (es. colonna role non ancora aggiunta al DB), 
+            // tentiamo di recuperare almeno l'onboarding_complete per non bloccare l'utente.
+            const { data: fallback } = await supabase
+                .from('users')
+                .select('onboarding_complete')
+                .eq('id', user.id)
+                .single();
+            if (fallback) {
+                profile = fallback as any;
+            }
         }
 
         const onboardingComplete = (profile as any)?.onboarding_complete ?? false;
