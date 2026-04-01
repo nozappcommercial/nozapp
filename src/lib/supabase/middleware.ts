@@ -81,13 +81,19 @@ export async function updateSession(request: NextRequest) {
             console.error(`[Middleware] Error fetching profile for ${user.id}:`, profileError);
             // Fallback: Se la query fallisce (es. colonna role non ancora aggiunta al DB), 
             // tentiamo di recuperare almeno l'onboarding_complete per non bloccare l'utente.
-            const { data: fallback } = await supabase
+            console.log(`[Middleware] Attempting fallback for onboarding_complete...`);
+            const { data: fallback, error: fallbackError } = await supabase
                 .from('users')
                 .select('onboarding_complete')
                 .eq('id', user.id)
-                .single();
-            if (fallback) {
+                .maybeSingle();
+
+            if (fallbackError) {
+                console.error(`[Middleware] Fallback failed:`, fallbackError);
+            } else if (fallback) {
                 profile = fallback as any;
+            } else {
+                console.warn(`[Middleware] No profile found for user ${user.id}, might be a new registration.`);
             }
         }
 

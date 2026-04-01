@@ -144,3 +144,16 @@ status: done
 **Side effects**: Tutti gli accessi non autenticati alla home ora portano direttamente al login.
 
 ---
+
+## [16:25] [tipo: bug-fix | security]
+
+**File toccati**:
+
+- `src/lib/supabase/middleware.ts` — Migliorata resilienza su errore 500 (colonne mancanti) per evitare loop di reindirizzamento.
+- `docs/implementation_plan.md` — Creato piano consolidato con script SQL risolutivo per migrazione database.
+
+**Problema di partenza**: Errore 500 costante in console Supabase (`/users?select=role`) che causava un loop infinito verso l'onboarding perché il middleware non riusciva a validare lo stato dell'utente.
+**Soluzione applicata**: Implementato un fallback più robusto nel middleware che tenta di recuperare solo lo stretto necessario (`onboarding_complete`) se la query principale fallisce, e fornito all'utente lo script SQL per allineare il database di produzione.
+**Side effects**: Risolto il loop di navigazione immediato, ma le funzionalità admin rimarranno limitate finché non viene eseguito l'SQL.
+
+---
