@@ -130,3 +130,17 @@ status: done
 **Side effects**: Tutti i controlli di protezione rotte, bot filtering e rate limiting definiti nel middleware sono ora attivi globalmente.
 
 ---
+
+## [16:20] [tipo: bug-fix | security]
+
+**File toccati**:
+
+- `src/proxy.ts` — Utilizzato export default per risolvere errore di build in Next.js 16.2.1.
+- `src/app/page.tsx` — Aggiunto controllo auth server-side per reindirizzare subito a `/login` se non loggato.
+- `src/lib/supabase/middleware.ts` — Rimossa esclusione della root: ora anche l'accesso a `/` richiede autenticazione.
+
+**Problema di partenza**: Errore di build su Vercel (Next.js 16.2.1) riguardante la deprecazione di `middleware.ts` e comportamento incoerente dei redirect che mandavano all'onboarding invece del login.
+**Soluzione applicata**: Adottata pienamente la convenzione `proxy.ts` di Next.js 16 e rafforzata la logica di protezione dell'autenticazione sia nel middleware che nella pagina root per garantire il redirect a `/login`.
+**Side effects**: Tutti gli accessi non autenticati alla home ora portano direttamente al login.
+
+---

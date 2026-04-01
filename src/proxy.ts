@@ -26,7 +26,7 @@ const BANNED_BOT_USER_AGENTS = [
     'claudebot',
 ];
 
-export async function proxy(request: NextRequest) {
+export default async function proxy(request: NextRequest) {
     const { pathname } = request.nextUrl;
     const userAgent = request.headers.get('user-agent') || '';
     
