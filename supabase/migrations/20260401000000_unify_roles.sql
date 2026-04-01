@@ -1,7 +1,12 @@
--- 1) Promote active explicit admins to the robust 'admin' role
-UPDATE public.users 
-SET role = 'admin' 
-WHERE is_admin = true AND role = 'base';
+-- 1) Promote active explicit admins to the robust 'admin' role (Solo se la colonna esiste ancora)
+DO $$ 
+BEGIN 
+    IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema = 'public' AND table_name = 'users' AND column_name = 'is_admin') THEN
+        UPDATE public.users 
+        SET role = 'admin' 
+        WHERE is_admin = true AND role = 'base';
+    END IF;
+END $$;
 
 -- 2) Drop the dependent RLS policies before we drop the column
 DROP POLICY IF EXISTS "Only admins can see security logs" ON security_logs;

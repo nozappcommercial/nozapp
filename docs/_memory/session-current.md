@@ -105,3 +105,15 @@ status: done
 **Side effects**: Sblocca la continuous deployment di Vercel.
 
 ---
+
+## [10:38] [tipo: bug-fix | security]
+
+**File toccati**:
+
+- `src/lib/supabase/middleware.ts` — Aggiunta logica di fallback per la lettura di `onboarding_complete`.
+
+**Problema di partenza**: Loop di redirect verso `/onboarding` perché la colonna `role` non era ancora presente nel DB di produzione, causando il fallimento della query del profilo nel middleware.
+**Soluzione applicata**: Implementato un secondo tentativo (fallback) di fetch che isola solo il campo `onboarding_complete` se la query principale fallisce. Corretto anche un errore di mutabilità (`const` -> `let`) per la variabile `profile`.
+**Side effects**: Permette agli utenti di accedere alla Sfera anche se il DB e il codice non sono ancora perfettamente sincronizzati durante il deploy.
+
+---
