@@ -117,3 +117,16 @@ status: done
 **Side effects**: Permette agli utenti di accedere alla Sfera anche se il DB e il codice non sono ancora perfettamente sincronizzati durante il deploy.
 
 ---
+
+## [16:15] [tipo: bug-fix | config]
+
+**File toccati**:
+
+- `src/middleware.ts` — [NEW] Creato rinominando `src/proxy.ts`.
+- `src/proxy.ts` — [DELETE] Rimosso in favore del nome standard di Next.js.
+
+**Problema di partenza**: L'apertura del sito non portava al `/login` per gli utenti non autenticati, ma mostrava un fallback di onboarding nella pagina `/sphere`.
+**Soluzione applicata**: Il middleware di autenticazione non veniva eseguito perché il file era nominato `proxy.ts` invece del nome standard `middleware.ts`. Rinominando il file, Next.js ora intercetta le richieste e reindirizza correttamente i visitatori non loggati al `/login`.
+**Side effects**: Tutti i controlli di protezione rotte, bot filtering e rate limiting definiti nel middleware sono ora attivi globalmente.
+
+---
