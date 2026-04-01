@@ -1,4 +1,4 @@
-updated: 2026-03-28
+updated: 2026-04-01
 agent: aggiornatore
 ---
 
@@ -25,6 +25,7 @@ NoZapp utilizza l'**App Router** di Next.js 14 per gestire la navigazione. La ma
 | `/admin/utenti` | `app/admin/utenti/page.tsx` | SSR | Admin | Gestione iscritti, filtri demografici e permessi. |
 | `/admin/analisi` | `app/admin/analisi/page.tsx` | SSR | Admin | Dashboard analytics (engagement, demografica). |
 | `/admin/cinema` | `app/admin/cinema/page.tsx` | SSR | Admin | Gestione manuale del carosello "Ora al Cinema". |
+| `/admin/collegamenti` | `app/admin/collegamenti/page.tsx` | SSR | Admin | Pannello gestione connessioni editoriali tra film. |
 | `/admin/verify` | `app/admin/verify/page.tsx` | CSR | Root | Verifica MFA (Multi-Factor Authentication). |
 
 ## Strategie di Rendering
@@ -72,7 +73,10 @@ graph TD
 
 ---
 > [!TIP]
-> Il middleware in `src/lib/supabase/middleware.ts` è il centro di controllo del routing basato sullo stato di onboarding dell'utente e sui permessi amministrativi (MFA).
+> Il middleware in `src/lib/supabase/middleware.ts` è il centro di controllo del routing basato sullo stato di onboarding dell'utente, sui permessi amministrativi (RBAC via `role`) e sul check MFA. Limita inoltre l'accesso a determinate rotte admin a seconda del ruolo (es. i redattori non vedono `/admin/utenti`).
 
 🔄 **Aggiornato il 2026-03-30**: Introdotta la rotta `/auth/confirmed` per il successo della verifica email. Ottimizzato il middleware per gestire il redirect automatico post-conferma.
 File modificati: `src/app/auth/confirmed/page.tsx`, `src/app/auth/callback/route.ts`, `src/app/page.tsx`
+
+🔄 **Aggiornato il 2026-04-01**: Aggiunta logica RBAC nel Middleware (`role` al posto di `is_admin`) per restringere o consentire l'accesso a sezioni specifiche del pannello admin in base a ruoli come Redattore e Analista. Aggiunta rotta `/admin/collegamenti`.
+File modificati: `src/lib/supabase/middleware.ts`, `src/app/admin/*`

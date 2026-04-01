@@ -69,8 +69,8 @@ graph TB
 
 NoZapp adotta un approccio a più livelli per proteggere i dati e le funzionalità amministrative:
 
-1. **Role-Based Access Control (RBAC)**: Utilizzo del flag `is_admin` nella tabella `users` per distinguere gli amministratori.
-2. **Row-Level Security (RLS)**: Le policy di Supabase garantiscono che solo gli admin possano modificare gli articoli (`articles`), mentre il pubblico può solo leggerli.
+1. **Role-Based Access Control (RBAC)**: Utilizzo del campo `role` (`admin`, `redattore`, `analista`, `base`) nella tabella `users` per distinguere i poteri amministrativi.
+2. **Row-Level Security (RLS)**: Le policy di Supabase (DB Level) garantiscono che solo utenti col ruolo adeguato possano modificare tabelle come `articles`, `cinema_movies` o `editorial_edges`.
 3. **Multi-Factor Authentication (MFA)**: Un secondo livello di verifica tramite OTP (One-Time Password) è richiesto per accedere a qualsiasi risorsa sotto il path `/admin`. La sessione MFA è gestita tramite cookie sicuri `httpOnly`.
 
 ---
@@ -82,3 +82,6 @@ NoZapp adotta un approccio a più livelli per proteggere i dati e le funzionalit
 
 🔄 **Aggiornato il 2026-03-30**: Passaggio dai Google Fonts ai font locali **Geist Sans** e **Geist Mono** per garantire privacy, performance e un'estetica editoriale coerente. Tutte le variabili CSS tipo `--font-serif` sono state mappate su Geist.
 File modificati: `src/app/layout.tsx`, `src/app/globals.css`
+
+🔄 **Aggiornato il 2026-04-01**: Eliminato storicamente lo switch logico `is_admin` a implementazione di un completo sistema di RBAC con ruoli utente nativi mappati anche su regole RLS Postgres.
+File modificati: `supabase/migrations/20260401000000_unify_roles.sql`, `src/types/supabase.ts`

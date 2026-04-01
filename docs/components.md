@@ -1,4 +1,4 @@
-updated: 2026-03-31
+updated: 2026-04-01
 agent: aggiornatore
 ---
 
@@ -91,6 +91,16 @@ I componenti di NoZapp sono suddivisi in **UI atomici** (Shadcn), **Layout** (st
 
 ---
 
+### `EdgeEditorForm` — `src/components/admin/EdgeEditorForm.tsx`
+**Scopo**: Interfaccia visuale per la creazione e cancellazione degli archi e dei collegamenti editoriali tra i film.
+**Caratteristiche**:
+- **Ricerca in tempo reale**: Box di ricerca con debounce (tramite hook isolato `FilmSearchBox` per evitare perdita di focus) per trovare Source e Target film.
+- **Rappresentazione Visiva**: Disegna la connessione e la direzione tra i due film selezionati.
+- **Supporto multi-tipo**: Gestione dei tre tipi di archi (Stylistic, Thematic, Contrast).
+- **Lista dinamica**: Visualizzazione differenziata tra "Collegamenti in Uscita" e "Collegamenti in Entrata" con eliminazione rapida.
+
+---
+
 ### `CinemaForm` — `src/components/admin/CinemaForm.tsx`
 **Scopo**: Form per la gestione manuale dei film nel carosello "Ora al Cinema".
 **Responsabilità**:
@@ -165,3 +175,6 @@ Questi componenti si trovano in `src/components/ui/` e seguono le specifiche di 
 
 🔄 **Aggiornato il 2026-03-31**: Refactoring modulare del flusso di onboarding. Il file monolitico è stato diviso in `OnboardingFlow` (core), `ConfirmPhase` (UI piramide), `types`, `onboarding.css.ts` e `useScrollReveal`.
 File modificati: `src/components/onboarding/OnboardingFlow.tsx`, `src/components/onboarding/ConfirmPhase.tsx`
+
+🔄 **Aggiornato il 2026-04-01**: Inserito `EdgeEditorForm` per la gestione visuale dei collegamenti `editorial_edges`.
+File modificati: `src/components/admin/EdgeEditorForm.tsx`

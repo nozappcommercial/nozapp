@@ -1,4 +1,4 @@
-updated: 2026-03-28
+updated: 2026-04-01
 agent: aggiornatore
 ---
 
@@ -30,15 +30,16 @@ Le Server Actions sono funzioni asincrone eseguite sul server, ma chiamate diret
 - **`updateUserStreaming`**: Aggiorna l'elenco delle piattaforme streaming sottoscritte.
 - **`updateUserProfile`**: Aggiorna i dati demografici dell'utente (età, stato, sesso).
 
-### Sistema Editoriale & Admin — `editorial.ts`, `admin_users.ts`, `admin_analytics.ts`
+### Sistema Editoriale & Admin — `editorial.ts`, `admin_users.ts`, `admin_analytics.ts`, `editorial_edges.ts`
 - **`upsertArticle`**: Crea o aggiorna un articolo della redazione.
 - **`deleteArticle`**: Rimuove un articolo dal database.
 - **`getPublishedArticles`**: Recupera gli articoli visibili al pubblico (attivi e non scaduti).
 - **`getArchivedArticles`**: Recupera lo storico completo di tutti gli articoli (inclusi quelli scaduti) per la sezione Archivio.
 - **`getArticleBySlug`**: Recupera un articolo specifico tramite lo slug URL (include bypass per preview admin).
 - **`deleteUser`**: Eliminazione definitiva di un account utente (Auth + Database).
-- **`updateUserPermissions`**: Toggle dei permessi amministrativi per un utente specifico.
-- **`getDashboardAnalytics`**: Calcolo delle statistiche aggregate (età, provenienza, genere, interazioni). Utilizza `createAdminClient` per bypassare le policy RLS.
+- **`updateUserRole`**: (NOVITÀ) Esegue l'aggiornamento protetto del campo `role` di un utente, subordinatamente alla verifica in-flight di un codice MFA valido.
+- **`addEditorialEdge` / `deleteEditorialEdge`**: Creazione e rimozione visiva di link e relazioni ('tematico', 'stilistico', 'contrasto') tra film tramite pannello `/admin/collegamenti`.
+- **`getDashboardAnalytics`**: Calcolo delle statistiche aggregate (età, provenienza, genere, interazioni). Utilizza `createAdminClient` per bypassare le policy RLS limitate.
 
 ### Autenticazione Admin (MFA) — `admin_auth.ts`
 - **`generateAdminOTP`**: Richiede a Supabase di inviare un codice OTP via Email all'amministratore loggato.
@@ -70,3 +71,6 @@ Tutte le API e le Actions implementano:
 
 🔄 **Aggiornato il 2026-03-28**: Introdotta l'azione `getArchivedArticles`. Aggiornata `getDashboardAnalytics` per utilizzare il Service Role (Admin Client) garantendo statistiche precise su tutto il database.
 File modificati: `src/app/actions/editorial.ts`, `src/app/actions/admin_analytics.ts`
+
+🔄 **Aggiornato il 2026-04-01**: Inserita la nuova Action `updateUserRole` che va a rimpiazzare il toggle bool `is_admin`, integrando controllo sincrono dell'OTP. Aggiunte actions per CRUD su `editorial_edges.ts`.
+File modificati: `src/app/actions/admin_users.ts`, `src/app/actions/editorial_edges.ts`

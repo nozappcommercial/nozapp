@@ -1,4 +1,4 @@
-updated: 2026-03-27
+updated: 2026-04-01
 agent: aggiornatore
 ---
 
@@ -61,7 +61,7 @@ Il sistema utilizza un `Raycaster` per rilevare l'interazione del mouse con i no
 Nel codice sono presenti variabili chiave per il fine-tuning della scena:
 - `camRadius`: Distanza della camera dal centro.
 - `focalLength`: FOV dinamico per l'effetto zoom nelle transizioni.
-- `nodeScale`: Fattore di scala dei nodi in base alla popolarità/rating.
+- `nodeScale`: Fattore di scala dei nodi in base alla popolarità/rating, gestito in real-time tramite interpolazione logaritmica/scalare in base alla distanza di Shell (`activeShell`).
 
 ---
 ---
@@ -74,3 +74,6 @@ File modificati: `src/hooks/useSphereEngine.ts`
 ---
 🔄 **Aggiornato il 2026-03-27**: Decomposizione del componente in orchestratore e hook `useSphereEngine.ts`. Rimozione `@ts-nocheck`.
 File modificati: `src/components/SemanticSphere.tsx`, `src/hooks/useSphereEngine.ts`
+
+🔄 **Aggiornato il 2026-03-31**: Intervento sulle dimensioni dei nodi per livello di visione tramite animazione "Tween". I nodi primari diminuiscono proporzionalmente di scala quando si passano le conchiglie interne, evitando sovrapposizioni visive ed equilibrando la UI dei titoli CSS in real-time.
+File modificati: `src/hooks/useSphereEngine.ts`

@@ -1,7 +1,7 @@
 ---
 tags: [#logic, #admin, #status/complete]
 created: 2026-03-26
-updated: 2026-03-28
+updated: 2026-04-01
 ---
 
 # Sistema Editoriale e Gestione Admin
@@ -22,11 +22,12 @@ Il workflow si basa su uno stato binario (`draft` | `published`) e sulla program
 ## Dashboard Admin (`/admin`)
 La dashboard centrale è stata evoluta in un sistema gestionale completo che include:
 - **Redazione**: CRUD articoli con indicatori di stato (Bozza/Pubblicato/Scaduto) e vista responsive a card per mobile.
-- **Utenti**: Monitoraggio degli iscritti, filtri demografici (età, provenienza, sesso) e gestione permessi admin con possibilità di eliminazione account.
+- **Utenti**: Monitoraggio degli iscritti, gestione permessi basata su ruoli (Utente, Redattore, Analista, Admin) eseguita tramite Modal OTP autorizzativo.
 - **Analisi**: Dashboard dinamica con grafici statistici sull'engagement e sulla distribuzione demografica degli utenti.
 - **System Vitals**: Modulo avanzato per il monitoraggio tecnico in tempo reale (latenza API, stato cache, indicatori di build success).
 - **Cinema**: Gestione manuale del carosello pubblico "Ora al Cinema" con supporto per le date di scadenza.
 - **Sicurezza**: Gestione del profilo e sessione MFA via Email OTP.
+- **Collegamenti**: (Solo per Admin/Redattore) Gestione grafica tramite `EdgeEditorForm` degli archi semantici (Thematic, Stylistic, Contrast) tra film.
 
 ## Gestione Cinema (Manuale)
 A differenza del resto della Sfera Semantica (che è dinamica), la sezione Cinema è curata manualmente dagli amministratori per garantire il lancio di titoli specifici o promozioni.
@@ -40,7 +41,7 @@ Per proteggere l'area amministrativa, è stato implementato un secondo livello d
 
 ### Flusso di Autenticazione
 1. **Punto di Ingresso**: L'utente tenta di accedere a una rotta `/admin`. Il [[middleware]] intercetta la richiesta.
-2. **Verifica Ruolo**: Viene controllato il flag `is_admin` nella tabella `users`.
+2. **Verifica Ruolo**: Viene controllato che il campo `role` abbia i permessi necessari (`admin`, `redattore`, o `analista`). I ruoli limitano l'accesso ai moduli della Dashboard (es. un Redattore non gestisce gli Utenti).
 3. **Verifica Sessione**: Se il cookie `admin_session` è assente, l'utente viene reindirizzato a `/admin/verify`.
 4. **Invio Codice**: L'utente richiede un codice via Email (servizio nativo Supabase Auth). 
 5. **Validazione**: Inserito il codice a 8 cifre corretto, viene impostato un cookie `httpOnly` sicuro della durata di 2 ore. L'utente ha anche l'opzione "Ho già un codice" per inserire un token precedentemente ricevuto senza generare un nuovo invio.
@@ -60,7 +61,8 @@ Tutti gli eventi critici per la sicurezza della piattaforma vengono tracciati tr
 ## Componenti Chiave
 - `ArticleForm.tsx`: Componente client per il CRUD degli articoli.
 - `EditorialSection.tsx`: Rendering degli articoli nella home page.
-- `VerifyAdminPage.tsx`: Interfaccia per l'inserimento dell'OTP.
+- `VerifyAdminPage.tsx`: Interfaccia per l'inserimento dell'OTP in fase di Login.
+- `EdgeEditorForm.tsx`: Componente client per la creazione visiva di archi tra nodi `film`.
 
 ## Database Schema
 Vedere [[database]] per il dettaglio della tabella `articles` e le nuove colonne MFA nella tabella `users`.
@@ -68,3 +70,9 @@ Vedere [[database]] per il dettaglio della tabella `articles` e le nuove colonne
 ---
 🔄 **Aggiornato il 2026-03-28**: Riprogettato il template articolo con sezioni Hero a tutto schermo e indicatori di scroll. Consolidata la rotta `/redazione` e implementata l'azione `getArchivedArticles` per la nuova pagina Archivio. Ottimizzato il refresh dei dati nell'area admin.
 File modificati: `src/app/redazione/[slug]/page.tsx`, `src/app/redazione/page.tsx`, `src/app/archivio/page.tsx`, `src/app/actions/editorial.ts`, `src/components/admin/AdminHeader.tsx`
+
+🔄 **Aggiornato il 2026-03-31**: Introdotta la funzionalità di gestione dei Collegamenti Editoriali (`editorial_edges`) con form dedicato `EdgeEditorForm` e Bypass RLS. Aggiunto effetto visivo Tween su nodi della Sfera 3D in esplorazione profonda.
+File modificati: `src/app/admin/collegamenti/page.tsx`, `src/components/admin/EdgeEditorForm.tsx`, `src/app/actions/editorial_edges.ts`, `src/hooks/useSphereEngine.ts`
+
+🔄 **Aggiornato il 2026-04-01**: Refactoring di Sicurezza Admin. Implementato un sistema di ruoli gerarchici (`role = base|redattore|analista|admin`), eliminando la colonna boolean `is_admin`. In Gestione Utenti, la promozione avviene tramite una select con Modal OTP autorizzativo validato lato server.
+File modificati: `src/app/admin/utenti/page.tsx`, `src/app/actions/admin_users.ts`, backend vari.

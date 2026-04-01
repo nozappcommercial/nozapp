@@ -11,7 +11,7 @@ export default async function CollegamentiPage() {
     if (!profile) redirect('/login');
     
     const role = profile.role || 'base';
-    const isAuthorized = profile.is_admin || role === 'admin' || role === 'redattore';
+    const isAuthorized = role === 'admin' || role === 'redattore';
 
     if (!isAuthorized) {
         redirect('/admin');

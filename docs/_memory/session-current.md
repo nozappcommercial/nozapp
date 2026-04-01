@@ -1,6 +1,6 @@
 ---
 date: 2026-03-31
-status: active
+status: done
 ---
 
 ## 12:05 [tipo: config | documentation]
@@ -91,5 +91,17 @@ status: active
 **Problema di partenza**: Sostituire il flag is_admin introducendo un selettore completo a più tier e vincolare la promozione via OTP admin in backend.
 **Soluzione applicata**: Aggiornati i file action per validare OTP di sicurezza dell'utente loggato, unificata la logica intera del progetto eliminando is_admin, introdotte RLS refactoring.
 **Side effects**: Le modifiche su DB richiedono di eseguire la migrazione in backend (Supabase SQL).
+
+---
+
+## [10:32] [tipo: bug-fix]
+
+**File toccati**:
+
+- `src/app/admin/collegamenti/page.tsx` — Rimosso riferimento obsoleto a `is_admin`.
+
+**Problema di partenza**: Errore di type-check su Vercel durante la build causato dalla rimozione di `is_admin` dall'integrazione di Supabase (ruoli unificati precedentemente).
+**Soluzione applicata**: Aggiornato un riferimento "dimenticato" in `collegamenti/page.tsx` sostituendo `profile.is_admin` con la logica `role === 'admin'`.
+**Side effects**: Sblocca la continuous deployment di Vercel.
 
 ---
