@@ -116,7 +116,6 @@ export interface Database {
                     id: string
                     display_name: string | null
                     onboarding_complete: boolean
-                    is_admin: boolean
                     admin_verified_at: string | null
                     created_at: string
                     role: 'base' | 'redattore' | 'analista' | 'admin'
@@ -125,7 +124,6 @@ export interface Database {
                     id: string
                     display_name?: string | null
                     onboarding_complete?: boolean
-                    is_admin?: boolean
                     admin_verified_at?: string | null
                     created_at?: string
                     role?: 'base' | 'redattore' | 'analista' | 'admin'
@@ -134,7 +132,6 @@ export interface Database {
                     id?: string
                     display_name?: string | null
                     onboarding_complete?: boolean
-                    is_admin?: boolean
                     admin_verified_at?: string | null
                     created_at?: string
                     role?: 'base' | 'redattore' | 'analista' | 'admin'

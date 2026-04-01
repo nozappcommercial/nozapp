@@ -1,16 +1,24 @@
 "use client";
 
 import React, { useEffect, useState } from 'react';
-import Link from 'next/link';
-import { Globe, Calendar, RefreshCw, Search, Shield, User } from 'lucide-react';
-import { getDashboardUsers, toggleAdminStatus, deleteUser, type DashboardUser } from '@/app/actions/admin_users';
+import { Globe, Calendar, Search, Shield, User, Loader2, Mail, X } from 'lucide-react';
+import { getDashboardUsers, updateUserRole, deleteUser, type DashboardUser } from '@/app/actions/admin_users';
+import { generateAdminOTP } from '@/app/actions/admin_auth';
 
 export default function AdminUsersPage() {
     const [users, setUsers] = useState<DashboardUser[]>([]);
     const [loading, setLoading] = useState(true);
     const [searchTerm, setSearchTerm] = useState('');
-    const [filterAdmin, setFilterAdmin] = useState<boolean | null>(null);
+    const [filterRole, setFilterRole] = useState<string | null>(null);
     const [error, setError] = useState<string | null>(null);
+
+    // Modal State
+    const [roleMutation, setRoleMutation] = useState<{ userId: string, newRole: 'base' | 'redattore' | 'analista' | 'admin' } | null>(null);
+    const [otpCode, setOtpCode] = useState(['', '', '', '', '', '', '', '']);
+    const [otpLoading, setOtpLoading] = useState(false);
+    const [otpSending, setOtpSending] = useState(false);
+    const [otpError, setOtpError] = useState<string | null>(null);
+    const [otpSuccess, setOtpSuccess] = useState(false);
 
     const fetchUsers = async () => {
         setLoading(true);
@@ -27,8 +35,6 @@ export default function AdminUsersPage() {
 
     useEffect(() => {
         fetchUsers();
-
-        // Global refresh listener
         const handleRefresh = () => fetchUsers();
         window.addEventListener('nozapp-admin-refresh', handleRefresh);
         return () => window.removeEventListener('nozapp-admin-refresh', handleRefresh);
@@ -42,29 +48,6 @@ export default function AdminUsersPage() {
             return date.toLocaleDateString();
         } catch (e) {
             return 'Errore data';
-        }
-    };
-
-    const handleToggleAdmin = async (userId: string, current: boolean) => {
-        if (!confirm(`Vuoi procedere col cambio permessi?`)) return;
-        try {
-            await toggleAdminStatus(userId, current);
-            setUsers(prev => prev.map(u => u.id === userId ? { ...u, is_admin: !current } : u));
-        } catch (err: any) {
-            alert('Errore nel cambio permessi: ' + err.message);
-        }
-    };
-
-    const handleDeleteUser = async (userId: string) => {
-        if (!confirm(`Sei sicuro di voler eliminare definitivamente questo utente? L'azione è irreversibile.`)) return;
-        setLoading(true);
-        try {
-            await deleteUser(userId);
-            setUsers(prev => prev.filter(u => u.id !== userId));
-        } catch (err: any) {
-            alert('Errore nell\'eliminazione: ' + err.message);
-        } finally {
-            setLoading(false);
         }
     };
 
@@ -83,16 +66,105 @@ export default function AdminUsersPage() {
         }
     };
 
+    const handleDeleteUser = async (userId: string) => {
+        if (!confirm(`Sei sicuro di voler eliminare definitivamente questo utente? L'azione è irreversibile.`)) return;
+        setLoading(true);
+        try {
+            await deleteUser(userId);
+            setUsers(prev => prev.filter(u => u.id !== userId));
+        } catch (err: any) {
+            alert('Errore nell\'eliminazione: ' + err.message);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    // -- Role Change Methods
+    const handleRoleChangeRequest = (userId: string, newRole: string) => {
+        setRoleMutation({ userId, newRole: newRole as any });
+        setOtpCode(['', '', '', '', '', '', '', '']);
+        setOtpError(null);
+        setOtpSuccess(false);
+    };
+
+    const handleSendOTP = async () => {
+        setOtpSending(true);
+        setOtpError(null);
+        setOtpSuccess(false);
+        try {
+            const res = await generateAdminOTP();
+            if (res && 'success' in res && !res.success) {
+                setOtpError(res.error || 'Errore invio codice');
+            } else {
+                setOtpSuccess(true);
+                setTimeout(() => setOtpSuccess(false), 5000);
+            }
+        } catch (err: any) {
+            setOtpError('Errore di connessione o del server.');
+        } finally {
+            setOtpSending(false);
+        }
+    };
+
+    const handleCodeChange = (index: number, value: string) => {
+        if (!/^\d*$/.test(value)) return;
+        const newCode = [...otpCode];
+        newCode[index] = value.slice(-1);
+        setOtpCode(newCode);
+
+        // Auto-focus next
+        if (value && index < 7) {
+            const nextInput = document.getElementById(`modal-otp-${index + 1}`);
+            nextInput?.focus();
+        }
+    };
+
+    const handleKeyDown = (index: number, e: React.KeyboardEvent) => {
+        if (e.key === 'Backspace' && !otpCode[index] && index > 0) {
+            const prevInput = document.getElementById(`modal-otp-${index - 1}`);
+            prevInput?.focus();
+        }
+    };
+
+    const executeRoleChange = async (e?: React.FormEvent) => {
+        e?.preventDefault();
+        if (!roleMutation) return;
+        
+        const fullCode = otpCode.join('');
+        if (fullCode.length < 8) return;
+
+        setOtpLoading(true);
+        setOtpError(null);
+        try {
+            await updateUserRole(roleMutation.userId, roleMutation.newRole, fullCode);
+            setUsers(prev => prev.map(u => u.id === roleMutation.userId ? { ...u, role: roleMutation.newRole } : u));
+            setRoleMutation(null); // Close modal
+        } catch (err: any) {
+            console.error('[VerifyPage] OTP verification failed:', err);
+            setOtpError(err.message || 'Errore aggiornamento ruolo.');
+        } finally {
+            setOtpLoading(false);
+        }
+    };
+
+    useEffect(() => {
+        if (roleMutation && otpCode.every(digit => digit !== '')) {
+            executeRoleChange();
+        }
+    }, [otpCode, roleMutation]);
+
     const filteredUsers = users.filter(u => {
         const matchesSearch = 
             (u.display_name?.toLowerCase() || '').includes(searchTerm.toLowerCase()) ||
             (u.email?.toLowerCase() || '').includes(searchTerm.toLowerCase());
-        const matchesAdmin = filterAdmin === null ? true : u.is_admin === filterAdmin;
-        return matchesSearch && matchesAdmin;
+            
+        if (filterRole === 'privileged') return matchesSearch && u.role !== 'base';
+        if (filterRole === 'base') return matchesSearch && u.role === 'base';
+        return matchesSearch;
     });
 
     return (
-        <div className="space-y-8 animate-in fade-in duration-500">
+        <div className="space-y-8 animate-in fade-in duration-500 relative">
             {/* Header section */}
             <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 pb-6 border-b border-black/5">
                 <div className="space-y-1">
@@ -115,16 +187,16 @@ export default function AdminUsersPage() {
                 </div>
                 <div className="flex gap-2">
                     <button 
-                        onClick={() => setFilterAdmin(prev => prev === true ? null : true)}
-                        className={`px-6 py-3 rounded-2xl border transition-all flex items-center gap-2 text-xs ${filterAdmin === true ? 'bg-black text-white border-black' : 'bg-white border-black/5 text-black/60 hover:bg-black/5'}`}
+                        onClick={() => setFilterRole(prev => prev === 'privileged' ? null : 'privileged')}
+                        className={`px-6 py-3 rounded-2xl border transition-all flex items-center gap-2 text-xs ${filterRole === 'privileged' ? 'bg-black text-white border-black' : 'bg-white border-black/5 text-black/60 hover:bg-black/5'}`}
                     >
-                        <Shield size={14} /> Solo Admin
+                        <Shield size={14} /> Sistema
                     </button>
                     <button 
-                        onClick={() => setFilterAdmin(prev => prev === false ? null : false)}
-                        className={`px-6 py-3 rounded-2xl border transition-all flex items-center gap-2 text-xs ${filterAdmin === false ? 'bg-black text-white border-black' : 'bg-white border-black/5 text-black/60 hover:bg-black/5'}`}
+                        onClick={() => setFilterRole(prev => prev === 'base' ? null : 'base')}
+                        className={`px-6 py-3 rounded-2xl border transition-all flex items-center gap-2 text-xs ${filterRole === 'base' ? 'bg-black text-white border-black' : 'bg-white border-black/5 text-black/60 hover:bg-black/5'}`}
                     >
-                        <User size={14} /> Solo Utenti
+                        <User size={14} /> Base
                     </button>
                 </div>
             </div>
@@ -148,8 +220,7 @@ export default function AdminUsersPage() {
                                     <th className="px-8 py-6 border-b border-white/5">Bio & Area</th>
                                     <th className="px-8 py-6 border-b border-white/5">Genere</th>
                                     <th className="px-8 py-6 border-b border-white/5">Creato il</th>
-                                    <th className="px-8 py-6 border-b border-white/5">Livello</th>
-                                    <th className="px-10 py-6 border-b border-white/5 text-right">Controlli</th>
+                                    <th className="px-8 py-6 border-b border-white/5">Ruolo</th>
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-black/5">
@@ -160,13 +231,12 @@ export default function AdminUsersPage() {
                                             <td className="px-8 py-8"><div className="h-4 bg-black/5 rounded w-24" /></td>
                                             <td className="px-8 py-8"><div className="h-4 bg-black/5 rounded w-20" /></td>
                                             <td className="px-8 py-8"><div className="h-4 bg-black/5 rounded w-16" /></td>
-                                            <td className="px-8 py-8"><div className="h-4 bg-black/5 rounded w-16" /></td>
-                                            <td className="px-10 py-8"><div className="h-4 bg-black/5 rounded w-8 ml-auto" /></td>
+                                            <td className="px-8 py-8"><div className="h-4 bg-black/5 rounded w-24" /></td>
                                         </tr>
                                     ))
                                 ) : (
                                     filteredUsers.map((user) => (
-                                        <tr key={user.id} className="group hover:bg-black/[0.02] transition-all duration-300">
+                                        <tr key={user.id} className="group hover:bg-black/[0.02] transition-colors duration-300 relative">
                                             <td className="px-10 py-8">
                                                 <div className="flex items-center gap-5">
                                                     <div className="w-12 h-12 rounded-2xl bg-black/[0.03] border border-black/5 flex items-center justify-center font-serif italic text-xl text-black/40 group-hover:bg-black group-hover:text-white transition-all duration-500 shadow-sm">
@@ -210,31 +280,28 @@ export default function AdminUsersPage() {
                                                 {formatDate(user.created_at)}
                                             </td>
                                             <td className="px-8 py-8">
-                                                {user.is_admin ? (
-                                                    <div className="px-3 py-1.5 bg-black text-white text-[9px] font-mono uppercase tracking-[0.2em] rounded-xl flex items-center gap-2 w-fit shadow-lg shadow-black/10">
-                                                        <Shield size={10} className="text-[var(--gold)]" /> Admin
-                                                    </div>
-                                                ) : (
-                                                    <div className="px-3 py-1.5 bg-black/5 text-black/40 text-[9px] font-mono uppercase tracking-[0.2em] rounded-xl w-fit border border-black/5">
-                                                        User
-                                                    </div>
-                                                )}
-                                            </td>
-                                            <td className="px-10 py-8 text-right whitespace-nowrap">
-                                                <div className="flex justify-end gap-3 translate-x-4 opacity-0 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-500">
-                                                    <button 
-                                                        onClick={() => handleToggleAdmin(user.id, user.is_admin)}
-                                                        className={`p-2.5 rounded-xl border transition-all ${user.is_admin ? 'text-black bg-[var(--gold)]/10 border-[var(--gold)]/30' : 'text-black/20 border-black/5 hover:text-black hover:bg-black/5'}`}
-                                                        title={user.is_admin ? "Rimuovi privilegi admin" : "Promuovi ad admin"}
+                                                <div className="flex items-center gap-4">
+                                                    <select 
+                                                        value={user.role} 
+                                                        onChange={(e) => handleRoleChangeRequest(user.id, e.target.value)}
+                                                        className={`text-[9px] font-mono uppercase tracking-[0.2em] rounded-xl px-3 py-2 border outline-none cursor-pointer transition-all ${
+                                                            user.role !== 'base' 
+                                                                ? 'bg-black text-white border-black shadow-lg shadow-black/10' 
+                                                                : 'bg-black/5 text-black/40 border-black/5 hover:border-black/20'
+                                                        }`}
                                                     >
-                                                        <Shield size={16} />
-                                                    </button>
+                                                        <option value="base">Utente</option>
+                                                        <option value="redattore">Redattore</option>
+                                                        <option value="analista">Analista</option>
+                                                        <option value="admin">Administrator</option>
+                                                    </select>
+                                                    
                                                     <button 
                                                         onClick={() => handleDeleteUser(user.id)}
-                                                        className="p-2.5 text-rose-300 border border-rose-100 hover:text-white hover:bg-rose-500 hover:border-rose-500 rounded-xl transition-all shadow-sm"
+                                                        className="p-2 text-rose-300 border border-transparent hover:text-white hover:bg-rose-500 hover:border-rose-500 rounded-xl transition-all shadow-sm opacity-0 group-hover:opacity-100"
                                                         title="Elimina utente"
                                                     >
-                                                        <User size={16} />
+                                                        <X size={14} />
                                                     </button>
                                                 </div>
                                             </td>
@@ -243,6 +310,82 @@ export default function AdminUsersPage() {
                                 )}
                             </tbody>
                         </table>
+                    </div>
+                </div>
+            )}
+
+            {/* OTP Modal Overlay per approvazione Ruolo */}
+            {roleMutation && (
+                <div className="fixed inset-0 z-50 bg-black/60 flex items-center justify-center p-6 backdrop-blur-sm animate-in fade-in">
+                    <div className="max-w-md w-full bg-white rounded-3xl p-10 shadow-2xl relative">
+                        <button 
+                            onClick={() => setRoleMutation(null)}
+                            className="absolute top-6 right-6 p-2 text-black/30 hover:text-black bg-black/5 rounded-full transition-colors"
+                        >
+                            <X size={16} />
+                        </button>
+
+                        <div className="text-center space-y-2 mb-8 mt-2">
+                            <div className="w-16 h-16 bg-[var(--gold)]/10 rounded-full flex items-center justify-center mx-auto mb-6">
+                                <Shield className="text-[var(--gold)]" size={32} />
+                            </div>
+                            <h2 className="text-2xl font-medium tracking-tight">Verifica Operazione</h2>
+                            <p className="text-sm text-black/50 leading-relaxed">
+                                Stai promuovendo l'utente al ruolo <strong className="font-mono text-xs uppercase text-black">{roleMutation.newRole}</strong>.<br />
+                                Inserisci il codice amministratore per confermare.
+                            </p>
+                        </div>
+
+                        {otpError && (
+                            <div className="p-4 mb-6 bg-red-50 border border-red-100 text-red-600 rounded-2xl text-xs font-mono text-center">
+                                {otpError}
+                            </div>
+                        )}
+
+                        {otpSuccess ? (
+                            <div className="p-4 mb-6 bg-green-50 border border-green-100 text-green-600 rounded-2xl text-xs font-mono text-center">
+                                Nuovo codice inviato alla tua email admin!
+                            </div>
+                        ) : (
+                            <button
+                                onClick={handleSendOTP}
+                                disabled={otpSending}
+                                className="w-full flex items-center justify-center gap-3 py-3 mb-6 bg-black/5 text-black hover:bg-black/10 rounded-2xl transition-all disabled:opacity-50 text-xs font-medium"
+                            >
+                                {otpSending ? <Loader2 className="animate-spin" size={16} /> : <Mail size={16} />}
+                                Invia codice via Email
+                            </button>
+                        )}
+
+                        <form onSubmit={executeRoleChange} className="space-y-6">
+                            <div className="flex justify-center gap-2">
+                                {otpCode.map((digit, i) => (
+                                    <input
+                                        key={i}
+                                        id={`modal-otp-${i}`}
+                                        type="text"
+                                        inputMode="numeric"
+                                        maxLength={1}
+                                        value={digit}
+                                        onChange={(e) => handleCodeChange(i, e.target.value)}
+                                        onKeyDown={(e) => handleKeyDown(i, e)}
+                                        disabled={otpLoading}
+                                        className={`w-9 h-12 text-center text-xl font-light bg-black/5 border border-transparent rounded-lg focus:ring-2 outline-none transition-all ${
+                                            otpError ? 'border-red-300 bg-red-50' : 
+                                            otpLoading ? 'opacity-50 cursor-wait' :
+                                            digit ? 'border-[var(--gold)]/30 bg-[var(--gold)]/5' : ''
+                                        }`}
+                                    />
+                                ))}
+                            </div>
+                            
+                            {otpLoading && (
+                                <div className="flex items-center justify-center gap-2 text-[10px] font-mono uppercase tracking-widest text-[var(--gold)]">
+                                    <Loader2 size={12} className="animate-spin" />
+                                    Verifica e Aggiornamento...
+                                </div>
+                            )}
+                        </form>
                     </div>
                 </div>
             )}

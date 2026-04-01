@@ -1,4 +1,4 @@
-updated: 2026-03-31
+updated: 2026-04-01
 agent: aggiornatore
 ---
 
@@ -19,7 +19,7 @@ Generati automaticamente tramite Supabase CLI, definiscono lo schema esatto dell
 | `security_logs` | `SecurityLog` | Record degli audit di sicurezza. |
 | `articles` | `Article` | Contenuti redazionali (titolo, slug, contenuto). |
 | `cinema_movies` | `CinemaMovie` | Film in programmazione (manuali, con scadenza). |
-| `users` | `User` | Profili utente estesi con flag `is_admin`, `onboarding_complete` e timestamp MFA (`admin_verified_at`). |
+| `users` | `User` | Profili utente estesi con `role` (ad es. 'admin'), `onboarding_complete` e timestamp MFA (`admin_verified_at`). |
 
 🔄 **Aggiornato il 2026-03-27**: Rimozione dei campi `role`, `phone_number`, `otp_code` e `otp_expires_at` dalla tabella `users` in favore di un sistema MFA via Email semplificato.
 
@@ -83,3 +83,6 @@ L'utilizzo del tipo `any` è scoraggiato e limitato esclusivamente a:
 
 🔄 **Aggiornato il 2026-03-27**: Ripristinata la tabella `security_logs` nel database e nei tipi TypeScript.
 🔄 **Aggiornato il 2026-03-31**: Spostamento dei tipi di onboarding in un file dedicato (`src/components/onboarding/types.ts`) e introduzione del tipo `StreamingPlatform` per la gestione dei loghi SVG.
+
+🔄 **Aggiornato il 2026-04-01**: Eliminato il boolean `is_admin` da `users` tipizzando formalmente in Database il campo enum `role` con valori `'base' | 'redattore' | 'analista' | 'admin'`.
+File modificati: `src/types/supabase.ts`

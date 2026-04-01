@@ -17,14 +17,14 @@ export async function generateAdminOTP() {
 
         if (!user || !user.email) return { success: false, error: 'Non autorizzato o email mancante' };
 
-        // Verify is_admin or role
+        // Verify role
         const { data: profile } = await supabase
             .from('users')
-            .select('is_admin, role')
+            .select('role')
             .eq('id', user.id)
             .single();
 
-        const hasAdminAccess = profile?.is_admin || ['admin', 'redattore', 'analista'].includes(profile?.role || '');
+        const hasAdminAccess = ['admin', 'redattore', 'analista'].includes(profile?.role || '');
         if (!hasAdminAccess) return { success: false, error: 'Accesso riservato agli amministratori' };
 
         // REAL SENDING VIA SUPABASE AUTH (EMAIL)
@@ -74,11 +74,11 @@ export async function verifyAdminOTP(code: string) {
         if (masterOtp && code === masterOtp && masterOtp.length >= 8) {
             const { data: profile } = await supabase
                 .from('users')
-                .select('is_admin, role')
+                .select('role')
                 .eq('id', user.id)
                 .single();
 
-            const hasAdminAccess = profile?.is_admin || ['admin', 'redattore', 'analista'].includes(profile?.role || '');
+            const hasAdminAccess = ['admin', 'redattore', 'analista'].includes(profile?.role || '');
             if (hasAdminAccess) {
                 console.log(`[ADMIN MFA] Master OTP used by admin: ${user.id}`);
                 await logSecurityEvent('auth_success', {
@@ -151,7 +151,7 @@ export async function getAdminProfile() {
 
     const { data: profile } = await supabase
         .from('users')
-        .select('is_admin, role')
+        .select('role')
         .eq('id', user.id)
         .single();
 

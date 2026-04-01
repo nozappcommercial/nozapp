@@ -13,11 +13,11 @@ async function checkAdmin() {
 
     const { data: profile } = await supabase
         .from('users')
-        .select('is_admin')
+        .select('role')
         .eq('id', user.id)
         .single();
 
-    return !!profile?.is_admin;
+    return profile?.role === 'admin' || profile?.role === 'redattore';
 }
 
 const CinemaMovieSchema = z.object({

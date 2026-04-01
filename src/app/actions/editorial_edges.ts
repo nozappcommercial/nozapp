@@ -10,7 +10,7 @@ export async function searchFilms(query: string) {
     
     // Auth Check
     const profile = await getAdminProfile();
-    if (!profile?.is_admin && profile?.role !== 'admin' && profile?.role !== 'redattore') {
+    if (profile?.role !== 'admin' && profile?.role !== 'redattore') {
         return { data: null, error: 'Non autorizzato' };
     }
 
@@ -28,7 +28,7 @@ export async function getEdgesForFilm(filmId: string) {
     
     // Auth Check
     const profile = await getAdminProfile();
-    if (!profile?.is_admin && profile?.role !== 'admin' && profile?.role !== 'redattore') {
+    if (profile?.role !== 'admin' && profile?.role !== 'redattore') {
         return { data: null, error: 'Non autorizzato' };
     }
 
@@ -72,7 +72,7 @@ export async function addEditorialEdge(params: {
     
     // Auth Check
     const profile = await getAdminProfile();
-    if (!profile?.is_admin && profile?.role !== 'admin' && profile?.role !== 'redattore') {
+    if (profile?.role !== 'admin' && profile?.role !== 'redattore') {
         return { success: false, error: 'Non autorizzato' };
     }
 
@@ -115,7 +115,7 @@ export async function deleteEditorialEdge(edgeId: string) {
     
     // Auth Check
     const profile = await getAdminProfile();
-    if (!profile?.is_admin && profile?.role !== 'admin' && profile?.role !== 'redattore') {
+    if (profile?.role !== 'admin' && profile?.role !== 'redattore') {
         return { success: false, error: 'Non autorizzato' };
     }
 

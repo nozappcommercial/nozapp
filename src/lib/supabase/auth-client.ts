@@ -12,7 +12,7 @@ export async function getAdminStatus(userId: string): Promise<boolean> {
   const supabase = createClient();
   const { data, error } = await supabase
     .from('users')
-    .select('is_admin')
+    .select('role')
     .eq('id', userId)
     .single();
 
@@ -21,5 +21,5 @@ export async function getAdminStatus(userId: string): Promise<boolean> {
     return false;
   }
 
-  return !!data.is_admin;
+  return data.role === 'admin' || data.role === 'redattore' || data.role === 'analista';
 }

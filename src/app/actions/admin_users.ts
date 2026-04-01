@@ -7,7 +7,7 @@ export interface DashboardUser {
     id: string;
     display_name: string | null;
     email: string | null;
-    is_admin: boolean;
+    role: 'base' | 'redattore' | 'analista' | 'admin';
     birth_date: string | null;
     country: string | null;
     gender: string | null;
@@ -25,11 +25,11 @@ export async function getDashboardUsers(): Promise<DashboardUser[]> {
     // Safety check: only admins can fetch this
     const { data: adminCheck } = await supabase
         .from('users')
-        .select('is_admin')
+        .select('role')
         .eq('id', adminUser?.id)
         .single();
 
-    if (!adminCheck?.is_admin) throw new Error("Unauthorized");
+    if (adminCheck?.role !== 'admin') throw new Error("Unauthorized");
 
     const adminSupabase = createAdminClient();
     
@@ -39,7 +39,7 @@ export async function getDashboardUsers(): Promise<DashboardUser[]> {
     
     const { data: publicUsers, error: publicError } = await adminSupabase
         .from('users')
-        .select('id, display_name, is_admin, birth_date, country, gender, onboarding_complete, created_at')
+        .select('id, display_name, role, birth_date, country, gender, onboarding_complete, created_at')
         .order('created_at', { ascending: false });
 
     if (publicError) throw publicError;
@@ -58,7 +58,7 @@ export async function getDashboardUsers(): Promise<DashboardUser[]> {
         id: u.id,
         display_name: u.display_name,
         email: authMap.get(u.id) || 'N/A',
-        is_admin: u.is_admin || false,
+        role: u.role || 'base',
         birth_date: u.birth_date,
         country: u.country,
         gender: u.gender,
@@ -67,29 +67,38 @@ export async function getDashboardUsers(): Promise<DashboardUser[]> {
     })) as DashboardUser[];
 }
 
+import { verifyAdminOTP } from './admin_auth';
+
 /**
- * Toggle admin status for a user
+ * Update user role (with OTP validation)
  */
-export async function toggleAdminStatus(userId: string, currentStatus: boolean): Promise<void> {
+export async function updateUserRole(userId: string, newRole: 'base' | 'redattore' | 'analista' | 'admin', otpCode: string): Promise<void> {
     const supabase = await createClient();
     const { data: { user: adminUser } } = await supabase.auth.getUser();
-    
-    // Safety check: only admins can toggle status
+
+    // Safety check: only admins can update roles
     const { data: adminCheck } = await supabase
         .from('users')
-        .select('is_admin')
+        .select('role')
         .eq('id', adminUser?.id)
         .single();
-    if (!adminCheck?.is_admin) throw new Error("Unauthorized");
+    if (adminCheck?.role !== 'admin') throw new Error("Unauthorized");
+
+    // Verify OTP first
+    const verification = await verifyAdminOTP(otpCode);
+    if (!verification.success) {
+        throw new Error(verification.error || "Codice amministratore non valido");
+    }
 
     const adminSupabase = createAdminClient();
     const { error } = await adminSupabase
         .from('users')
-        .update({ is_admin: !currentStatus })
+        .update({ role: newRole })
         .eq('id', userId);
 
     if (error) throw error;
 }
+
 
 /**
  * Delete a user from both auth and public schema
@@ -101,10 +110,10 @@ export async function deleteUser(userId: string): Promise<void> {
     // Safety check: only admins can delete
     const { data: adminCheck } = await supabase
         .from('users')
-        .select('is_admin')
+        .select('role')
         .eq('id', adminUser?.id)
         .single();
-    if (!adminCheck?.is_admin) throw new Error("Unauthorized");
+    if (adminCheck?.role !== 'admin') throw new Error("Unauthorized");
 
     const adminSupabase = createAdminClient();
     

@@ -73,7 +73,7 @@ export async function updateSession(request: NextRequest) {
     if (user) {
         const { data: profile, error: profileError } = await supabase
             .from('users')
-            .select('onboarding_complete, is_admin, role')
+            .select('onboarding_complete, role')
             .eq('id', user.id)
             .single();
 
@@ -82,11 +82,10 @@ export async function updateSession(request: NextRequest) {
         }
 
         const onboardingComplete = (profile as any)?.onboarding_complete ?? false;
-        const isAdmin = (profile as any)?.is_admin ?? false;
         const role = (profile as any)?.role ?? 'base';
-        const hasAdminAccess = isAdmin || role === 'admin' || role === 'redattore' || role === 'analista';
+        const hasAdminAccess = role === 'admin' || role === 'redattore' || role === 'analista';
         
-        console.log(`[Middleware] User: ${user.email} (${user.id}), role: ${role}, isAdmin: ${isAdmin}, path: ${path}`);
+        console.log(`[Middleware] User: ${user.email} (${user.id}), role: ${role}, path: ${path}`);
 
         // If it's an API route, don't redirect, just let the request through
         if (isApiRoute) {

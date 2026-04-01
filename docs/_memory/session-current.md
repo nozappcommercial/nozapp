@@ -76,3 +76,20 @@ status: active
 **Side effects**: CSS title offset ricalcolato live durante la transizione tween.
 
 ---
+
+## [10:26] [tipo: refactor | feature | security]
+
+**File toccati**:
+
+- `supabase/migrations/20260401000000_unify_roles.sql` — [NEW] Creata migrazione per rimuovere is_admin mantenendo intatta la RLS policy.
+- `src/types/supabase.ts` — Rimosso is_admin dalle interfacce TypeScript.
+- `src/lib/supabase/middleware.ts` — Utilizzato field role in sostituzione a is_admin.
+- `src/lib/supabase/auth-client.ts` — Rimosso is_admin e rimpiazzato logicamente da role.
+- `src/app/actions/*.ts` — Rimosso interamente is_admin dalle query in db e permessi, sostituito con role ('admin', 'redattore', 'analista').
+- `src/app/admin/utenti/page.tsx` — Riscritta UI inserendo il modulo drop down dei Ruoli e implementato Modal flow OTP per conferma asincrona dispostiva.
+
+**Problema di partenza**: Sostituire il flag is_admin introducendo un selettore completo a più tier e vincolare la promozione via OTP admin in backend.
+**Soluzione applicata**: Aggiornati i file action per validare OTP di sicurezza dell'utente loggato, unificata la logica intera del progetto eliminando is_admin, introdotte RLS refactoring.
+**Side effects**: Le modifiche su DB richiedono di eseguire la migrazione in backend (Supabase SQL).
+
+---

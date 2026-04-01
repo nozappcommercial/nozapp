@@ -1,6 +1,6 @@
 ---
 tags: [#security, #status/complete]
-updated: 2026-03-28
+updated: 2026-04-01
 agent: scrittore
 ---
 
@@ -23,7 +23,7 @@ Ogni evento critico (autenticazione, errori di sistema, superamento rate-limit) 
 - `created_at`: Timestamp dell'evento.
 
 ### Politiche di Accesso (RLS)
-- **SELECT**: Consentito solo agli utenti con `is_admin = true`.
+- **SELECT**: Consentito solo agli utenti autorizzati con `role = 'admin'`.
 - **INSERT**: Consentito al sistema (Service Role) per la scrittura dei log.
 
 > [!IMPORTANT]
@@ -33,7 +33,7 @@ Ogni evento critico (autenticazione, errori di sistema, superamento rate-limit) 
 
 L'accesso all'area `/admin` è protetto da un sistema a due fattori (MFA) tramite Email OTP:
 1. **Login Supabase**: L'utente si autentica con le credenziali standard.
-2. **Controllo Admin**: Il sistema verifica il flag `is_admin` nella tabella `public.users`.
+2. **Controllo Admin**: Il sistema verifica il campo `role` nella tabella `public.users` (deve valere `admin`, `redattore` o `analista`).
 3. **Email OTP**: Viene inviato un codice a 8 cifre via email.
 4. **Verifica e Sessione**: Dopo la verifica del codice, viene impostato un cookie `admin_session` (httpOnly, secure) con durata di 2 ore.
 5. **Feedback Visivi**: La pagina di verifica include feedback sullo stato dell'OTP:
@@ -61,3 +61,6 @@ await logSecurityEvent('auth_success', {
 
 🔄 **Aggiornato il 2026-03-30**: Rafforzato il flusso di conferma email con una pagina di successo dedicata (`/auth/confirmed`) che previene leak di token nell'URL e fornisce feedback immediato all'utente.
 File modificati: `src/app/auth/confirmed/page.tsx`, `src/components/auth/AuthHandler.tsx`
+
+🔄 **Aggiornato il 2026-04-01**: Eliminata la colonna `is_admin` in favore di un sistema RBAC completo basato sul campo `role`. Aggiornate le definizioni delle RLS su DB e le protezioni delle route.
+File modificati: `supabase/migrations/20260401000000_unify_roles.sql`, `src/types/supabase.ts`, `src/lib/supabase/middleware.ts`, `src/app/actions/*`

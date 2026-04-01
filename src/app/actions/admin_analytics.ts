@@ -35,11 +35,11 @@ export async function getDashboardAnalytics(): Promise<DashboardStats> {
     // 1. Safety Check: Only admins can view analytics
     const { data: adminCheck } = await supabase
         .from('users')
-        .select('is_admin')
+        .select('role')
         .eq('id', currentUser?.id)
         .single();
 
-    if (!adminCheck?.is_admin) throw new Error("Unauthorized access to analytics");
+    if (adminCheck?.role !== 'admin' && adminCheck?.role !== 'analista') throw new Error("Unauthorized access to analytics");
 
     // 2. Use Admin Client to bypass RLS for aggregate statistics
     const adminSupabase = createAdminClient();

@@ -14,11 +14,11 @@ async function checkAdmin() {
 
     const { data: profile } = await supabase
         .from('users')
-        .select('is_admin')
+        .select('role')
         .eq('id', user.id)
         .single();
 
-    return !!profile?.is_admin;
+    return profile?.role === 'admin' || profile?.role === 'redattore';
 }
 
 const ArticleSchema = z.object({
@@ -173,10 +173,10 @@ export async function getArticleBySlug(slug: string) {
     if (user) {
         const { data: profile } = await supabase
             .from('users')
-            .select('is_admin')
+            .select('role')
             .eq('id', user.id)
             .single();
-        isAdmin = !!profile?.is_admin;
+        isAdmin = profile?.role === 'admin' || profile?.role === 'redattore';
     }
 
     let query = supabase
