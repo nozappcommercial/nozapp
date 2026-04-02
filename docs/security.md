@@ -1,6 +1,6 @@
 ---
 tags: [#security, #status/complete]
-updated: 2026-04-01
+updated: 2026-04-02
 agent: scrittore
 ---
 
@@ -42,6 +42,21 @@ L'accesso all'area `/admin` è protetto da un sistema a due fattori (MFA) tramit
    - **Reinvio**: Notifica visiva al completamento dell'invio di un nuovo codice.
 6. **Accesso Rapido**: Per gli admin già autenticati, è presente un'icona Settings (rotellina) nell'header della Sfera che rimanda direttamente a `/admin/verify`.
 
+## Audit e Logging di Sicurezza
+Tutti gli eventi critici per la sicurezza della piattaforma vengono tracciati tramite un logger centralizzato (`src/lib/logger.ts`).
+
+- **Destinazione**: I log vengono stampati sulla console del server e salvati nella tabella `security_logs` (solo in produzione o se abilitato esplicitamente).
+- **Eventi Tracciati**:
+    - Tentativi di accesso (successo/fallimento).
+    - Blocchi per Rate Limiting.
+    - Rilevamento Bot e Crawler malevoli.
+    - Errori API critici e traffico sospetto.
+- **Accesso**: I log sono consultabili direttamente dal database Supabase dagli amministratori.
+
+## Row-Level Security (RLS) & Bypass Ricorsivo
+Per ovviare all'errore di *infinite recursion* tipico su Supabase quando una policy della tabella `users` cerca di leggere se stessa (es. verificando il ruolo per concedere una READ sulla stessa tabella o su altre risorse globali), è stata introdotta la funzione `get_auth_user_role()` in Postgres.
+Essa agisce con attributo `SECURITY DEFINER`, scavalcando i trigger ricorsivi, fornendo accesso pulito per l'esecuzione della policy base.
+
 ## Utility di Logging
 
 La funzione `logSecurityEvent` in `@/lib/logger` gestisce la scrittura dei log sia su console che su database (se abilitata via `ENABLE_DB_LOGGING=true`).
@@ -64,3 +79,6 @@ File modificati: `src/app/auth/confirmed/page.tsx`, `src/components/auth/AuthHan
 
 🔄 **Aggiornato il 2026-04-01**: Eliminata la colonna `is_admin` in favore di un sistema RBAC completo basato sul campo `role`. Aggiornate le definizioni delle RLS su DB e le protezioni delle route.
 File modificati: `supabase/migrations/20260401000000_unify_roles.sql`, `src/types/supabase.ts`, `src/lib/supabase/middleware.ts`, `src/app/actions/*`
+
+🔄 **Aggiornato il 2026-04-02**: Implementata mitigazione per i crash RLS (`infinite recursion`) tramite la macro funzione globale `get_auth_user_role` DB-side. Il `middleware.ts` è stato fortificato prevedendo l'errore 500 in caso di DB non allineato limitando query bloccanti su iterazioni continue all'onboarding.
+File modificati: `src/lib/supabase/middleware.ts`, `supabase/migrations/20260401000100_fix_rls_recursion.sql`

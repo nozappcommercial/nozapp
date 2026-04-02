@@ -1,4 +1,4 @@
-updated: 2026-04-01
+updated: 2026-04-02
 agent: aggiornatore
 ---
 
@@ -11,7 +11,7 @@ NoZapp utilizza l'**App Router** di Next.js 14 per gestire la navigazione. La ma
 
 | Percorso URL | File Sorgente | Rendering | Layout | Scopo |
 | :--- | :--- | :--- | :--- | :--- |
-| `/` | `app/page.tsx` | SSR | Root | Landing page o redirect automatico alla sfera. |
+| `/` | `app/page.tsx` | SSR | Root | Reindirizzamento automatico a `/login` per utenti non autenticati (chiusura della root). |
 | `/login` | `app/(auth)/login/page.tsx` | CSR | Root | Autenticazione utente (Email/Password + Magic Link). |
 | `/auth/confirmed` | `app/auth/confirmed/page.tsx` | SSR | Root | Pagina di successo dopo la conferma dell'email. |
 | `/onboarding`| `app/onboarding/page.tsx` | Dynamic | Root | Wizard iniziale di selezione dei pilastri del gusto (3D/2D Hybrid). |
@@ -80,3 +80,6 @@ File modificati: `src/app/auth/confirmed/page.tsx`, `src/app/auth/callback/route
 
 🔄 **Aggiornato il 2026-04-01**: Aggiunta logica RBAC nel Middleware (`role` al posto di `is_admin`) per restringere o consentire l'accesso a sezioni specifiche del pannello admin in base a ruoli come Redattore e Analista. Aggiunta rotta `/admin/collegamenti`.
 File modificati: `src/lib/supabase/middleware.ts`, `src/app/admin/*`
+
+🔄 **Aggiornato il 2026-04-02**: Rafforzamento della sicurezza sulle root page. Ora `app/page.tsx` prevede il binding di redirect mandatory al login se l'utente non è autenticato. Ripristinato l'uso del `middleware.ts` standard in Next.js 16.
+File modificati: `src/middleware.ts`, `src/app/page.tsx`

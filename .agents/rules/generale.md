@@ -30,3 +30,4 @@ Non modificarlo mai parzialmente: o lo leggi, o lo riscrivi completamente.
 - Scrivi sempre in italiano
 - I blocchi di codice devono specificare il linguaggio (`tsx, `ts, ```bash)
 - I test li effettuo sempre io Marco e non tu (elencami solo cosa testare a fine di ogni fix)
+

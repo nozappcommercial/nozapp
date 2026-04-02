@@ -1,6 +1,7 @@
 ---
 tags: [#architecture, #status/complete]
 created: 2026-03-26
+updated: 2026-04-02
 agent: scrittore
 ---
 
@@ -42,7 +43,7 @@ graph TB
     subgraph Server_NextJS
         SA[Server Actions]
         RH[Route Handlers / API]
-        Proxy[Auth Proxy / Session Refresh]
+        Middleware[Auth Middleware / Session Refresh]
     end
 
     subgraph Data
@@ -56,11 +57,11 @@ graph TB
     SA --> Supabase
     RH --> Supabase
     SA --> CSV
-    Proxy --> Supabase
+    Middleware --> Supabase
 ```
 
 ## Flusso Generale dei Dati
-1. L'**Auth Proxy** (ex middleware) intercetta la richiesta e valida la sessione.
+1. Il **Middleware** di Next.js intercetta la richiesta e valida la sessione.
 2. La **Server Page** recupera il profilo utente e i dati del grafo da Supabase/CSV.
 3. Lo **Sphere Engine** riceve i dati iniziali come props e costruisce la scena 3D.
 4. Ogni interazione (like/seen) attiva una **Server Action** che aggiorna Supabase in tempo reale.
@@ -85,3 +86,6 @@ File modificati: `src/app/layout.tsx`, `src/app/globals.css`
 
 🔄 **Aggiornato il 2026-04-01**: Eliminato storicamente lo switch logico `is_admin` a implementazione di un completo sistema di RBAC con ruoli utente nativi mappati anche su regole RLS Postgres.
 File modificati: `supabase/migrations/20260401000000_unify_roles.sql`, `src/types/supabase.ts`
+
+🔄 **Aggiornato il 2026-04-02**: Migrazione definitiva al nome file standard `middleware.ts` risolvendo bug legati all'impostazione `proxy.ts`. La Root `/` reindirizza ora obbligatoriamente al `/login` qualora non si sia autenticati.
+File modificati: `src/middleware.ts`, `src/app/page.tsx`

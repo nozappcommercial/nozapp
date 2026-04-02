@@ -13,12 +13,12 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "REVIEW.md",
+                "file": "components.md",
                 "mode": "source",
                 "source": false
               },
               "icon": "lucide-file",
-              "title": "REVIEW"
+              "title": "components"
             }
           }
         ]
@@ -156,13 +156,13 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "REVIEW.md",
+                "file": "components.md",
                 "followCursor": false,
                 "showSearch": false,
                 "searchQuery": ""
               },
               "icon": "lucide-list",
-              "title": "Struttura di REVIEW"
+              "title": "Struttura di components"
             }
           }
         ],
@@ -183,8 +183,14 @@
       "bases:Crea nuova Base": false
     }
   },
-  "active": "9291addc238c3f17",
+  "active": "37c58857e052224a",
   "lastOpenFiles": [
+    "architecture.md",
+    "_memory/sessions-index.md",
+    "progetto.md",
+    "onboarding-guide.md",
+    "_memory/session-2026-04-02.md",
+    "todo.md",
     "REVIEW.md",
     "implementation_plan.md",
     "scripts.md",
@@ -194,27 +200,21 @@
     "_memory/chat-history",
     "project-structure.md",
     "dependencies.md",
-    "onboarding-guide.md",
-    "progetto.md",
     "security.md",
     "hooks-and-utilities.md",
     "data-flow.md",
     "configuration.md",
     "components.md",
-    "architecture.md",
     "pages-and-routing.md",
     "dataset.md",
     "editorial-system.md",
     "_memory/session-2026-03-28.md",
     "known-issues.md",
     "three-js.md",
-    "todo.md",
     "Senza nome.canvas",
     "types.md",
     "_memory/session-2026-03-27.md",
     "Senza nome.base",
-    "_memory/session-current.md",
-    "_memory",
-    "api.md"
+    "_memory"
   ]
 }

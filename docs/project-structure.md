@@ -1,6 +1,6 @@
 ---
 tags: [#structure, #status/complete]
-updated: 2026-03-31
+updated: 2026-04-02
 agent: aggiornatore
 ---
 
@@ -73,3 +73,5 @@ Non è solo una cartella di asset: contiene l'intelligenza di pre-processing del
 
 ---
 🔄 **Aggiornato il 2026-03-26**: Inserite le nuove cartelle per l'area amministrativa e la gestione redazionale.
+
+🔄 **Aggiornato il 2026-04-02**: Sostituito `proxy.ts` in favore del nome standard `middleware.ts` permettendone il corretto funzionamento out-of-the-box con Next.js 16.

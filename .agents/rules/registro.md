@@ -46,3 +46,9 @@ status: active
 - Non saltare la voce anche se la modifica è piccola
 - Scrivi sempre in append e mai all'inizio del testo
 - Mantieni rigida la formattazione, tra uno step e l'altro aggiungi dei delimitatori
+
+## Sessioni e collegamenti Obsidian
+Ogni volta che scrivi una voce in session-current.md,
+aggiungi in fondo alla voce stessa il tag della macroarea
+coinvolta nel formato: `→ [[nome-macroarea]]`
+Questo permette a /connettore di lavorare più velocemente.
