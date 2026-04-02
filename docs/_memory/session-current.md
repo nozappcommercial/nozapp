@@ -157,3 +157,16 @@ status: done
 **Side effects**: Risolto il loop di navigazione immediato, ma le funzionalità admin rimarranno limitate finché non viene eseguito l'SQL.
 
 ---
+
+## [16:32] [tipo: bug-fix | security]
+
+**File toccati**:
+
+- `docs/implementation_plan.md` — Aggiornato con lo script SQL per risolvere la ricorsione infinita RLS.
+- `supabase/migrations/20260401000100_fix_rls_recursion.sql` — [NEW] Creato file di migrazione per tracciare il fix della ricorsione.
+
+**Problema di partenza**: Errore 500 "infinite recursion detected in policy for relation 'users'" che bloccava ogni accesso al database.
+**Soluzione applicata**: Identificata la causa nella policy RLS della tabella `users` che interrogava se stessa ricorsivamente. Introdotta una funzione `get_auth_user_role` con attributo `SECURITY DEFINER` per scavalcare i controlli RLS solo per la lettura del ruolo dell'utente corrente, interrompendo il loop.
+**Side effects**: Sblocca l'accesso a tutte le tabelle dipendenti dal ruolo utente (Articoli, Cinema, Log, ecc.).
+
+---

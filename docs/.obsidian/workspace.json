@@ -13,12 +13,12 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "implementation_plan.md",
+                "file": "REVIEW.md",
                 "mode": "source",
                 "source": false
               },
               "icon": "lucide-file",
-              "title": "implementation_plan"
+              "title": "REVIEW"
             }
           }
         ]
@@ -156,13 +156,13 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "implementation_plan.md",
+                "file": "REVIEW.md",
                 "followCursor": false,
                 "showSearch": false,
                 "searchQuery": ""
               },
               "icon": "lucide-list",
-              "title": "Struttura di implementation_plan"
+              "title": "Struttura di REVIEW"
             }
           }
         ],
@@ -183,8 +183,9 @@
       "bases:Crea nuova Base": false
     }
   },
-  "active": "37c58857e052224a",
+  "active": "9291addc238c3f17",
   "lastOpenFiles": [
+    "REVIEW.md",
     "implementation_plan.md",
     "scripts.md",
     "_memory/chat-history/2026-03-30/1816-missing-history.md",
@@ -214,7 +215,6 @@
     "Senza nome.base",
     "_memory/session-current.md",
     "_memory",
-    "api.md",
-    "auth.md"
+    "api.md"
   ]
 }
