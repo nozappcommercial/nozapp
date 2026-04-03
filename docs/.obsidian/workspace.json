@@ -1,24 +1,20 @@
 {
   "main": {
-    "id": "88db1817f1600ddd",
+    "id": "08125652da602ad4",
     "type": "split",
     "children": [
       {
-        "id": "253a9c12d3f4d0ff",
+        "id": "1c2b65ed2b40a28a",
         "type": "tabs",
         "children": [
           {
-            "id": "37c58857e052224a",
+            "id": "2f303580bf7120ea",
             "type": "leaf",
             "state": {
-              "type": "markdown",
-              "state": {
-                "file": "components.md",
-                "mode": "source",
-                "source": false
-              },
-              "icon": "lucide-file",
-              "title": "components"
+              "type": "graph",
+              "state": {},
+              "icon": "lucide-git-fork",
+              "title": "Vista grafo"
             }
           }
         ]
@@ -27,15 +23,15 @@
     "direction": "vertical"
   },
   "left": {
-    "id": "a49c60784f03570f",
+    "id": "d403e142075a1168",
     "type": "split",
     "children": [
       {
-        "id": "49677c96e0097af5",
+        "id": "c354f90ac3652516",
         "type": "tabs",
         "children": [
           {
-            "id": "9291addc238c3f17",
+            "id": "a4bb397f8fe29ec9",
             "type": "leaf",
             "state": {
               "type": "file-explorer",
@@ -48,7 +44,7 @@
             }
           },
           {
-            "id": "b21ad2c59bc8cb4b",
+            "id": "5233e44979a311be",
             "type": "leaf",
             "state": {
               "type": "search",
@@ -65,7 +61,7 @@
             }
           },
           {
-            "id": "915efd7eb952a22b",
+            "id": "c40ea6fd3dfa4dd9",
             "type": "leaf",
             "state": {
               "type": "bookmarks",
@@ -78,51 +74,49 @@
       }
     ],
     "direction": "horizontal",
-    "width": 200
+    "width": 300
   },
   "right": {
-    "id": "d9cceedaf437acd3",
+    "id": "ee359038acb181b1",
     "type": "split",
     "children": [
       {
-        "id": "4373375221beaa0a",
+        "id": "aa66e625ac234164",
         "type": "tabs",
         "children": [
           {
-            "id": "cf92f58de08046bc",
+            "id": "c428e139417a0267",
             "type": "leaf",
             "state": {
               "type": "backlink",
               "state": {
-                "file": "dataset.md",
-                "collapseAll": false,
-                "extraContext": false,
+                "collapseAll": true,
+                "extraContext": true,
                 "sortOrder": "alphabetical",
                 "showSearch": false,
                 "searchQuery": "",
                 "backlinkCollapsed": false,
-                "unlinkedCollapsed": true
+                "unlinkedCollapsed": false
               },
               "icon": "links-coming-in",
-              "title": "Riferimenti a dataset"
+              "title": "Riferimenti"
             }
           },
           {
-            "id": "70805178ab083133",
+            "id": "0004908a23366a80",
             "type": "leaf",
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "editorial-system.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               },
               "icon": "links-going-out",
-              "title": "Collegamenti in uscita da editorial-system"
+              "title": "Collegamenti in uscita"
             }
           },
           {
-            "id": "4df61595936ce4e2",
+            "id": "d49b8c3932812706",
             "type": "leaf",
             "state": {
               "type": "tag",
@@ -137,7 +131,7 @@
             }
           },
           {
-            "id": "28825ac53db4de67",
+            "id": "67b10d974d89d9c7",
             "type": "leaf",
             "state": {
               "type": "all-properties",
@@ -151,26 +145,24 @@
             }
           },
           {
-            "id": "66e68758a4aecadb",
+            "id": "336b08b1d1d0ada2",
             "type": "leaf",
             "state": {
               "type": "outline",
               "state": {
-                "file": "components.md",
                 "followCursor": false,
                 "showSearch": false,
                 "searchQuery": ""
               },
               "icon": "lucide-list",
-              "title": "Struttura di components"
+              "title": "Struttura"
             }
           }
-        ],
-        "currentTab": 4
+        ]
       }
     ],
     "direction": "horizontal",
-    "width": 294.5
+    "width": 300
   },
   "left-ribbon": {
     "hiddenItems": {
@@ -183,38 +175,43 @@
       "bases:Crea nuova Base": false
     }
   },
-  "active": "37c58857e052224a",
+  "active": "2f303580bf7120ea",
   "lastOpenFiles": [
-    "architecture.md",
-    "_memory/sessions-index.md",
-    "progetto.md",
-    "onboarding-guide.md",
-    "_memory/session-2026-04-02.md",
-    "todo.md",
-    "REVIEW.md",
-    "implementation_plan.md",
-    "scripts.md",
-    "_memory/chat-history/2026-03-30/1816-missing-history.md",
-    "_memory/chat-history/2026-03-30/1509-onboarding-ui.md",
-    "_memory/chat-history/2026-03-30",
-    "_memory/chat-history",
-    "project-structure.md",
-    "dependencies.md",
-    "security.md",
-    "hooks-and-utilities.md",
-    "data-flow.md",
-    "configuration.md",
-    "components.md",
-    "pages-and-routing.md",
-    "dataset.md",
-    "editorial-system.md",
-    "_memory/session-2026-03-28.md",
-    "known-issues.md",
-    "three-js.md",
-    "Senza nome.canvas",
-    "types.md",
-    "_memory/session-2026-03-27.md",
-    "Senza nome.base",
-    "_memory"
+    "areas/sviluppo-strumenti/sviluppo-strumenti.md",
+    "areas/interfaccia-utente/interfaccia-utente.md",
+    "areas/infrastruttura/infrastruttura.md",
+    "areas/feature-sphere/feature-sphere.md",
+    "areas/feature-redazione/feature-redazione.md",
+    "areas/feature-onboarding/feature-onboarding.md",
+    "areas/autenticazione/autenticazione.md",
+    "areas/architettura-core/architettura-core.md",
+    "areas/amministrazione/amministrazione.md",
+    "sessions/session01-03-04-2026.md",
+    "sessions",
+    "areas/sviluppo-strumenti/pipeline-deploy.md",
+    "areas/sviluppo-strumenti/scripts-configurazione.md",
+    "areas/amministrazione/gestione-permessi.md",
+    "areas/amministrazione/pannello-controllo-admin.md",
+    "areas/infrastruttura/gestione-database-cache.md",
+    "areas/infrastruttura/supabase-ssr-integration.md",
+    "areas/feature-onboarding/configurazione-profilo-iniziale.md",
+    "areas/feature-onboarding/flusso-wizard-onboarding.md",
+    "areas/feature-redazione/visualizzazione-articoli.md",
+    "areas/feature-redazione/grafo-editoriale.md",
+    "areas/feature-redazione/gestione-contenuti.md",
+    "areas/feature-sphere/interazioni-utente-3d.md",
+    "areas/feature-sphere/algoritmo-posizionamento.md",
+    "areas/feature-sphere/motore-grafico-threejs.md",
+    "areas/interfaccia-utente/tematizzazione-branding.md",
+    "areas/interfaccia-utente/standard-animazioni.md",
+    "areas/sviluppo-strumenti",
+    "areas/interfaccia-utente",
+    "areas/infrastruttura",
+    "areas/feature-sphere",
+    "areas/feature-redazione",
+    "areas/feature-onboarding",
+    "areas/autenticazione",
+    "areas/architettura-core",
+    "areas/amministrazione"
   ]
 }
