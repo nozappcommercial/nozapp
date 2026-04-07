@@ -6,17 +6,81 @@
   "hideUnresolved": false,
   "showOrphans": true,
   "collapse-color-groups": true,
-  "colorGroups": [],
+  "colorGroups": [
+    {
+      "query": "[\"macroarea\":amministrazione]",
+      "color": {
+        "a": 1,
+        "rgb": 14701138
+      }
+    },
+    {
+      "query": "[\"macroarea\":architettura-core]",
+      "color": {
+        "a": 1,
+        "rgb": 14725458
+      }
+    },
+    {
+      "query": "[\"macroarea\":autenticazione]",
+      "color": {
+        "a": 1,
+        "rgb": 11657298
+      }
+    },
+    {
+      "query": "[\"macroarea\":feature-onboarding]",
+      "color": {
+        "a": 1,
+        "rgb": 5431378
+      }
+    },
+    {
+      "query": "[\"macroarea\":feature-redazione]",
+      "color": {
+        "a": 1,
+        "rgb": 5431473
+      }
+    },
+    {
+      "query": "[\"macroarea\":feature-sphere]",
+      "color": {
+        "a": 1,
+        "rgb": 5419488
+      }
+    },
+    {
+      "query": "[\"macroarea\":infrastruttura]",
+      "color": {
+        "a": 1,
+        "rgb": 5395168
+      }
+    },
+    {
+      "query": "[\"macroarea\":interfaccia-utente]",
+      "color": {
+        "a": 1,
+        "rgb": 11621088
+      }
+    },
+    {
+      "query": "[\"macroarea\":sviluppo-strumenti]",
+      "color": {
+        "a": 1,
+        "rgb": 14701233
+      }
+    }
+  ],
   "collapse-display": false,
   "showArrow": true,
-  "textFadeMultiplier": 0,
-  "nodeSizeMultiplier": 1.49939236111111,
-  "lineSizeMultiplier": 2.49640625,
-  "collapse-forces": true,
-  "centerStrength": 0.518713248970312,
-  "repelStrength": 10,
+  "textFadeMultiplier": -3,
+  "nodeSizeMultiplier": 1.50556291390728,
+  "lineSizeMultiplier": 2.48839072847682,
+  "collapse-forces": false,
+  "centerStrength": 0,
+  "repelStrength": 11.1750236518448,
   "linkStrength": 1,
-  "linkDistance": 250,
-  "scale": 1.2600608486554545,
-  "close": true
+  "linkDistance": 30,
+  "scale": 1.1104714167549476,
+  "close": false
 }

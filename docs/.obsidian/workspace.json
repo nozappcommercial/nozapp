@@ -11,10 +11,10 @@
             "id": "2f303580bf7120ea",
             "type": "leaf",
             "state": {
-              "type": "graph",
+              "type": "empty",
               "state": {},
-              "icon": "lucide-git-fork",
-              "title": "Vista grafo"
+              "icon": "lucide-file",
+              "title": "Nuova scheda"
             }
           }
         ]
@@ -96,7 +96,7 @@
                 "showSearch": false,
                 "searchQuery": "",
                 "backlinkCollapsed": false,
-                "unlinkedCollapsed": false
+                "unlinkedCollapsed": true
               },
               "icon": "links-coming-in",
               "title": "Riferimenti"
@@ -150,12 +150,13 @@
             "state": {
               "type": "outline",
               "state": {
+                "file": "Senza nome 2.canvas",
                 "followCursor": false,
                 "showSearch": false,
                 "searchQuery": ""
               },
               "icon": "lucide-list",
-              "title": "Struttura"
+              "title": "Struttura di Senza nome 2"
             }
           }
         ]
@@ -175,18 +176,23 @@
       "bases:Crea nuova Base": false
     }
   },
-  "active": "2f303580bf7120ea",
+  "active": "a4bb397f8fe29ec9",
   "lastOpenFiles": [
+    "Senza nome 1.canvas",
+    "Senza nome.canvas",
+    "Senza nome 2.canvas",
+    "areas/autenticazione/autenticazione.md",
+    "areas/onboarding/onboarding.md",
+    "areas/onboarding",
+    "areas/architettura-core/architettura-core.md",
+    "sessions/session01-03-04-2026.md",
     "areas/sviluppo-strumenti/sviluppo-strumenti.md",
     "areas/interfaccia-utente/interfaccia-utente.md",
     "areas/infrastruttura/infrastruttura.md",
     "areas/feature-sphere/feature-sphere.md",
     "areas/feature-redazione/feature-redazione.md",
     "areas/feature-onboarding/feature-onboarding.md",
-    "areas/autenticazione/autenticazione.md",
-    "areas/architettura-core/architettura-core.md",
     "areas/amministrazione/amministrazione.md",
-    "sessions/session01-03-04-2026.md",
     "sessions",
     "areas/sviluppo-strumenti/pipeline-deploy.md",
     "areas/sviluppo-strumenti/scripts-configurazione.md",
@@ -202,8 +208,6 @@
     "areas/feature-sphere/interazioni-utente-3d.md",
     "areas/feature-sphere/algoritmo-posizionamento.md",
     "areas/feature-sphere/motore-grafico-threejs.md",
-    "areas/interfaccia-utente/tematizzazione-branding.md",
-    "areas/interfaccia-utente/standard-animazioni.md",
     "areas/sviluppo-strumenti",
     "areas/interfaccia-utente",
     "areas/infrastruttura",
@@ -211,7 +215,6 @@
     "areas/feature-redazione",
     "areas/feature-onboarding",
     "areas/autenticazione",
-    "areas/architettura-core",
-    "areas/amministrazione"
+    "areas/architettura-core"
   ]
 }
